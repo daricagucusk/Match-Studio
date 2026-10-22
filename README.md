@@ -1,4 +1,4 @@
-# Match Studio V2.6.8-F.12
+# Match Studio V2.6.8-F.13
 
 Türkçe, yerel veri kullanan futbol kulübü PWA'sı. V2.6.8-F.1 R1 telefon paketinden geri kazanılmış geliştirme projesi.
 
@@ -45,7 +45,7 @@ Veriler aynı tarayıcı profili ve origin'e bağlıdır. İlk çevrimdışı ku
 ## Paket doğrulama ve CI
 
 ```sh
-python3 tools/verify-release.py dist/MatchStudio_V268F11_PWA.zip
+python3 tools/verify-release.py dist/MatchStudio_V268F13_PWA.zip
 ```
 
 Doğrulayıcı ZIP'i çıkarmadan dosya yollarını, tekrarları, dosya özetlerini, service worker manifestini ve sürüm kimliğini denetler. Bu bir imza veya kaynak kimlik doğrulaması değildir.
@@ -57,3 +57,7 @@ GitHub Actions yapılandırması push/PR üzerinde aynı `npm run release` komut
 `npm run build:vercel` yalnızca doğrulanmış uygulama dosyalarını `public/` içine çıkarır. Vercel ayarları `vercel.json` içindedir; kaynak deposunun kökü doğrudan yayınlanmaz. Tarayıcı testleri de bu yayın klasörüne karşı çalışır. Mevcut Vercel projesi GitHub deposuna bağlandıktan sonra main değişiklikleri otomatik yayınlanır; Actions kontrolleri main'e birleştirmeden önce geçmelidir.
 
 [İlk bağlantı, testler ve geri dönüş adımları](docs/GITHUB_VERCEL.md). Depo ve Vercel bağlantısı henüz tamamlanmadı; canlı adres halen F.3 olarak kayıtlıdır.
+
+## F.13 GitHub eşitleme adayı (23 Ekim 2026)
+
+F.12 (gerçek oyuncu katılımı) ve F.13 (asist düzeltme bütünlüğü) değişiklikleri bu dalda birlikte yer alır. GitHub Actions doğrulaması ve gerçek Z Fold 7 kabulü tamamlanmadan üretim dağıtımı yapılmamalıdır. `main` ve Vercel canlı dağıtımı bu dalın hazırlanmasıyla değişmez.

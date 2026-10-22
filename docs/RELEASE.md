@@ -1,3 +1,15 @@
+# V2.6.8-F.13 — GitHub yükseltme adayı (23 Ekim 2026)
+
+Bu aday F.12 ve F.13 düzeltmelerini birlikte içerir. F.12 oyuncunun gerçekten oyuna katılmasını, F.13 ise düzeltme geçmişinde gizli asistin geçersizleşme/golcü değişimi sonrası uygunsuz etkinleşmemesini ele alır.
+
+- Paket kimliği `2.6.8-f.13` olarak yenilenmiştir; IndexedDB veri şeması ve kulüp kayıtları değiştirilmemiştir.
+- Eski oyuncu/maç kayıtları ve şifreli yedek biçimi korunmuştur.
+- Üretim yayını **yapılmadı**. `main` ve Vercel'e yükseltme ayrı kalite kapısına bağlıdır.
+- Gerekli kapılar: GitHub Actions `verify` başarılı, gerçek Galaxy Z Fold 7 kabul testi, açık yayın kararı.
+- Entegrasyon dalı: `release/v268-f13-github-sync-20261023`.
+
+---
+
 # V2.6.8-F.12 — Oyuncu katılım raporu doğruluğu
 
 Bu sürüm yalnızca yeni bir **kaynak/test geliştirme dalında** hazırlanmıştır; `main` veya mevcut canlı Vercel dağıtımı değiştirilmemiştir.
