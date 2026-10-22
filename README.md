@@ -57,3 +57,10 @@ GitHub Actions yapılandırması push/PR üzerinde aynı `npm run release` komut
 `npm run build:vercel` yalnızca doğrulanmış uygulama dosyalarını `public/` içine çıkarır. Vercel ayarları `vercel.json` içindedir; kaynak deposunun kökü doğrudan yayınlanmaz. Tarayıcı testleri de bu yayın klasörüne karşı çalışır. Mevcut Vercel projesi GitHub deposuna bağlandıktan sonra main değişiklikleri otomatik yayınlanır; Actions kontrolleri main'e birleştirmeden önce geçmelidir.
 
 [İlk bağlantı, testler ve geri dönüş adımları](docs/GITHUB_VERCEL.md). Depo ve Vercel bağlantısı henüz tamamlanmadı; canlı adres halen F.3 olarak kayıtlıdır.
+
+## GitHub üzerinden geliştirme protokolü
+
+Bu depo Match Studio'nun ana kaynak referansıdır. Yeni geliştirmeler özellik dalı + Pull Request üzerinden yapılır; `main` dalında GitHub Actions `verify` kontrolü ve kullanıcı onayı olmadan birleşim yapılmaz. Canlı Vercel dağıtımı ve gerçek Samsung Z Fold 7 kabulü ayrı doğrulanır.
+
+- [Kod geliştirme ilkeleri](AGENTS.md)
+- [GitHub entegrasyonu, kaynak durumu ve açık kalite kapıları](docs/GITHUB_IS_AKISI_VE_PROJE_DURUMU.md)
