@@ -6,7 +6,7 @@ Mevcut Vercel projesi: match-studio-telefon, daricagucusk-9093 kapsamı.
 
 ## İlk bağlantı
 
-1. `daricagucusk/Match-Studio` deposu oluşturuldu. İlk kontrol sırasında Public olduğu görüldü. Kaynak yüklemesinden önce Settings → General → Danger Zone → Change repository visibility üzerinden Private seçilmelidir.
+1. `daricagucusk/Match-Studio` deposu oluşturuldu. Kullanıcı Private ayarını tamamladı; özel görünürlük GitHub üzerinden doğrulandı. Kaynaklar bu depoya yüklenebilir.
 2. Telefonda mevcut uygulamadan şifreli yedek alın; indirdiğiniz dosyayı kontrol edin. Site verilerini temizlemeyin.
 3. Vercel'de **mevcut** match-studio-telefon projesini açın. Settings → Git → Connect Git Repository bölümünden GitHub ve Match-Studio deposunu seçin. Yeni Vercel projesi oluşturmayın. Gerekirse GitHub'daki Vercel uygulamasına bu özel depo için erişim verin.
 4. Production Branch: `main`. Root Directory: depo kökü (boş). Framework: Other. Node.js: 24.x. Dosyadaki ayarlarla çelişen eski panel geçersiz kılmalarını kaldırın: Install Command `npm ci --no-audit --no-fund`, Build Command `npm run build:vercel`, Output Directory `public`.
@@ -37,4 +37,4 @@ vercel.json yalnızca public/ klasörünü sunar. HTML ve worker adresleri korun
 
 ## Mevcut durum
 
-Yerel yayın hazırlığı tamamlanmıştır. GitHub deposu oluşturuldu; Private ayarı doğrulanması, kaynakların yüklenmesi ve mevcut Vercel projesinin bu depoya bağlanması beklenmektedir. Actions'ın GitHub üzerinde çalıştığı veya F.11'in canlıya çıktığı henüz doğrulanmamıştır.
+Yerel yayın hazırlığı tamamlanmıştır. GitHub deposu oluşturuldu; Private ayarı doğrulandı; kaynakların yüklenmesi ve mevcut Vercel projesinin bu depoya bağlanması beklenmektedir. Actions'ın GitHub üzerinde çalıştığı veya F.11'in canlıya çıktığı henüz doğrulanmamıştır.

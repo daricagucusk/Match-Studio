@@ -3,8 +3,8 @@
   "repository": "daricagucusk/Match-Studio",
   "branch": "main",
   "requestedVisibility": "private",
-  "lastObservedVisibility": "public",
-  "sourceUpload": "waiting-for-private-visibility",
+  "lastObservedVisibility": "private",
+  "sourceUpload": "ready-for-first-push",
   "localPreparation": "complete",
   "githubActions": "not-run-remotely",
   "vercelGitConnection": "pending-panel-connection",
@@ -13,7 +13,6 @@
   "url": "https://match-studio-telefon.vercel.app",
   "liveVersion": "2.6.8-f.3",
   "blockers": [
-    "GitHub integration cannot create repositories or change visibility (403). User created the repository; private visibility must be confirmed before source upload.",
     "Vercel project API 403; authorize_team_access helper unavailable. Existing project Git connection requires the owner dashboard."
   ]
 }
