@@ -53,7 +53,16 @@ function validateCorrection(input,session,events){
  // Exclude the target when validating an assist correction; prevent self-duplicate.
  const effective=effectiveSportingEvents(events).filter(e=>e.id!==targetId);
  const normalized=normalizeSportsPayload(newType,input.replacement?.payload||{},session,effective);
- if(item.type==='GOAL'&&newType==='GOAL'){const attached=effective.filter(e=>e.type==='ASSIST'&&e.payload?.goalEventId===targetId);if(attached.some(e=>e.payload?.playerId===normalized.playerId||Boolean(normalized.assistPlayerId)))throw Error('Bu gole bağlı ayrı asist kaydı var. Önce asisti düzeltin.');}
+ if(item.type==='GOAL'&&newType==='GOAL'){
+  // A goal corrected to an own goal hides linked assists in the current projection.
+  // Reconstitute the candidate goal without its previous corrections before checking
+  // linked assists, or an old assist may silently revive as a self-assist.
+  const candidateHistory=events.filter(e=>!(e.type==='EVENT_CORRECTION'&&e.payload?.targetEventId===targetId))
+   .map(e=>e.id===targetId?{...e,type:'GOAL',payload:normalized}:e);
+  const linked=effectiveSportingEvents(candidateHistory).filter(e=>e.type==='ASSIST'&&e.payload?.goalEventId===targetId);
+  if(linked.some(e=>e.payload?.playerId===normalized.playerId||Boolean(normalized.assistPlayerId)))
+   throw Error('Bu gole bağlı ayrı asist kaydı var. Önce asisti düzeltin.');
+ }
  return {targetEventId:targetId,reason,void:false,replacement:{type:newType,payload:normalized}};
 }
 function projectMatchReport(session,events=[],players=[],roster=null,nowMs=Date.now()){
