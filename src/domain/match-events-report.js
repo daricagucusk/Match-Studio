@@ -62,7 +62,7 @@ function projectMatchReport(session,events=[],players=[],roster=null,nowMs=Date.
  const playerMap=new Map(players.map(p=>[p.id,p.fullName]));for(const e of roster?.entries||[])if(!playerMap.has(e.playerId))playerMap.set(e.playerId,e.nameSnapshot);
  const minute=calculatePlayerMinutes(session,events,nowMs);
  const real=effectiveSportingEvents(events);
- const byPlayer=Object.fromEntries(pool.map(id=>[id,{id,name:playerMap.get(id)||'Bilinmeyen oyuncu',starter:starter.has(id),playedMs:minute.byPlayer[id]?.playedMs||0,goals:0,assists:0,yellow:0,red:0,injuries:0,participated:starter.has(id)}]));
+ const byPlayer=Object.fromEntries(pool.map(id=>[id,{id,name:playerMap.get(id)||'Bilinmeyen oyuncu',starter:starter.has(id),playedMs:minute.byPlayer[id]?.playedMs||0,goals:0,assists:0,yellow:0,red:0,injuries:0,participated:false}]));
  let us=0,opponent=0;const notes=[];const goalsById=new Map(real.filter(e=>e.type==='GOAL').map(e=>[e.id,e]));const assignedAssists=new Set();
  for(const e of real){const p=e.payload||{},r=byPlayer[p.playerId];
   if(e.type==='GOAL'){us++;if(r)r.goals++;if(byPlayer[p.assistPlayerId]){byPlayer[p.assistPlayerId].assists++;assignedAssists.add(e.id);}}
@@ -73,9 +73,11 @@ function projectMatchReport(session,events=[],players=[],roster=null,nowMs=Date.
   if(e.type==='RED_CARD'&&r)r.red++;
   if(e.type==='INJURY'&&r)r.injuries++;
   if(e.type==='NOTE'||e.type==='INJURY')notes.push(e);
-  if(r)r.participated=r.participated||['GOAL','OWN_GOAL','ASSIST','YELLOW_CARD','RED_CARD','INJURY'].includes(e.type);
  }
- const participants=Object.values(byPlayer).map(p=>({...p,participated:p.participated||p.playedMs>0}));
+ // A disciplinary/medical event can be recorded for a substitute without an appearance.
+ // Participation is based on kickoff or a recorded entrance, not the occurrence of an event.
+ const matchStarted=session.status!=='prepared';
+ const participants=Object.values(byPlayer).map(p=>({...p,participated:matchStarted&&(p.starter||Boolean(minute.byPlayer[p.id]?.playedBefore)||p.playedMs>0)}));
  const clock=projectClock(session,nowMs);
  return {matchId:session.matchId,status:session.status,ourGoals:us,opponentGoals:opponent,players:participants,events:real,notes,minutesReviewRequired:minute.reviewRequired,clockReviewRequired:clock.reviewRequired,elapsedMatchMs:clock.elapsedMatchMs,matchTimeLabel:session.status==='finished'?'Maç tamamlandı':'Geçici maç özeti',corrections:events.filter(e=>e.type==='EVENT_CORRECTION').length};
 }

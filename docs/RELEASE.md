@@ -1,3 +1,15 @@
+# V2.6.8-F.12 — Oyuncu katılım raporu doğruluğu
+
+Bu sürüm yalnızca yeni bir **kaynak/test geliştirme dalında** hazırlanmıştır; `main` veya mevcut canlı Vercel dağıtımı değiştirilmemiştir.
+
+- Maç başlamadan önce ilk kadro üyeleri raporda `katıldı` sayılmaz.
+- Sahaya girmemiş yedek oyuncu kart/sakatlık/diğer sportif olay kaydı alırsa istatistiği korunur; fakat otomatik olarak maçta oynamış sayılmaz.
+- Oyuncunun sahaya giriş olayı kaydedilmişse sıfır saniye geçmiş olsa bile `katıldı` kabul edilir.
+- Eski kulüp veri şeması, olay kayıtları, yedekleme ve taktik saha konumları değiştirilmez.
+- Tam kaynak regresyonu GitHub Actions üzerinde doğrulanmadan ve kullanıcı onayı alınmadan `main` dalına geçilmez.
+
+## Önceki sürüm
+
 # V2.6.8-F.11 dağıtımı
 
 Bu paket üretim adayıdır. Gerçek cihaz kabulü için DEVICE_CHECKLIST.md kullanın.

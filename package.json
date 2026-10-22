@@ -1,6 +1,6 @@
 {
   "name": "match-studio",
-  "version": "2.6.8-f.11",
+  "version": "2.6.8-f.12",
   "private": true,
   "description": "Offline football club operations PWA",
   "scripts": {

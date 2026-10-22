@@ -115,3 +115,22 @@ test('assist retry remains a duplicate after a later correction voids its goal',
  await sports.commitSportingEvent({matchId:'m1',type:'EVENT_CORRECTION',payload:{targetEventId:goal.event.id,reason:'Gol iptal edildi',void:true},expectedRevision:3,idempotencyKey:'void',nowMs:63000});
  assert.equal((await sports.commitSportingEvent(assist)).duplicate,true);assert.equal((await live.listMatchEvents('m1')).length,4);
 });
+
+test('report distinguishes a bench card from actually entering the field',async()=>{
+ const {live,clock,sports,subs,load}=await fixture([1,1]);
+ const project=load('src/domain/match-events-report.js').projectMatchReport;
+ const before=project(await live.getMatchSession('m1'),[],[],null,1000);
+ assert.deepEqual(Array.from(before.players,p=>p.participated),[false,false,false]);
+ await clock.commitClockAction({matchId:'m1',action:'START',nowMs:1000,expectedRevision:0,idempotencyKey:'start'});
+ await sports.commitSportingEvent({matchId:'m1',type:'YELLOW_CARD',payload:{playerId:'p3'},nowMs:2000,expectedRevision:1,idempotencyKey:'bench-yellow'});
+ const report=project(await live.getMatchSession('m1'),await live.listMatchEvents('m1'),[],null,2100);
+ const bench=report.players.find(p=>p.id==='p3');
+ assert.equal(bench.yellow,1);
+ assert.equal(bench.playedMs,0);
+ assert.equal(bench.participated,false,'bench caution alone must not count as a match appearance');
+ assert.equal(report.players.filter(p=>p.participated).length,2);
+ await subs.commitSubstitution({matchId:'m1',outPlayerId:'p1',inPlayerId:'p3',nowMs:2100,expectedRevision:2,idempotencyKey:'sub'});
+ const entered=project(await live.getMatchSession('m1'),await live.listMatchEvents('m1'),[],null,2100);
+ assert.equal(entered.players.find(p=>p.id==='p3').playedMs,0);
+ assert.equal(entered.players.find(p=>p.id==='p3').participated,true,'recorded entrance counts even if less than one second elapsed');
+});
