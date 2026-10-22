@@ -1,0 +1,18 @@
+MATCH STUDIO / BROADCAST V2.6.8-F.3
+KULÜBÜNÜZ.
+SAHNE SİZİN.
+
+Maç günü hazırlığı, kadro ve profesyonel yayın grafikleri. Kulüp kimliğinizi belirleyin, saha operasyonuna başlayın.
+
+Yerel ve ayrılmış veriler
+Yayına hazır maç tasarımları
+Tek yerden kadro yönetimi
+01 / KULÜP KİMLİĞİ
+İlk kulübünüzü oluşturun
+
+Her kulüp ayrı yerel veritabanında saklanır. Başlangıç paketinde gerçek sporcu bilgisi yoktur.
+
+Kulüp adı
+Kurumsal vurgu rengi
+KULÜP OLUŞTUR VE BAŞLA
+Eski Darıca Gücü V2.4 verileri korunur. Önce kulübü oluşturun; ardından Arşiv & Ayarlar bölümünden eski JSON yedeğinizi aktarabilirsiniz.

@@ -1,0 +1,52 @@
+/* Match Studio V2.6.8-D | live-first, thumb-accessible tactical pitch */
+.live-tactical{--live-stroke:#7b9feb;--live-purple:#9579f9;position:relative;isolation:isolate}
+.live-tactical-header{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.live-tactical-header h2{margin:4px 0 3px;font-size:clamp(19px,2.5vw,27px)}
+.live-tactical-header p{margin:0;color:#cbd5e9;font-size:14px}
+.live-tactical-sync{flex-shrink:0;color:#9dcaf7;font-size:12px}
+.live-tactical-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(240px,.75fr);gap:16px;align-items:start}
+.live-field-wrap{min-width:0}
+.live-field-attack{color:#d7e9ff;text-align:center;font-size:12px;font-weight:800;letter-spacing:.12em;margin:4px 0 10px}
+.live-field{position:relative;overflow:visible;isolation:isolate;width:100%;max-width:520px;aspect-ratio:8/10;margin:0 auto;border:2px solid rgba(192,238,235,.7);border-radius:17px;background:repeating-linear-gradient(0deg,#164c43 0%,#164c43 12%,#1b5449 12%,#1b5449 24%);box-shadow:inset 0 0 0 10px rgba(11,36,42,.14),0 16px 40px rgba(0,0,0,.26)}
+.live-field::before{content:'';position:absolute;inset:3.5%;border:2px solid rgba(235,250,248,.58);border-radius:4px;pointer-events:none}
+.live-field-lines{position:absolute;pointer-events:none;border-color:rgba(235,250,248,.65)}
+.live-field-mid{left:4%;right:4%;top:50%;height:0;border-top:2px solid}
+.live-field-circle{width:23%;aspect-ratio:1;left:38.5%;top:calc(50% - 11.5%);border:2px solid;border-radius:50%}
+.live-field-goal-top{height:14%;width:34%;left:33%;top:3.5%;border:2px solid;border-top:0}
+.live-field-goal-bottom{height:14%;width:34%;left:33%;bottom:3.5%;border:2px solid;border-bottom:0}
+.live-field-player{position:absolute;z-index:2;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;border:2px solid rgba(178,212,255,.75);border-radius:12px;background:linear-gradient(160deg,rgba(8,21,53,.97),rgba(27,37,76,.95));color:#f5f9ff;min-width:64px;min-height:58px;padding:5px 3px;max-width:90px;box-shadow:0 5px 16px #07132991;touch-action:manipulation;cursor:pointer}
+.live-field-player .live-field-number{font-size:16px;font-weight:900;line-height:1.1;color:#cde0ff}
+.live-field-player .live-field-name{font-size:11px;line-height:1.08;font-weight:800;max-width:85px;text-align:center;overflow-wrap:anywhere}
+.live-field-player .live-field-position{color:#a3bcfb;font-size:10px;letter-spacing:.06em}
+.live-field-player.vacant{opacity:.5;cursor:default}
+.live-field-player.selected{border-color:#e3b3ff;box-shadow:0 0 0 4px rgba(170,130,255,.33),0 7px 22px #080e2b}
+.live-field-player:focus-visible,.live-bench-chip:focus-visible,#live-pitch-confirm:focus-visible{outline:3px solid #f2d48f;outline-offset:3px}
+.live-tactical-bench{border:1px solid rgba(126,160,220,.33);background:#101d36;border-radius:16px;padding:14px;min-width:0}
+.live-tactical-bench h3{margin:0 0 5px;display:flex;justify-content:space-between;gap:8px;font-size:16px;color:#f1f6ff}
+.live-tactical-bench h3 span{color:#b1c8ff}
+.live-tactical-bench p{margin:0 0 12px;font-size:12px;color:#ccd5e8}
+.live-tactical-benchlist{display:grid;gap:8px;max-height:530px;overflow-y:auto;overscroll-behavior:contain}
+.live-bench-chip{border:1px solid #54749f;border-radius:12px;background:#1c2b4e;color:#f8faff;min-height:54px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;text-align:left;gap:8px;cursor:pointer;touch-action:manipulation;font-size:14px;font-weight:750}
+.live-bench-chip small{flex-shrink:0;color:#becdf3}
+.live-bench-chip.selected{border:2px solid #c2a0ff;background:#393365}
+.live-bench-chip:disabled{opacity:.55;cursor:default}
+.live-action-dock{position:sticky;bottom:max(8px,env(safe-area-inset-bottom));z-index:8;display:flex;align-items:center;gap:12px;border:1px solid #6076bd;background:rgba(9,18,46,.98);border-radius:15px;padding:11px;box-shadow:0 -7px 28px #0208169c;margin-top:12px}
+.live-action-dock span{flex:1;color:#f0f3ff;font-weight:750;font-size:12px;min-width:0;overflow-wrap:anywhere}
+.live-action-dock .btn{min-height:52px;font-size:14px;white-space:normal;min-width:150px}
+.live-pitch-footnote{font-size:11px;color:#bacbe5}
+.live-tactical .ms-facility{margin:10px 0 12px}
+@media(max-width:699px){.live-tactical-layout{grid-template-columns:minmax(0,1fr)}.live-tactical-header{flex-wrap:wrap}.live-tactical-benchlist{grid-template-columns:repeat(2,minmax(0,1fr));max-height:none}.live-bench-chip{min-width:0}.live-action-dock{flex-direction:column;align-items:stretch;gap:7px;bottom:max(5px,env(safe-area-inset-bottom));padding:10px}.live-action-dock .btn{width:100%;min-height:52px}.live-field{max-width:410px}.live-field-player{min-height:52px;min-width:60px;max-width:77px}.live-field-player .live-field-name{font-size:10px;max-width:76px}}
+@media(max-width:360px){.live-field-player{min-width:54px;max-width:66px}.live-field-player .live-field-name{font-size:9px}}
+@media(min-width:700px) and (max-width:1050px){.live-tactical-layout{grid-template-columns:minmax(0,1fr) minmax(220px,.72fr);gap:10px}.live-field-player{min-width:59px;max-width:76px}}
+@media(prefers-reduced-motion:reduce){.live-tactical *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* On a folded phone the commit control stays under the thumb, above the app bottom nav. */
+@media(max-width:699px){.live-tactical{padding-bottom:136px}.live-action-dock{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:18;margin:0;box-shadow:0 10px 35px rgba(0,0,0,.85)}}
+
+/* Keep the field fully visible until the coach selects a player. */
+.live-action-dock:not(.engaged){display:none}
+.live-tactical .ms-facility{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:12px;border:1px solid #3b6493;background:#13223e}
+.live-tactical .ms-facility-copy{flex:1;min-width:190px}
+.live-tactical .ms-facility-copy b{display:block;font-size:13px;color:#e2efff;margin-bottom:4px}
+.live-tactical .ms-facility-copy small{display:block;font-size:12px;color:#bdcbe2;line-height:1.4}
+@media(max-width:699px){.live-tactical{padding-bottom:0}.live-tactical:has(.live-action-dock.engaged){padding-bottom:136px}}

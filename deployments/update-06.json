@@ -1,0 +1,20 @@
+{
+  "version": "2.6.8-f.9",
+  "update": "Çalışma alanı başlıklarının ve özetlerinin sadeleşmesi",
+  "implementation": "complete",
+  "targetedBrowserTests": {
+    "passed": 6
+  },
+  "phoneMetrics": {
+    "viewport": "360x780",
+    "headerBeforePx": 310,
+    "headerAfterPx": 125,
+    "pitchTopBeforePx": 1037,
+    "pitchTopAfterPx": 596
+  },
+  "deployment": "blocked",
+  "reason": "Existing Vercel 403 team-access blocker; authorization tool unavailable",
+  "includes": "F.4–F.8 fixes",
+  "liveVersion": "2.6.8-f.3",
+  "nextUpdate": "Modal keyboard focus containment; requires user approval"
+}

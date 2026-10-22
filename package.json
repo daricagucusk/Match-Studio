@@ -1,0 +1,20 @@
+{
+  "name": "match-studio",
+  "version": "2.6.8-f.11",
+  "private": true,
+  "description": "Offline football club operations PWA",
+  "scripts": {
+    "build": "node tools/build.cjs",
+    "start": "node tools/serve.cjs 8911",
+    "test": "node --test tests/*.test.cjs",
+    "test:browser": "playwright test",
+    "check": "npm run build && npm test && npm run test:browser",
+    "package": "node tools/package.cjs",
+    "release": "npm run check && npm run package",
+    "build:vercel": "npm run build && node tools/export-static.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "fake-indexeddb": "^6.2.4"
+  }
+}

@@ -1,0 +1,41 @@
+MATCH CENTER
+Kıyı Spor
+Oyuncu merkezi
+Yerel kayıt hazır
+Yeni Maç
+Aktif kulüp
+Kıyı Spor
+OYUNCU VERİTABANI
+Oyuncu Merkezi
+
+Kulübünüze özel oyuncu havuzu, birden fazla gruba atama ve oyuncu profilleri.
+
+Oyuncu Ekle
+0 kayıt
+CSV İçe Aktar
+Tüm gruplar
+Bu filtrede oyuncu yok
+
+İlk oyuncunu ekleyebilir veya farklı yaş grubuna geçebilirsin.
+
+Oyuncu Ekle
+OYUNCU KAYDI
+Bir kere kaydet.
+Her maçta kullan.
+
+Adlar afişte olduğu gibi kullanılır; otomatik kısaltma veya yapay zekâ düzeltmesi yapılmaz. Oyuncu fotoğrafı ve doğum yılı isteğe bağlıdır.
+
+Lisans durumu yalnızca senin girişindir; resmî TFF doğrulaması değildir.
+
+Ana Ekran
+Maç
+Oyuncular
+Afiş
+Diğer
+DİĞER BÖLÜMLER
+Canlı Maç Saati
+Kadro Seçimi
+Takım Derinliği
+Saha Dizilişi
+Haftalık Pano
+Arşiv & Ayarlar

@@ -1,0 +1,13 @@
+{
+  "version": "2.6.8-f.10",
+  "update": "Modal klavye odağının pencere içinde kalması",
+  "implementation": "complete",
+  "targetedBrowserTests": {
+    "passed": 12
+  },
+  "deployment": "blocked",
+  "reason": "Existing Vercel 403 team-access blocker; authorization tool unavailable",
+  "includes": "F.4–F.9 fixes",
+  "liveVersion": "2.6.8-f.3",
+  "nextUpdate": "Visual language and user copy consistency; requires user approval"
+}

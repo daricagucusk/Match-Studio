@@ -1,0 +1,13 @@
+{
+  "version": "2.6.8-f.5",
+  "update": "Afişte müsabaka türünün korunması",
+  "implementation": "complete",
+  "targetedBrowserTests": {
+    "passed": 6
+  },
+  "deployment": "blocked",
+  "reason": "Existing Vercel 403 team-access blocker; authorization tool unavailable",
+  "includes": "F.4 draft preservation",
+  "liveVersion": "2.6.8-f.3",
+  "nextUpdate": "Live clock/report refresh; requires user approval"
+}

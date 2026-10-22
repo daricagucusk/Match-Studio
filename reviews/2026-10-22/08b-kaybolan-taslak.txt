@@ -1,0 +1,96 @@
+MATCH CENTER
+Kıyı Spor
+Maç planlama
+Yerel kayıt hazır
+Yeni Maç
+Aktif kulüp
+Kıyı Spor
+MAÇ OLUŞTURUCU
+Yeni Maç Oluştur
+
+Zorunlu bilgileri gir; organizasyon notlarını veli afişine özel sakla.
+
+Karşılaşma
+Takım / Grup *
+Yaş grubu seç…
+U14
+Maçın yaş kategorisi *
+Kategori seç…
+U6
+U7
+U8
+U9
+U10
+U11
+U12
+U13
+U14
+U15
+U16
+U17
+U18
+U19
+U20
+U21
+U22
+U23
+A TAKIM
+KADIN
+VETERAN
+SERBEST
+Lig / Kategori
+Rakip takım *
+Stat / Saha *
+Maç tarihi *
+Maç saati *
+Oyun formatı ve saha düzeni — Yaş grubundan bağımsız
+
+3v3–11v11 formatlarından birini ve saha yerleşimini seçin. Yedek sayısı kulüp/turnuva kuralınıza göre değiştirilebilir.
+
+🇹🇷 Türkiye U11/U12 · Enine Yarı Saha 8v8
+Kaleler ana sahanın karşılıklı taç çizgilerinde · 1 kaleci + 7 saha oyuncusu
+Bu şablonu uygula
+Sahadaki oyuncu sayısı *
+3v3 · 3 oyuncu (kaleci dahil olabilir)
+4v4 · 4 oyuncu (kaleci dahil olabilir)
+5v5 · 5 oyuncu (kaleci dahil olabilir)
+6v6 · 6 oyuncu (kaleci dahil olabilir)
+7v7 · 7 oyuncu (kaleci dahil olabilir)
+8v8 · 8 oyuncu (kaleci dahil olabilir)
+9v9 · 9 oyuncu (kaleci dahil olabilir)
+10v10 · 10 oyuncu (kaleci dahil olabilir)
+11v11 · 11 oyuncu (kaleci dahil olabilir)
+Saha yerleşimi *
+Standart / taktik saha
+Bağımsız küçük saha
+Yarı saha · Enine (taç çizgilerinde kaleler)
+Kaleci uygulaması
+Kalecili
+Kalecisiz
+Yedek oyuncu kapasitesi (0–32)
+Yarı sahanın seçimi
+1. yarı saha
+2. yarı saha
+Müsabaka türü
+Hazırlık
+Resmî lig
+Turnuva
+Antrenman maçı
+
+Bu seçenekler teknik profil oluşturur. Resmî müsabaka kurallarını ilgili sezonun il/turnuva statüsünden doğrulayın; burada hiçbir profil otomatik resmî kural değildir.
+
+Organizasyon Bilgileri — Yalnızca özel veli afişinde
+Tesislerde toplanma saati
+Toplanma yeri
+Maç yemeği en geç
+Yemek menüsü
+Kıyafet / ekipman
+Sıvı kontrolü / su hatırlatması
+Antrenör notları
+* Zorunlu alan
+Kaydet ve Kadroya Geç
+Ana Ekran
+Maç
+Oyuncular
+Afiş
+Diğer

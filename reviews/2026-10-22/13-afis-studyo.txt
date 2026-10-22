@@ -1,0 +1,71 @@
+MATCH CENTER
+Kıyı Spor
+Görsel tasarım
+Yerel kayıt hazır
+Yeni Maç
+Aktif kulüp
+Kıyı Spor
+Kıyı Spor / MAÇ ÇALIŞMA ALANI
+V2.6.8-F.3
+Afiş Stüdyosu
+
+U14 · Kıyı Spor VS Sahil Spor
+
+24 Ekim 2026 Cumartesi
+14:00 · Kent Stadı
+01   Maç Bilgileri
+02   Kadro Seçimi
+03   Saha Dizilişi
+04   Afiş Tasarımı
+05   Canlı Maç Saati
+Maç
+Kadro
+Tasarım
+Önizleme
+TASARIM KONTROLLERİ
+Görselini özelleştir
+
+Seçimler canlı afişe uygulanır. Oyuncu isimleri korunur.
+
+Yayın hedefi
+Sosyal Medya
+Veli / Oyuncu
+
+Özel paylaşım: kadro ve organizasyon talimatları görüntülenebilir.
+
+Görsel şablonu
+4 tasarım
+01 · Classic Stadium
+Stadyum ışıkları · Klasik kulüp kimliği
+02 · Elite Minimal
+Sakin, temiz ve prestijli
+03 · Tactical Board
+Saha çizgileri ve teknik görünüm
+04 · Matchday Pro
+Yayın grafiği tarzında modern
+Çıktı oranı
+Gönderi 4:5
+1080×1350
+Hikâye 9:16
+1080×1920
+Hassas ayarlar
+Yazı ölçeği
+100%
+Logo ölçeği
+100%
+Vurgu rengi
+Kulüp yeşili
+Canlı yeşil
+Gri yeşil
+Zümrüt
+Organizasyon bilgilerini göster
+Özel arka plan (isteğe bağlı)
+Özel arka planı kaldır
+Kadroya Dön
+Saha Dizilişi
+PNG İndir
+Ana Ekran
+Maç
+Oyuncular
+Afiş
+Diğer

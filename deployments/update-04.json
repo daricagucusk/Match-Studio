@@ -1,0 +1,17 @@
+{
+  "version": "2.6.8-f.7",
+  "update": "İlk takım/grup oluşturmanın görünür olması",
+  "implementation": "complete",
+  "targetedBrowserTests": {
+    "passed": 9
+  },
+  "deployment": "blocked",
+  "reason": "Existing Vercel 403 team-access blocker; authorization tool unavailable",
+  "includes": [
+    "F.4 draft preservation",
+    "F.5 poster match type",
+    "F.6 live report refresh"
+  ],
+  "liveVersion": "2.6.8-f.3",
+  "nextUpdate": "Live match event entry accessibility; requires user approval"
+}

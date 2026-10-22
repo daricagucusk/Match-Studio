@@ -1,0 +1,22 @@
+/* Packet C responsive, touch-first live substitution management. */
+.live-substitution {display:grid;gap:14px;}
+.live-sub-head {display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.live-sub-head h2 {margin:0}
+.live-sub-head span {color:#B9D4F2;font-weight:650;font-size:0.9rem}
+.live-sub-form {display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;}
+.live-sub-form .field {min-width:0;}
+.live-sub-form select {min-height:48px;width:100%;max-width:100%;background:#14243A;color:#F5F8FF;border:1px solid #6384A8;border-radius:12px;padding:10px;}
+.live-sub-form button {min-height:48px;width:100%;}
+.live-return-check {display:flex;align-items:center;gap:10px;line-height:1.4;color:#D5E4FF;font-size:0.9rem}
+.live-return-check input {width:22px;height:22px;flex:none;accent-color:#528CFF}
+.live-squads {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.live-squads>div {min-width:0;background:#122239;border:1px solid #364D73;border-radius:16px;padding:12px}
+.live-squads h3 {font-size:1rem;margin:0 0 12px;color:#E9F0FF;}
+.live-player-row {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #30415F;font-variant-numeric:tabular-nums;}
+.live-player-row span {min-width:0;overflow-wrap:anywhere;display:grid;gap:3px}
+.live-player-row span strong {font-size:0.96rem;color:#F5F7FD;}
+.live-player-row span small {font-size:0.8rem;color:#AEC4E2}
+.live-player-row>strong {white-space:nowrap;font-size:0.95rem;color:#AFC9FF}
+.live-sub-form :is(input,button,select):focus-visible {outline:3px solid #9AB6FF;outline-offset:2px}
+@media (max-width:640px){.live-sub-form,.live-squads{grid-template-columns:1fr}.live-substitution{gap:12px}}
+@media (prefers-reduced-motion:reduce){.live-substitution *{transition:none!important;animation:none!important}}
