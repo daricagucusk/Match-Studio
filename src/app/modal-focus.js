@@ -37,7 +37,7 @@ function createModalFocusController(root,onDismiss){
   for(const fallback of ['[data-action="add-player"]','[data-pitch-slot]','.app-shell button']){if(target)break;target=[...root.querySelectorAll(fallback)].find(usable);}
   target?.focus({preventScroll:true});
  }
- root.addEventListener('click',event=>{if(!dialog()&&!root.inert)rememberTrigger(event.target.closest('button,a[href],input,select,summary,[tabindex]'));},true);
+ root.addEventListener('click',event=>{if(!dialog()&&!root.inert){const trigger=event.target.closest('button,a[href],input,select,summary,[tabindex]');if(usable(trigger))rememberTrigger(trigger);}},true);
  doc.addEventListener('focusin',event=>{
   const panel=dialog();if(!panel||root.inert)return;
   if(panel.contains(event.target))lastFocused=mark(event.target);else focusFirst(panel);

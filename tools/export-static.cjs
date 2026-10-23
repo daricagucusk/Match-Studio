@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const runtimeFiles=new Set(['index.html','app.bundle.js','broadcast.css','premium-v267.css','live-clock-v268b.css','live-substitutions-v268c.css','live-pitch-v268d.css','live-events-v268e.css','manifest.webmanifest','device-test.html','icons/icon-192.png','icons/icon-512.png','assets/ms-emblem-mark.png','assets/match-studio-brand-preview.png','assets/match-studio-blue-violet-brand.png']);
+const runtimeFiles=new Set(['index.html','app.bundle.js','broadcast.css','premium-v267.css','live-clock-v268b.css','live-substitutions-v268c.css','live-pitch-v268d.css','live-events-v268e.css','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','assets/ms-emblem-mark.png','assets/match-studio-brand-preview.png','assets/match-studio-blue-violet-brand.png']);
 function exportStatic(root=path.resolve(__dirname,'..')){
  const read=name=>{const file=path.join(root,name);if(!fs.lstatSync(file).isFile()||fs.realpathSync(file)!==file)throw Error('Unsafe file: '+name);return fs.readFileSync(file);};
  const worker=read('sw.js');

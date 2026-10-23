@@ -41,21 +41,20 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
  const downloaded=page.waitForEvent('download');await page.locator('[data-action=export-png]:visible').first().click();const png=await downloaded;expect(png.suggestedFilename()).toMatch(/\.png$/);await idle(page);
  expect(errors).toEqual([]);
 });
-test('PWA caches a complete shell and opens with local data while offline',async({page,context})=>{
+test('app caches a complete shell and opens with saved records while offline',async({page,context})=>{
  await createClub(page);await page.evaluate(()=>navigator.serviceWorker.ready);
  await expect.poll(()=>page.evaluate(()=>Boolean(navigator.serviceWorker.controller))).toBe(true);
  await page.reload();await expect(page.locator('.app-shell')).toBeVisible();
- await expect(page.locator('#offline-readiness')).toHaveText('Çevrimdışı uygulama dosyaları hazır');
+ await expect(page.locator('#offline-readiness')).toHaveText('Kayıtlar hazır');
  await context.setOffline(true);await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await nav(page,'players');await nav(page,'archive');
  await expect(page.locator('#club-settings-form [name=clubName]')).toHaveValue('Üretim Test Spor');
- await page.goto('/device-test.html');await expect(page.getByRole('heading',{name:'IndexedDB, PWA ve katlanabilir ekran testi'})).toBeVisible();
  await context.setOffline(false);
 });
-test('encrypted backup can be reselected and restored twice through the phone UI',async({page})=>{
- await createClub(page);await group(page);const password='phone-test-password-123';page.on('dialog',dialog=>dialog.accept(dialog.type()==='prompt'?password:undefined));
- const download=page.waitForEvent('download');await page.locator('[data-action=backup-export-secure]').click();const file=await download;const filename=await file.path();await idle(page);
+test('a downloaded backup can be reselected and restored twice through the phone UI',async({page})=>{
+ await createClub(page);await group(page);
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Yedeği indir'}).click();const file=await download;const filename=await file.path();await idle(page);
  for(let i=0;i<2;i++){
-  const chooser=page.waitForEvent('filechooser');await page.locator('[data-action=backup-import]').click();await (await chooser).setFiles(filename);await idle(page);await expect(page.locator('.toast')).toContainText('Yedek geri yüklendi');
+  await page.locator('#data-file').setInputFiles(filename);await page.getByRole('button',{name:'Yüklemeyi tamamla'}).click();await idle(page);await expect(page.locator('.toast')).toContainText('Kayıtlar yüklendi');
   await nav(page,'archive');await expect(page.locator('#group-form')).toBeVisible();
  }
 });

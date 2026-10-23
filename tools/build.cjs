@@ -14,7 +14,7 @@ for(const id of order){
 }
 bundle+="require('src/main.js');})();\n";
 fs.writeFileSync(path.join(root,'app.bundle.js'),bundle);
-const shell=['./','./index.html','./app.bundle.js','./broadcast.css','./premium-v267.css','./live-clock-v268b.css','./live-substitutions-v268c.css','./live-pitch-v268d.css','./live-events-v268e.css','./assets/ms-emblem-mark.png','./assets/match-studio-brand-preview.png','./assets/match-studio-blue-violet-brand.png','./manifest.webmanifest','./device-test.html','./icons/icon-192.png','./icons/icon-512.png'];
+const shell=['./','./index.html','./app.bundle.js','./broadcast.css','./premium-v267.css','./live-clock-v268b.css','./live-substitutions-v268c.css','./live-pitch-v268d.css','./live-events-v268e.css','./assets/ms-emblem-mark.png','./assets/match-studio-brand-preview.png','./assets/match-studio-blue-violet-brand.png','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 const hash=crypto.createHash('sha256');
 const integrity={};
 for(const file of shell){const bytes=fs.readFileSync(path.join(root,file==='./'?'index.html':file));hash.update(file);hash.update(bytes);integrity[file]=crypto.createHash('sha256').update(bytes).digest('hex');}

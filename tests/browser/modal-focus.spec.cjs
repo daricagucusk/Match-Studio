@@ -3,15 +3,15 @@ const {setup,idle,nav}=require('./live-fixture.cjs');
 async function inside(page){expect(await page.evaluate(()=>Boolean(document.querySelector('[role=dialog]')?.contains(document.activeElement)))).toBe(true);}
 test('player dialog traps keyboard focus, blocks background and restores its opener',async({page})=>{
  await setup(page);await nav(page,'players');const opener=page.locator('[data-action=add-player]').first();await opener.click();await idle(page);await expect(page.getByRole('dialog')).toBeVisible();
- await page.locator('.modal [data-action=close-modal]').focus();await page.keyboard.press('Shift+Tab');await inside(page);
+ await page.getByRole('button',{name:'Kapat'}).focus();await page.keyboard.press('Shift+Tab');await inside(page);
  await expect(page.locator('.app-shell')).toHaveJSProperty('inert',true);
  for(let i=0;i<22;i++){await page.keyboard.press('Tab');await inside(page);}
  await page.locator('#fullName').fill('Geçici Oyuncu');await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);await expect(opener).toBeFocused();await expect(page.locator('.app-shell')).toHaveJSProperty('inert',false);
  await opener.click();await idle(page);await expect(page.locator('#fullName')).toBeFocused();await page.locator('.modal [data-action=close-modal]').click();await idle(page);await expect(opener).toBeFocused();
 });
-test('CSV dialog skips disabled confirmation and returns focus after escape',async({page})=>{
- await setup(page);await nav(page,'players');const opener=page.locator('[data-action=csv-import]');await opener.click();await idle(page);await expect(page.locator('#csv-group')).toBeFocused();await expect(page.locator('#csv-confirm')).toBeDisabled();
- await page.locator('#csv-file').focus();await page.keyboard.press('Tab');await expect(page.locator('.modal [data-action=close-modal]')).toBeFocused();await page.keyboard.press('Shift+Tab');await expect(page.locator('#csv-file')).toBeFocused();
+test('player list dialog traps focus and returns it after escape',async({page})=>{
+ await setup(page);await nav(page,'archive');const opener=page.getByRole('button',{name:'Dosyadan yükle'});const chooser=page.waitForEvent('filechooser');await opener.click();await (await chooser).setFiles({name:'oyuncular.csv',mimeType:'text/csv',buffer:Buffer.from('Ad Soyad;Doğum Yılı\nYeni Oyuncu;2013')});await idle(page);await expect(page.locator('#import-group')).toBeFocused();
+ await page.getByRole('button',{name:'Kapat'}).focus();await page.keyboard.press('Shift+Tab');await inside(page);
  await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);await expect(opener).toBeFocused();
 });
 test('saving a player closes the dialog and restores a usable background control',async({page})=>{

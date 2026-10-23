@@ -1,4 +1,4 @@
-# Match Studio V2.6.8-F.13
+# Match Studio V2.6.8-F.14
 
 Türkçe, yerel veri kullanan futbol kulübü PWA'sı. V2.6.8-F.1 R1 telefon paketinden geri kazanılmış geliştirme projesi.
 

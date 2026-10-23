@@ -18,9 +18,9 @@ function posterStudio(){
  </section>
  <aside class="poster-pane" aria-label="Afişin canlı önizlemesi"><div class="poster-container v13-poster-container"><div class="preview-topline"><div><div class="eyebrow">CANLI ÖNİZLEME</div><h2>${draft.kind==='private'?'Veli ve oyuncu afişi':'Sosyal medya afişi'}</h2></div><span class="preview-resolution">${draft.size==='story'?'1080 × 1920':'1080 × 1350'}</span></div>
   <div class="preview-display"><canvas id="poster-canvas" width="1080" height="1350" role="img" aria-label="Güncel maç afişinin canlı önizlemesi"></canvas></div>
-  <div class="preview-quality ${issues.length?'needs-attention':'is-verified'}" id="preview-status" role="status">${issues.length?`<strong>Yayın öncesi kontrol gerekiyor</strong><ul>${issues.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`${I('check')} Bilgiler kontrol ediliyor, PNG yerleşimi hesaplanıyor…`}</div>
-  <div class="preview-actionbar"><div><strong>Tek kaynaktan iki çıktı</strong><p>Dosya cihazında oluşturulur; herhangi bir sunucuya gönderilmez.</p></div><div class="preview-action-buttons">${btn(I('download')+' PNG İndir','export-png','btn-primary',issues.length?'disabled aria-label="Önce uyarıları düzelt"':'')}${btn(I('share')+' Paylaş','share-png','btn-ghost',issues.length?'disabled':'')}</div></div>
- </div></aside></div><div class="mobile-export-bar">${btn(I('download')+' PNG İndir','export-png','btn-primary',issues.length?'disabled':'')}${btn(I('share'),'share-png','btn-ghost btn-icon',`aria-label="Paylaş" ${issues.length?'disabled':''}`)}</div>`;
+  <div class="preview-quality ${issues.length?'needs-attention':'is-verified'}" id="preview-status" role="status">${issues.length?`<strong>Yayın öncesi kontrol gerekiyor</strong><ul>${issues.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`${I('check')} Bilgiler ve yerleşim kontrol ediliyor…`}</div>
+  <div class="preview-actionbar"><div><strong>İndir veya paylaş</strong><p>Hazırladığınız görsel bu cihazda oluşturulur.</p></div><div class="preview-action-buttons">${btn(I('download')+' Görseli indir','export-png','btn-primary',issues.length?'disabled aria-label="Önce uyarıları düzelt"':'')}${btn(I('share')+' Paylaş','share-png','btn-ghost',issues.length?'disabled':'')}</div></div>
+ </div></aside></div><div class="mobile-export-bar">${btn(I('download')+' Görseli indir','export-png','btn-primary',issues.length?'disabled':'')}${btn(I('share'),'share-png','btn-ghost btn-icon',`aria-label="Paylaş" ${issues.length?'disabled':''}`)}</div>`;
 }
 function weeklyPage(){
  const board=state.board,filtered=pickBoardMatches(state.data.matches,board.week,board.mode);
@@ -40,7 +40,7 @@ function weeklyPage(){
   </section>
   <section class="weekly-preview-panel"><div class="weekly-preview-header"><div><div class="weekly-kicker">03 / CANLI ÖNİZLEME</div><h2>Grup paylaşım görseli</h2></div><span class="weekly-resolution">${board.size==='story'?'9:16':'4:5'}</span></div>
    ${plan.ok?`<canvas id="weekly-board-canvas" width="540" height="${board.size==='story'?960:675}" aria-label="Seçili maçların görsel önizlemesi"></canvas>`:`<div class="weekly-placeholder">${I('calendar')}<strong>Görsel henüz hazır değil</strong><span>Kaydedilmiş ve doğrulanmış maçları seçtiğinde önizleme burada açılacak.</span></div>`}
-   <div class="weekly-actions">${btn(I('download')+' PNG İndir','weekly-export','btn-primary',plan.ok?'':'disabled')}${btn(I('share')+' WhatsApp / Paylaş','weekly-share','btn-ghost',plan.ok?'':'disabled')}</div><p class="weekly-help">Paylaş düğmesi telefonun paylaşım menüsünü açmayı dener. Desteklenmiyorsa PNG indirilir; WhatsApp grubuna Dosyalarım’dan ekleyebilirsin.</p></section>
+   <div class="weekly-actions">${btn(I('download')+' Görseli indir','weekly-export','btn-primary',plan.ok?'':'disabled')}${btn(I('share')+' WhatsApp / Paylaş','weekly-share','btn-ghost',plan.ok?'':'disabled')}</div><p class="weekly-help">Paylaş düğmesi telefonun paylaşım menüsünü açar. Açılmazsa indirilen görseli grubunuza ekleyebilirsiniz.</p></section>
  </div>`;
 }
 
