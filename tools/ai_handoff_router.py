@@ -11,7 +11,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 ROOT = Path.cwd().resolve()
-PATH_PATTERN = re.compile(r"(?<![A-Za-z0-9_./-])((?:src|tests|assets|icons)/[A-Za-z0-9_./-]+\.(?:js|cjs|css|html|json)|index\.html)(?![A-Za-z0-9_./-])")
+PATH_PATTERN = re.compile(r"(?<![A-Za-z0-9_./-])((?:src|tests|assets|icons)/[A-Za-z0-9_./-]+\.(?:js|cjs|css|html|json)|index\.html)(?![A-Za-z0-9_/-])")
 MAX_FILE = 110_000
 MAX_CONTEXT = 170_000
 MAX_EDIT = 24_000
@@ -26,8 +26,11 @@ def safe_file(name):
         raise ValueError("Unsupported source path")
     if any(word in name.lower() for word in SECRET_WORDS):
         raise ValueError("Sensitive source path")
-    path = (ROOT / name).resolve()
-    if not path.is_relative_to(ROOT) or path.is_symlink() or not path.is_file():
+    original = ROOT / name
+    if original.is_symlink():
+        raise ValueError("Symlinked source path")
+    path = original.resolve()
+    if not path.is_relative_to(ROOT) or not path.is_file():
         raise ValueError("Missing, symlinked, or out-of-tree source file")
     if path.stat().st_size > MAX_FILE:
         raise ValueError("Source file is larger than 110 KB")
