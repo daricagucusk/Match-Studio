@@ -47,9 +47,11 @@ test('P0: encrypted club backup restores roster, match and image in a completely
  await page.locator('[data-action=add-player]').first().click();await idle(page);
  await page.locator('#fullName').fill('Sentetik Test Oyuncusu');
  await page.locator('#birthYear').fill('2012');
+ await page.locator('#shirtNumber').fill('7');
  await page.locator('#player-form [name=groups]').check();
  await page.locator('#player-photo').setInputFiles('icons/icon-192.png');
  await page.locator('[data-action=submit-player]').click();await idle(page);
+ await expect(page.locator('#player-form')).toHaveCount(0);
  await nav(page,'matches');
  await page.locator('#groupId').selectOption({label:'U14'});
  await page.locator('#ageCategory').selectOption('U14');
