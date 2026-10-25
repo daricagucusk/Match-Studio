@@ -27,50 +27,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Require preconfigured Google AI Studio key
-        env:
-          KEY_PRESENT: ${{ secrets.GEMINI_API_KEY != '' }}
-        run: |
-          if [ "$KEY_PRESENT" != "true" ]; then
-            echo "::error::GEMINI_API_KEY is missing. Add it in Settings > Secrets and variables > Actions."
-            exit 1
-          fi
-
-      - name: Generate changes with Gemini CLI
-        uses: google-github-actions/run-gemini-cli@f77273f4c914e4bf38440cf36a0369cb64a37489 # v0.1.22
-        env:
-          GEMINI_CLI_TRUST_WORKSPACE: "true"
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_cli_version: "0.65.0"
-          settings: |
-            {
-              "tools": {
-                "core": ["read_file", "write_file", "replace", "glob", "grep_search", "list_directory"]
-              },
-              "model": {"maxSessionTurns": 20}
-            }
-          prompt: |
-            You are working on the Match Studio mobile-first football club PWA.
-            Read README.md and docs/AI_AGENT_HANDOFF.md. Implement the OWNER-AUTHORED
-            GitHub issue request below, directly editing only permitted application
-            source files or tests in the checkout. Keep the change minimal and
-            preserve existing working features and user data formats.
-            The tool allowlist deliberately excludes shell execution, web fetch,
-            extension tools, and MCP tools. Only source reading and direct edits
-            are permitted.
-            Do NOT use shell commands, deploy, commit, push, open PRs, install
-            dependencies, or access credentials. A separate locked workflow will
-            run validation and prepare a draft pull request.
-            Forbidden paths include .github/, .gemini/, .env*, package*.json,
-            vercel.json, shell scripts, and every secret/credential file.
-            Do not delete or rename files. If the task needs protected changes,
-            explain the limitation and leave those changes undone.
-            ISSUE #${{ github.event.issue.number }}
-            TITLE: ${{ github.event.issue.title }}
-            REQUEST:
-            ${{ github.event.issue.body }}
+          python-version: "3.12"
+
+      - name: Validate safe multi-model routing (offline unit tests)
+        run: python -m unittest discover -s tools -p 'test_ai_handoff_router.py' -v
+
+      - name: Generate code with bounded multi-provider fallback
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          AI_ENABLE_PAID_FALLBACK: ${{ vars.AI_ENABLE_PAID_FALLBACK || 'false' }}
+        run: python tools/ai_handoff_router.py
 
       - name: Enforce pilot scope and export patch
         id: changes
