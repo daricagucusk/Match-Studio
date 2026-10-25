@@ -24,6 +24,8 @@ class ProviderError(Exception):
 def safe_file(name):
     if not isinstance(name, str) or not PATH_PATTERN.fullmatch(name):
         raise ValueError("Unsupported source path")
+    if any(segment in (".", "..") for segment in Path(name).parts):
+        raise ValueError("Relative path segments are forbidden")
     if any(word in name.lower() for word in SECRET_WORDS):
         raise ValueError("Sensitive source path")
     original = ROOT / name
