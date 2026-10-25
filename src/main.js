@@ -1,5 +1,6 @@
 const {createModalFocusController}=require('src/app/modal-focus.js');
 const {createMatchDraftStore}=require('src/app/match-form-drafts.js');
+const {readFixtureFile}=require('src/domain/fixture-import.js');
 const {setupPwaUpdates,getOfflineReadiness}=require('src/app/pwa-updates.js');
 
 const {uid,now,validatePlayer,validateMatch,formatTurkishDate,validateOverrides}=require("src/domain/validation.js");
@@ -76,7 +77,7 @@ function listenRoot(type,handler){
  if(handler.constructor.name!=='AsyncFunction'){root.addEventListener(type,handler);return;}
  root.addEventListener(type,event=>{
   if(uiBusy){event.preventDefault();return;}
-  if(type==='change'&&!event.target.matches('#club-switch,#club-switch-mobile,#pitch-role,#pitch-formation,#team-group,#team-pitch-formation,#team-formation-select,#team-pitch-depth,#team-depth-factor,#team-depth-select,[data-team-role-player],[data-player-id],[data-override],#club-logo,#poster-bg-file,#csv-file,#backup-file')){Promise.resolve(handler(event)).catch(error=>toast(error.message,true));return;}
+  if(type==='change'&&!event.target.matches('#club-switch,#club-switch-mobile,#pitch-role,#pitch-formation,#team-group,#team-pitch-formation,#team-formation-select,#team-pitch-depth,#team-depth-factor,#team-depth-select,[data-team-role-player],[data-player-id],[data-override],#club-logo,#poster-bg-file,#csv-file,#backup-file,#weekly-import-file')){Promise.resolve(handler(event)).catch(error=>toast(error.message,true));return;}
   if(type==='click'&&event.target.closest('[data-action=backup-import],[data-action=live-quick-event]')){Promise.resolve(handler(event)).catch(error=>toast(error.message,true));return;}
   if(type==='click'&&!event.target.closest('[data-action],[data-team-priority],[data-pitch-remove],[data-pitch-slot],[data-template],[data-size]')){Promise.resolve(handler(event)).catch(error=>toast(error.message,true));return;}
   // Cancel native form submission before waiting for a cross-tab lock.
@@ -94,7 +95,7 @@ function I(k){return `<span class="inline-icon" aria-hidden="true"><svg viewBox=
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const groupNames=[]; // New clubs start without seeded roster data.
 const nav=[['dashboard','home','Genel Bakış'],['players','users','Oyuncular'],['matches','calendar','Yeni Maç'],['roster','roster','Kadro Seçimi'],['team','users','Genel Takım Kadrosu'],['pitch','pitch','Saha / Diziliş'],['studio','studio','Afiş Stüdyosu'],['weekly','calendar','Haftalık Maç Panosu'],['archive','archive','Arşiv / Ayarlar']];
-const state={club:null,clubs:[],legacy:null,integrityAudit:null,route:'dashboard',data:{players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]},currentId:null,filterGroup:'all',query:'',modal:null,tab:'design',previewResult:null,csvPending:null,sessionMatch:null,liveSession:null,liveEvents:[],liveLoading:false,notice:null,rosterPoolScope:'all',rosterQuery:'',pitchMode:'match',pitchSelectedId:null,pitchContext:null,rosterPoolGroups:[],rosterFilterMatchId:null,teamGroupId:null,teamRoleSelected:'GK',teamQuery:'',teamPitchPrefs:{formation:'4-3-3',depthFactor:2},board:{week:mondayOf(new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'}))||new Date().toISOString().slice(0,10),mode:'week',size:'portrait-post',selected:null}};
+const state={club:null,clubs:[],legacy:null,integrityAudit:null,route:'dashboard',data:{players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]},currentId:null,filterGroup:'all',query:'',modal:null,tab:'design',previewResult:null,csvPending:null,sessionMatch:null,liveSession:null,liveEvents:[],liveLoading:false,notice:null,rosterPoolScope:'all',rosterQuery:'',pitchMode:'match',pitchSelectedId:null,pitchContext:null,rosterPoolGroups:[],rosterFilterMatchId:null,teamGroupId:null,teamRoleSelected:'GK',teamQuery:'',teamPitchPrefs:{formation:'4-3-3',depthFactor:2},board:{week:mondayOf(new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'}))||new Date().toISOString().slice(0,10),mode:'week',size:'portrait-post',selected:null},fixtureImport:null};
 let draftStorage=null;try{draftStorage=sessionStorage;}catch(error){}
 const matchDrafts=createMatchDraftStore(draftStorage);
 const matchDraftScope=()=>({clubId:state.club?.id,matchId:state.currentId||null});
@@ -328,6 +329,33 @@ case 'legacy-import':{if(!state.legacy?.found)throw Error('Önce eski veritaban�
 case 'delete-group':{const id=target.dataset.id;const g=state.data.groups.find(x=>x.id===id);if(!g)return;if(!confirm(g.name+' grubu silinsin mi? İlişkili kayıt varsa işlem engellenecektir.'))return;await safeDeleteGroup(id);if(state.filterGroup===id)state.filterGroup='all';state.teamGroupId=null;await refresh();render();toast('Grup silindi.');break;}
 case 'new-match':state.currentId=null;state.sessionMatch=null;selectRoute('matches');break;
 case 'weekly-prev':case 'weekly-next':{const dt=new Date(`${state.board.week}T12:00:00Z`);dt.setUTCDate(dt.getUTCDate()+(action==='weekly-next'?7:-7));state.board.week=dt.toISOString().slice(0,10);state.board.selected=null;render();break;}
+case 'weekly-import-clear':state.fixtureImport=null;render();break;
+case 'weekly-import-confirm':{
+ const pending=state.fixtureImport;if(!pending?.rows?.length||pending.errors?.length)throw Error('Önizleme hata içeriyor; veriler kaydedilmedi.');
+ const rawSize=Number(document.getElementById('weekly-import-format')?.value);
+ if(![3,5,8,9,11].includes(rawSize))throw Error('Oyun formatını açıkça seçin.');
+ const format=normalizeGameFormat({playersPerSide:rawSize,goalkeeperMode:rawSize<=4?'none':'required',benchLimit:Math.min(rawSize,8)});
+ const pitchLayout=normalizePitchLayout({id:'standard'},format);
+ const norm=x=>String(x||'').trim().toLocaleLowerCase('tr-TR');
+ const groups=new Map(state.data.groups.map(g=>[norm(g.name),g]));
+ const signatures=new Set(state.data.matches.map(m=>[m.groupId,norm(m.opponent),m.matchDate,m.kickoffTime].join('|')));
+ const errors=[],prepared=[];
+ for(const [idx,item] of pending.rows.entries()){
+  const group=groups.get(norm(item.group));
+  if(!group){errors.push('Satır '+(idx+2)+': mevcut takım bulunamadı: '+item.group);continue;}
+  const signature=[group.id,norm(item.opponent),item.matchDate,item.kickoffTime].join('|');
+  if(signatures.has(signature)){errors.push('Satır '+(idx+2)+': aynı maç zaten kayıtlı veya dosyada tekrar var.');continue;}
+  signatures.add(signature);
+  const result=validateMatch({...item,groupId:group.id,ageCategory:group.name,gameFormat:format,pitchLayout,state:'draft'});
+  if(!result.ok){errors.push('Satır '+(idx+2)+': '+result.errors.join(', '));continue;}
+  prepared.push(result.data);
+ }
+ if(errors.length)throw Error(errors.slice(0,5).join(' | ')+'; hiçbir maç eklenmedi.');
+ if(!prepared.length||!confirm(prepared.length+' maç kontrol edildi. Tümünü mevcut kulübe kaydetmek istiyor musunuz?'))return;
+ await transact(['matches'],'readwrite',tx=>{for(const m of prepared)tx.objectStore('matches').add(m);});
+ state.fixtureImport=null;state.board.selected=null;await refresh();render();
+ toast(prepared.length+' maç aynı işlemde kaydedildi.');break;
+}
 case 'weekly-export':case 'weekly-share':{const plan=boardPlan();if(!plan.ok)throw Error(plan.issues.join(' '));const clubLogo=await bundledCrest();const blob=await exportWeeklyBoard(plan,{logo:clubLogo});const name=`${clubSlug()}_${plan.size==='story'?'HIKAYE':'MAC_PROGRAMI'}_${plan.items[0].date}.png`;if(action==='weekly-share'){const result=await sharePng(blob,name);toast(result==='shared'?'Paylaşım tamamlandı.':result==='cancelled'?'İşlem iptal edildi.':'PNG indirildi. WhatsApp grubunda dosyayı paylaşabilirsin.');}else{downloadPng(blob,name);toast('Haftalık maç panosu indirildi.');}break;}
 case 'go-live':{if(!activeMatch())throw Error('Önce maç seçmelisiniz.');selectRoute('live');break;}
 case 'live-quick-event':{
@@ -642,6 +670,12 @@ listenRoot('change',async e=>{const el=e.target;if(el.id==='club-switch'||el.id=
  if(el.id==='club-logo'&&el.files[0]){const f=el.files[0];if(!['image/png','image/webp'].includes(f.type))throw Error('Şeffaf PNG veya WEBP yükleyin.');const blob=await prepareLogo(f),id=await saveAsset(blob);await putRecord('settings',{id:'clubLogo',value:id});await refresh();render();toast('Kulüp logosu cihazda saklandı.');return;}
  if(el.id==='poster-bg-file'&&el.files[0]){const blob=await preparePhoto(el.files[0],1920);const id=await saveAsset(blob);await persistDraft({overrides:{backgroundAssetId:id}});toast('Arka plan görseli uygulandı.');return;}
  if(el.id==='csv-file'&&el.files[0]){const groupId=document.getElementById('csv-group').value;const res=parsePlayersCsv(await el.files[0].text(),groupId);state.csvPending=res;const review=document.getElementById('csv-review');review.textContent=`${res.rows.length} geçerli kayıt. ${res.errors.length} hatalı satır.`+(res.errors.length?' Hatalar: '+res.errors.map(x=>`${x.row}. satır: ${x.message}`).join(' | '):'');document.getElementById('csv-confirm').disabled=!res.rows.length||!!res.errors.length;return;}
+ if(el.id==='weekly-import-file'&&el.files[0]){
+ const file=el.files[0],parsed=await readFixtureFile(file);
+ state.fixtureImport={...parsed,filename:file.name};render();
+ toast(parsed.errors.length?'Program hataları var; hiçbir kayıt eklenmedi.':'Program okundu, kontrol edip onaylayın.',!!parsed.errors.length);
+ return;
+ }
  if(el.id==='backup-file'&&el.files[0]){
  const file=el.files[0];el.value='';if(file.size>105*1024*1024)throw Error('Yedek dosyası 105 MB sınırını aşıyor.');
  let password=null,report=await inspectBackup(file);
