@@ -25,7 +25,7 @@ The canonical code remains in `daricagucusk/Match-Studio`. The production Vercel
 4. **Do not change the title prefix** `[AI DEVIR]`.
 5. Submit the issue as repository owner `daricagucusk`.
 6. Go to **Actions > Mobile AI Handoff Pilot** to inspect status. A successful run should generate a new `agent/mobile-handoff-<issue>-<run>` branch and a **draft Pull Request**.
-7. Examine all changed files and verify the existing **Verify Match Studio release** checks. Merge only after explicit owner approval and separate production release validation.
+7. The draft PR job explicitly triggers **Verify Match Studio release** via GitHub workflow_dispatch, because bot-authored PR events can require separate approval or fail to trigger automatic CI. Examine all changed files and verify that dispatched run. Merge only after explicit owner approval and separate production release validation.
 
 ## Security and rollback
 
@@ -33,7 +33,7 @@ The canonical code remains in `daricagucusk/Match-Studio`. The production Vercel
 - Gemini runs in a read-only GitHub-token job without checkout credentials, and is asked to edit source files only. The selected CLI is set to `auto_edit` rather than broad YOLO shell execution.
 - Changes must be small; prohibited modifications to `.github/`, deployment/build configuration, credentials, shell scripts, file deletions or renames make the job fail. The patch size is capped at 200 KB.
 - `npm run build` and `npm test` run before a patch is transferred. Existing PR CI carries out heavier browser/release tests.
-- A separate job with write permission applies only the patch and opens a draft PR; no commit is made to `main`.
+- A separate job with write permission applies only the patch and opens a draft PR; no commit is made to `main`. It needs scoped `actions: write` to request the existing `verify.yml` workflow on the new branch.
 - Never put production credentials, player PII, API keys, or sensitive backup files in GitHub issues. AI providers receive relevant task text and repository context.
 - An AI-generated patch can still be incorrect or unsafe; human review is mandatory.
 - To disable the pilot, delete or rename `.github/workflows/mobile-ai-handoff.yml` in a reviewed PR. A failed task does not change the main branch or production.
