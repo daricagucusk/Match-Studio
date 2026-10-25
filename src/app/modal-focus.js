@@ -1,3 +1,4 @@
+// MATCH_STUDIO_MULTI_MODEL_HANDOFF_SMOKE_20261025: agent code review pipeline smoke test.
 // Modal focus is restored after the UI operation releases its temporary root lock.
 function createModalFocusController(root,onDismiss){
  const doc=root.ownerDocument;
