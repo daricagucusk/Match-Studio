@@ -172,8 +172,12 @@ def run(event, env):
         raise ValueError("Not an owner-authored handoff issue")
     original = source_context(issue.get("body") or "")
     choices = models(env)
+    if issue.get("title", "").startswith("[AI DEVIR][OPENROUTER SMOKE]"):
+        # Explicit owner-only canary: never hit Gemini or paid OpenRouter models.
+        choices = [(provider, model) for provider, model in choices
+                   if provider == "router" and (model.endswith(":free") or model == "openrouter/free")]
     if not choices:
-        raise ValueError("No model credentials configured")
+        raise ValueError("No models configured for this handoff mode")
     prompt = prompt_for(issue.get("body") or "", original)
     for provider, model in choices:
         if provider == "router" and not model.endswith(":free") and model != "openrouter/free":
