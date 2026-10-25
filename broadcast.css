@@ -299,3 +299,11 @@ h1,h2,h3{letter-spacing:-.04em;color:#f2f8f6}
 .group-setup-form .field{min-width:0}.group-setup-form .btn{min-height:46px}
 .group-setup-groups{margin-top:14px;flex-wrap:wrap;overflow-wrap:anywhere}
 @media(max-width:600px){.group-setup.setting-card{padding:18px}.group-setup h2{font-size:20px}.group-setup-form{grid-template-columns:minmax(0,1fr);gap:12px}.group-setup-form .btn{width:100%}}
+
+/* Fold/phone touch safety: the persistent navigation must stay above
+   scrollable match content, without eclipsing dialogs and toasts. */
+@media (max-width:767px){
+ .app-shell > .main { position:relative; z-index:0; }
+ .app-shell > .mobile-nav { position:fixed !important; inset:auto 0 0 !important; z-index:80 !important; isolation:isolate; pointer-events:auto; }
+ .app-shell > .mobile-nav .mobile-link { pointer-events:auto; touch-action:manipulation; }
+}
