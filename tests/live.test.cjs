@@ -115,3 +115,66 @@ test('assist retry remains a duplicate after a later correction voids its goal',
  await sports.commitSportingEvent({matchId:'m1',type:'EVENT_CORRECTION',payload:{targetEventId:goal.event.id,reason:'Gol iptal edildi',void:true},expectedRevision:3,idempotencyKey:'void',nowMs:63000});
  assert.equal((await sports.commitSportingEvent(assist)).duplicate,true);assert.equal((await live.listMatchEvents('m1')).length,4);
 });
+
+test('report distinguishes a bench card from actually entering the field',async()=>{
+ const {live,clock,sports,subs,load}=await fixture([1,1]);
+ const project=load('src/domain/match-events-report.js').projectMatchReport;
+ const before=project(await live.getMatchSession('m1'),[],[],null,1000);
+ assert.deepEqual(Array.from(before.players,p=>p.participated),[false,false,false]);
+ await clock.commitClockAction({matchId:'m1',action:'START',nowMs:1000,expectedRevision:0,idempotencyKey:'start'});
+ await sports.commitSportingEvent({matchId:'m1',type:'YELLOW_CARD',payload:{playerId:'p3'},nowMs:2000,expectedRevision:1,idempotencyKey:'bench-yellow'});
+ const report=project(await live.getMatchSession('m1'),await live.listMatchEvents('m1'),[],null,2100);
+ const bench=report.players.find(p=>p.id==='p3');
+ assert.equal(bench.yellow,1);
+ assert.equal(bench.playedMs,0);
+ assert.equal(bench.participated,false,'bench caution alone must not count as a match appearance');
+ assert.equal(report.players.filter(p=>p.participated).length,2);
+ await subs.commitSubstitution({matchId:'m1',outPlayerId:'p1',inPlayerId:'p3',nowMs:2100,expectedRevision:2,idempotencyKey:'sub'});
+ const entered=project(await live.getMatchSession('m1'),await live.listMatchEvents('m1'),[],null,2100);
+ assert.equal(entered.players.find(p=>p.id==='p3').playedMs,0);
+ assert.equal(entered.players.find(p=>p.id==='p3').participated,true,'recorded entrance counts even if less than one second elapsed');
+});
+
+
+test('reclassifying an own goal back to goal cannot revive a self-assist',async()=>{
+ const {live,clock,sports,load}=await fixture();
+ const act=async(type,payload,key,nowMs)=>{
+  const session=await live.getMatchSession('m1');
+  return sports.commitSportingEvent({matchId:'m1',type,payload,expectedRevision:session.revision,idempotencyKey:key,nowMs});
+ };
+ await clock.commitClockAction({matchId:'m1',action:'START',nowMs:1000,expectedRevision:0,idempotencyKey:'start'});
+ const goal=await act('GOAL',{playerId:'p1'},'goal',2000);
+ const assist=await act('ASSIST',{playerId:'p2',goalEventId:goal.event.id},'assist',3000);
+ assert.ok(assist.event.id);
+ await act('EVENT_CORRECTION',{targetEventId:goal.event.id,reason:'Hakem kendi kalesine gol dedi',replacement:{type:'OWN_GOAL',payload:{playerId:'p1'}}},'own-goal',4000);
+ const before=await live.getMatchSession('m1');
+ await assert.rejects(act('EVENT_CORRECTION',{targetEventId:goal.event.id,reason:'Golcü tekrar değerlendirildi',replacement:{type:'GOAL',payload:{playerId:'p2'}}},'self-assist',5000),/asist/);
+ const after=await live.getMatchSession('m1');
+ assert.equal(after.revision,before.revision);
+ const events=await live.listMatchEvents('m1');
+ assert.equal(events.length,4);
+ const report=load('src/domain/match-events-report.js').projectMatchReport(after,events,[],null,6000);
+ assert.equal(report.ourGoals,0);
+ assert.equal(report.opponentGoals,1);
+ assert.equal(report.players.find(p=>p.id==='p2').assists,0);
+});
+
+test('voiding a linked assist permits legitimate scorer correction without reintroducing assist',async()=>{
+ const {live,clock,sports,load}=await fixture();
+ const act=async(type,payload,key,nowMs)=>{
+  const session=await live.getMatchSession('m1');
+  return sports.commitSportingEvent({matchId:'m1',type,payload,expectedRevision:session.revision,idempotencyKey:key,nowMs});
+ };
+ await clock.commitClockAction({matchId:'m1',action:'START',nowMs:1000,expectedRevision:0,idempotencyKey:'start'});
+ const goal=await act('GOAL',{playerId:'p1'},'goal',2000);
+ const assist=await act('ASSIST',{playerId:'p2',goalEventId:goal.event.id},'assist',3000);
+ await act('EVENT_CORRECTION',{targetEventId:goal.event.id,reason:'Hakem kendi kalesine gol dedi',replacement:{type:'OWN_GOAL',payload:{playerId:'p1'}}},'own-goal',4000);
+ await act('EVENT_CORRECTION',{targetEventId:assist.event.id,reason:'Asist geçersiz sayıldı',void:true},'void-assist',5000);
+ await act('EVENT_CORRECTION',{targetEventId:goal.event.id,reason:'Asıl golcü düzeltildi',replacement:{type:'GOAL',payload:{playerId:'p2'}}},'goal-again',6000);
+ const session=await live.getMatchSession('m1'),events=await live.listMatchEvents('m1');
+ const report=load('src/domain/match-events-report.js').projectMatchReport(session,events,[],null,7000);
+ assert.equal(report.ourGoals,1);
+ assert.equal(report.opponentGoals,0);
+ assert.equal(report.players.find(p=>p.id==='p2').goals,1);
+ assert.equal(report.players.find(p=>p.id==='p2').assists,0);
+});
