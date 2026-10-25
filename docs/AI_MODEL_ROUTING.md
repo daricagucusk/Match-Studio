@@ -25,9 +25,10 @@ Issue açıldıktan sonra modeller arasında geçiş otomatik olur.
 | 2 | Google | gemini-3.5-flash-lite | GEMINI_API_KEY |
 | 3 | OpenRouter | poolside/laguna-s-2.1:free | OPENROUTER_API_KEY, 31 Ekim 2026'da kaldırılması planlanıyor |
 | 4 | OpenRouter | nvidia/nemotron-3-ultra-550b-a55b:free | OPENROUTER_API_KEY |
-| 5 | OpenRouter | openrouter/free | OPENROUTER_API_KEY; sağlayıcı tarafından uygun ücretsiz model seçilir |
-| 6 (opsiyonel) | OpenRouter | z-ai/glm-5.3-flash | Ücretli mod açık + kredi limiti |
-| 7 (opsiyonel) | OpenRouter | deepseek/deepseek-v4.1-flash | Ücretli mod açık + kredi limiti |
+| 5 | OpenRouter | cohere/north-mini-code:free | OPENROUTER_API_KEY; hafif ajan odaklı kod modeli |
+| 6 | OpenRouter | openrouter/free | OPENROUTER_API_KEY; sağlayıcı tarafından uygun ücretsiz model seçilir |
+| 7 (opsiyonel) | OpenRouter | z-ai/glm-5.3-flash | Ücretli mod açık + kredi limiti |
+| 8 (opsiyonel) | OpenRouter | deepseek/deepseek-v4.1-flash | Ücretli mod açık + kredi limiti |
 
 Mevcut olmayan model/başarısız API erişimi/429 kota/503 yoğunluk/ağ hatası/
 bozuk JSON/benzersiz olmayan edit doğrulaması => sıradaki modele geç.
