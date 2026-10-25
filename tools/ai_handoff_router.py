@@ -73,6 +73,23 @@ def post(url, token_header, payload):
     except (ValueError, UnicodeError):
         raise ProviderError("invalid_response") from None
 
+def paid_key_has_hard_cap(env):
+    """Paid requests only when the OpenRouter key itself has <= $5 spending cap."""
+    key = env.get("OPENROUTER_API_KEY")
+    if not key:
+        return False
+    req = Request("https://openrouter.ai/api/v1/key",
+                  headers={"Authorization": "Bearer " + key}, method="GET")
+    try:
+        with urlopen(req, timeout=12) as response:
+            info = json.loads(response.read(200_000)).get("data") or {}
+        limit = info.get("limit")
+        remaining = info.get("limit_remaining")
+        return isinstance(limit, (float, int)) and 0 < limit <= 5 and isinstance(remaining, (float, int)) and remaining > 0
+    except (HTTPError, URLError, OSError, ValueError, TypeError):
+        return False
+
+
 def infer(provider, model, prompt, env):
     if provider == "gemini":
         data = post(
@@ -153,6 +170,10 @@ def run(event, env):
         raise ValueError("No model credentials configured")
     prompt = prompt_for(issue.get("body") or "", original)
     for provider, model in choices:
+        if provider == "router" and not model.endswith(":free") and model != "openrouter/free":
+            if not paid_key_has_hard_cap(env):
+                print("Skipped paid model: API key has no verified <= $5 lifetime spending cap", flush=True)
+                continue
         print("Trying", provider, model, flush=True)
         try:
             proposed = validate_edits(decode_plan(infer(provider, model, prompt, env)), original)
