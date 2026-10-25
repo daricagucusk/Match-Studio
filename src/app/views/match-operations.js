@@ -19,7 +19,7 @@ function dashboard(){
  const tasks=[...(!groups?[['Yaş gruplarını oluştur','archive','Kulüp altyapısı']]:[]),...(!players?[['Oyuncuları kaydet veya CSV aktar','players','Oyuncu merkezi']]:[]),...(incomplete?[['Kadro bekleyen maçları tamamla','archive',`${incomplete} karşılaşma`]]:[]),...(!lastBackup?[['İlk şifreli yedeğini al','archive','Veri güvenliği']]:[])].slice(0,4);
  const hasMatches=state.data.matches.length>0;
  const firstSteps=[
-  {label:'Takım / yaş grubunu oluştur',done:groups>0,route:'dashboard',hint:'Maç ve oyuncu kayıtlarının temel grubu'},
+  {label:'Takım / yaş grubunu oluştur',done:groups>0,route:'archive',hint:'Takımlarını ve yaş gruplarını yönet'},
   {label:'Oyuncu listesini ekle',done:players>0,route:'players',hint:'Oyuncu ekleyebilir veya listenizi aktarabilirsiniz'},
   {label:'İlk maçını hazırla',done:hasMatches,route:'matches',hint:'Rakip, tarih, saat ve sahayı kaydedin'}
  ];
