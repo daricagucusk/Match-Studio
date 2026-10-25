@@ -31,3 +31,18 @@ test('shortcuts remain reachable after scrolling and respect match status',async
  await page.locator('[data-action=live-end]').click();await idle(page);await expect(goal).toBeEnabled();await page.locator('[data-action=live-next]').click();await idle(page);await page.locator('[data-action=live-end]').click();await idle(page);await expect(goal).toBeEnabled();
  await page.locator('[data-action=live-finish]').click();await idle(page);await expect(goal).toBeDisabled();await expect(page.locator('[data-action=live-quick-event]:enabled')).toHaveCount(0);
 });
+
+
+test('P1: matchday quick substitution control reaches the editable form without creating an event',async({page})=>{
+ await setup(page);
+ await page.locator('[data-action=live-start]').click();await idle(page);
+ const quick=page.locator('.live-day-sub-link');
+ await expect(quick).toBeVisible();
+ const before=(await count(page)).length;
+ await quick.click();
+ await expect(page).toHaveURL(/#live-substitution-form$/);
+ await expect(page.locator('#live-substitution-form')).toBeVisible();
+ await expect(page.locator('#live-sub-out')).toBeEnabled();
+ expect((await count(page)).length).toBe(before);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+});
