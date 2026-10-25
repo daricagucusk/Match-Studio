@@ -21,12 +21,15 @@ test('P1: fixture preview requires coach approval and creates no records until c
  await upload(page,'Grup;Rakip;Tarih;Saat;Saha\nU14;Sahil Spor;08.11.2026;14.30;Merkez Stadı');
  await expect(page.locator('.weekly-import-preview')).toContainText('1 geçerli maç');
  await expect(page.locator('.weekly-import-preview')).toContainText('2026-11-08');
- await expect(page.locator('.weekly-roster')).toContainText('Henüz');
+ await expect(page.locator('.weekly-roster')).toContainText('Bu aralıkta kayıtlı maç yok');
  page.once('dialog',d=>d.dismiss());
  await page.locator('[data-action=weekly-import-confirm]').click();await idle(page);
  await expect(page.locator('.weekly-import-preview')).toBeVisible();
  page.once('dialog',d=>d.accept());
  await page.locator('[data-action=weekly-import-confirm]').click();await idle(page);
+ // Imported fixture is 8 Nov; the board defaults to the current week.
+ // Use the all-matches filter to verify durable saved data, not a week mismatch.
+ await page.locator('#weekly-range').selectOption('all');await idle(page);
  await expect(page.locator('.weekly-roster')).toContainText('Sahil Spor');
  await expect(page.locator('.weekly-import-preview')).toHaveCount(0);
 });
@@ -36,5 +39,5 @@ test('P1: wrong or conflicting team refuses entire file and leaves matches uncha
  await expect(page.locator('.weekly-import-preview')).toContainText('1 geçerli maç');
  await page.locator('[data-action=weekly-import-confirm]').click();await idle(page);
  await expect(page.locator('.toast')).toContainText('takım bulunamadı');
- await expect(page.locator('.weekly-roster')).toContainText('Henüz');
+ await expect(page.locator('.weekly-roster')).toContainText('Bu aralıkta kayıtlı maç yok');
 });
