@@ -28,7 +28,7 @@
 @media(prefers-reduced-motion:reduce){.live-event-zone *,.live-report *{animation:none!important;transition-duration:.01ms!important}}
 
 /* Reach event entry from any position without saving an event implicitly. */
-.live-event-shortcuts{position:sticky;top:8px;z-index:25;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:8px;margin:0 0 16px;border:1px solid #526fa3;border-radius:14px;background:#101b30;box-shadow:0 8px 24px #03081566}
+.live-event-shortcuts{position:sticky;top:8px;z-index:25;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:8px;margin:0 0 16px;border:1px solid #526fa3;border-radius:14px;background:#101b30;box-shadow:0 8px 24px #03081566}
 .live-event-shortcuts .btn{min-width:0;min-height:48px;padding:8px 6px;font-size:13px;white-space:normal;line-height:1.25}
 .live-event-shortcuts .btn:focus-visible{outline:3px solid #a7b8ff;outline-offset:2px}
 .live-event-shortcuts [data-event-type=YELLOW_CARD]{border-color:#c9ae53}.live-event-shortcuts [data-event-type=RED_CARD]{border-color:#d37979}
@@ -36,3 +36,8 @@
 @media(max-width:767px){#live-event-form{scroll-margin-top:16px}.live-event-shortcuts{position:fixed;top:auto;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));margin:0;gap:6px}.live-event-shortcuts .btn{font-size:12px}.page:has(.live-event-shortcuts){padding-bottom:90px}}
 @media print{.live-event-shortcuts{display:none!important}}
 @media(max-width:767px){.page:has(.live-event-shortcuts) .live-controls .btn{min-width:0;flex:1 1 0;font-size:13px}}
+
+/* P1: the fifth field action opens the substitution form without changing match state. */
+.live-day-sub-link{text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;border-color:#789bc5!important}
+#live-substitution-form{scroll-margin-top:100px}
+@media(max-width:767px){.live-event-shortcuts .btn{font-size:11px;padding:7px 3px}.live-day-sub-link{font-size:11px}}
