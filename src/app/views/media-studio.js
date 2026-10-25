@@ -29,7 +29,7 @@ function weeklyPage(){
  const goWeek=(days)=>{const dt=new Date(`${board.week}T12:00:00Z`);dt.setUTCDate(dt.getUTCDate()+days);return dt.toISOString().slice(0,10)};
  return `${pageHeader('GÖRSEL PAYLAŞIM MERKEZİ','Haftalık Maç Panosu','Kayıtlı karşılaşmaları tek bir paylaşılabilir görsele dönüştür. Oyuncu, toplantı veya özel antrenör bilgisi bu görsele girmez.')}
  <section class="weekly-file-panel" aria-labelledby="weekly-import-heading">
-  <details>
+  <details ${state.fixtureImport?'open':''}>
     <summary id="weekly-import-heading">Dosyadan haftalık maç ekle (CSV / Excel)</summary>
     <p>Dosya yalnızca bu tarayıcıda okunur. Hiçbir maç siz onaylamadan kaydedilmez. Zorunlu sütunlar: Grup, Rakip, Tarih, Saat, Saha. İlk satır başlık olmalıdır.</p>
     <label for="weekly-import-file">Federasyon maç programı dosyası</label>
