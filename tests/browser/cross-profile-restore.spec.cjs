@@ -9,7 +9,7 @@ async function nav(page,route){
     const nav=el.closest('.mobile-nav'),content=document.elementFromPoint(x,y);
     return {rectangle:{x:r.x,y:r.y,width:r.width,height:r.height},
       viewport:{innerWidth,innerHeight,visualWidth:visualViewport?.width,visualHeight:visualViewport?.height},
-      nav:{position:getComputedStyle(nav).position,zIndex:getComputedStyle(nav).zIndex,display:getComputedStyle(nav).display},
+      nav:nav?{position:getComputedStyle(nav).position,zIndex:getComputedStyle(nav).zIndex,display:getComputedStyle(nav).display}:null,
       mainZ:getComputedStyle(document.querySelector('.main')).zIndex,
       hit:(content?.outerHTML||'').slice(0,260)};
    });
