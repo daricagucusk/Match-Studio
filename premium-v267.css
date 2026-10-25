@@ -314,3 +314,106 @@ body:has(.workspace-compact) .v22-metrics strong{font-size:24px}
 .v22-cluster-chips .group-chip{min-height:44px}
 
 .ms-manager-details,.ms-group-row{border-color:var(--ui-border)}
+
+
+/* MATCH STUDIO | Fold dashboard onboarding polish
+   Consistent one-hand onboarding: never inherit browser-default grey
+   buttons or place step number, label and supporting text inline. */
+.ms-quickstart {
+  --qs-ink:#eef2ff;
+  --qs-muted:#a3b3d6;
+  margin:0 0 20px;
+  padding:19px;
+  background:linear-gradient(135deg,#151f36 0%,#101b2d 100%);
+  border:1px solid #3b507d;
+  border-radius:17px;
+  box-shadow:0 10px 32px #060b1c42;
+  color:var(--qs-ink);
+  min-width:0;
+}
+.ms-quickstart-title {display:flex;flex-direction:column;gap:6px;margin-bottom:14px;min-width:0}
+.ms-quickstart-kicker {
+  font-size:10px;font-weight:850;letter-spacing:.13em;
+  color:#adbefd;text-transform:uppercase;
+}
+.ms-quickstart-title h2 {
+  font-size:clamp(18px,2.4vw,24px);line-height:1.2;
+  margin:0;font-weight:850;letter-spacing:-.025em;
+  color:var(--qs-ink);overflow-wrap:break-word;
+}
+.ms-quickstart-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ms-quickstart-step {
+  -webkit-appearance:none;appearance:none;box-sizing:border-box;
+  width:100%;min-width:0;min-height:80px;padding:12px;
+  display:grid;grid-template-columns:30px minmax(0,1fr) 16px;
+  align-items:center;gap:9px;text-align:left;
+  background:#1a2844;border:1px solid #40557f;border-radius:12px;
+  color:#eaf0ff;cursor:pointer;
+  font:inherit;white-space:normal;touch-action:manipulation;
+}
+.ms-quickstart-step:hover{background:#223358;border-color:#7995da}
+.ms-quickstart-step:focus-visible{outline:3px solid #adc3ff;outline-offset:2px}
+.ms-quickstart-count{
+  display:grid;place-items:center;
+  width:30px;height:30px;border-radius:9px;
+  background:#2c447e;color:#e8efff;font-size:13px;
+  font-weight:900;font-variant-numeric:tabular-nums;
+}
+.ms-quickstart-copy{
+  display:flex;flex-direction:column;gap:3px;
+  min-width:0;max-width:100%;overflow-wrap:anywhere;
+}
+.ms-quickstart-copy strong{
+  font-size:12px;line-height:1.32;font-weight:800;
+  color:#f0f3ff;white-space:normal;
+}
+.ms-quickstart-copy small{
+  font-size:10px;line-height:1.38;
+  color:var(--qs-muted);white-space:normal;
+}
+.ms-quickstart-arrow{display:grid;place-items:center;color:#9fb6ec}
+.ms-quickstart-arrow svg{width:14px;height:14px}
+.ms-quickstart-step.is-done{
+  background:#142b2a;border-color:#2e5d55;
+}
+.ms-quickstart-step.is-done .ms-quickstart-count{background:#265a4b;color:#baf4d1}
+.ms-quickstart-step.is-done .ms-quickstart-arrow{color:#89d5b1}
+@media (max-width:900px){
+  .ms-quickstart-steps{grid-template-columns:1fr;gap:8px}
+  .ms-quickstart-step{min-height:62px;padding:10px 12px}
+}
+@media (max-width:767px){
+  .ms-quickstart{margin-bottom:16px;padding:15px 14px;border-radius:15px}
+  .ms-quickstart-title{gap:6px;margin-bottom:11px}
+  .ms-quickstart-title h2{font-size:19px}
+  .ms-quickstart-step{min-height:60px;grid-template-columns:30px minmax(0,1fr) 16px}
+  .ms-quickstart-copy strong{font-size:12px}
+  .ms-quickstart-copy small{font-size:10px}
+  /* No meaningless, giant empty fixture on a brand-new club. It returns
+     automatically as soon as an actual upcoming match exists. */
+  .broadcast-hero.is-empty{min-height:0;display:block}
+  .broadcast-hero.is-empty .hero-fixture{display:none}
+  .broadcast-hero.is-empty .hero-copy{padding:21px 19px}
+  .broadcast-hero.is-empty .hero-copy h1{
+    font-size:clamp(27px,6.5vw,35px);line-height:1.06;
+    letter-spacing:-.035em;margin:13px 0 9px;
+  }
+  .broadcast-hero.is-empty .hero-copy p{line-height:1.45;font-size:12px}
+  .broadcast-hero.is-empty .hero-bottom-line{
+    margin-top:16px;font-size:9px;letter-spacing:.07em;flex-wrap:wrap;
+  }
+  .hero-buttons{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .hero-buttons .btn{min-width:0!important;width:100%;white-space:normal;text-align:center;
+    justify-content:center;min-height:52px;line-height:1.24;padding:9px 8px;font-size:10px}
+  .broadcast-page-kicker{margin-top:4px}
+}
+@media (max-width:380px){
+  .ms-quickstart-step{grid-template-columns:28px minmax(0,1fr) 14px;gap:8px;padding:9px}
+  .ms-quickstart-count{width:28px;height:28px}
+  .broadcast-hero.is-empty .hero-copy{padding:19px 15px}
+  .hero-buttons{gap:7px}
+  .hero-buttons .btn{font-size:9px;min-height:52px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ms-quickstart-step{transition:none!important}
+}
