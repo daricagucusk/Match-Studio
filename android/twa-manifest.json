@@ -1,0 +1,38 @@
+{
+  "packageId": "com.daricagucusk.matchstudio",
+  "host": "match-studio-telefon.vercel.app",
+  "name": "Match Studio",
+  "launcherName": "Match Studio",
+  "display": "standalone",
+  "themeColor": "#090E1B",
+  "themeColorDark": "#090E1B",
+  "navigationColor": "#090E1B",
+  "navigationColorDark": "#090E1B",
+  "navigationDividerColor": "#090E1B",
+  "backgroundColor": "#090E1B",
+  "enableNotifications": false,
+  "startUrl": "/index.html",
+  "iconUrl": "https://match-studio-telefon.vercel.app/icons/icon-512.png",
+  "maskableIconUrl": "https://match-studio-telefon.vercel.app/icons/icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./upload-key.jks",
+    "alias": "matchstudio-upload"
+  },
+  "appVersionCode": 1,
+  "appVersion": "2.6.8",
+  "generatorApp": "match-studio-google-play-prep",
+  "webManifestUrl": "https://match-studio-telefon.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "minSdkVersion": 24,
+  "orientation": "default",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "shortcuts": [],
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  }
+}
