@@ -94,3 +94,15 @@ Doğrulama için yeni bir '[AI DEVIR]' Issue oluşturun; test konusu öncekiyle
 aynı tek satırlık src/main.js yorum satırı olabilir. Uçtan uca başarılı
 olduğu söylenebilmesi için ayrı ajan branch'i, bir DRAFT PR,
 npm build+test ve verify.yml kontrolü gerçekten başarıyla tamamlanmalıdır.
+
+## OpenRouter canlı bağlantı doğrulaması (salt ücretsiz)
+
+Depo sahibinin açtığı başlık `[AI DEVIR][OPENROUTER SMOKE]` ile başlayan
+Issue'lar, ücretsiz OpenRouter modellerini doğrudan denetlemek için Gemini'yi
+atlar. Bu mod ücretli modellere **asla geçmez**, `OPENROUTER_API_KEY` yoksa
+hızlı başarısız olur. Issue içinde bir küçük ve kişisel veri içermeyen
+mevcut kaynak dosyası belirtin. Başarılı kod değişikliği yalnızca insan
+onayını bekleyen taslak PR'a yazılır; `main` veya üretim etkilenmez.
+
+Bu bir açık API anahtarı doğrulaması değildir; yalnızca GitHub Actions
+secret'ını kullanan uçtan uca istek ve model yanıtını sınar.
