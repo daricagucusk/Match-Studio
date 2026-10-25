@@ -30,7 +30,7 @@ The canonical code remains in `daricagucusk/Match-Studio`. The production Vercel
 ## Security and rollback
 
 - Trigger is limited to new issues opened by the repo owner with the exact title prefix.
-- Gemini runs in a read-only GitHub-token job without checkout credentials, and is asked to edit source files only. The selected CLI is set to `auto_edit` rather than broad YOLO shell execution.
+- Gemini runs in a read-only GitHub-token job without checkout credentials. Note: Google's pinned `run-gemini-cli` Action internally starts the CLI with `--yolo`; therefore this pilot explicitly limits built-in tools using `tools.core` to `read_file`, `write_file`, `replace`, `glob`, `grep_search`, and `list_directory`. The CLI cannot call its built-in shell or web tools with this configuration. This is defense-in-depth, **not** a complete sandbox or guarantee against malicious source content. Review the workflow before enabling it.
 - Changes must be small; prohibited modifications to `.github/`, deployment/build configuration, credentials, shell scripts, file deletions or renames make the job fail. The patch size is capped at 200 KB.
 - `npm run build` and `npm test` run before a patch is transferred. Existing PR CI carries out heavier browser/release tests.
 - A separate job with write permission applies only the patch and opens a draft PR; no commit is made to `main`. It needs scoped `actions: write` to request the existing `verify.yml` workflow on the new branch.
