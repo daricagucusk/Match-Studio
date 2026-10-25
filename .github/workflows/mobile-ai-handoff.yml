@@ -1,0 +1,179 @@
+name: Mobile AI Handoff Pilot
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-ai-handoff-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    name: Generate isolated code patch
+    if: >-
+      github.event.issue.user.login == github.repository_owner &&
+      startsWith(github.event.issue.title, '[AI DEVIR]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Require preconfigured Google AI Studio key
+        env:
+          KEY_PRESENT: ${{ secrets.GEMINI_API_KEY != '' }}
+        run: |
+          if [ "$KEY_PRESENT" != "true" ]; then
+            echo "::error::GEMINI_API_KEY is missing. Add it in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Generate changes with Gemini CLI
+        uses: google-github-actions/run-gemini-cli@f77273f4c914e4bf38440cf36a0369cb64a37489 # v0.1.22
+        env:
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_cli_version: "0.65.0"
+          settings: |
+            {
+              "tools": {
+                "core": ["read_file", "write_file", "replace", "glob", "grep_search", "list_directory"]
+              },
+              "model": {"maxSessionTurns": 20}
+            }
+          prompt: |
+            You are working on the Match Studio mobile-first football club PWA.
+            Read README.md and docs/AI_AGENT_HANDOFF.md. Implement the OWNER-AUTHORED
+            GitHub issue request below, directly editing only permitted application
+            source files or tests in the checkout. Keep the change minimal and
+            preserve existing working features and user data formats.
+            The tool allowlist deliberately excludes shell execution, web fetch,
+            extension tools, and MCP tools. Only source reading and direct edits
+            are permitted.
+            Do NOT use shell commands, deploy, commit, push, open PRs, install
+            dependencies, or access credentials. A separate locked workflow will
+            run validation and prepare a draft pull request.
+            Forbidden paths include .github/, .gemini/, .env*, package*.json,
+            vercel.json, shell scripts, and every secret/credential file.
+            Do not delete or rename files. If the task needs protected changes,
+            explain the limitation and leave those changes undone.
+            ISSUE #${{ github.event.issue.number }}
+            TITLE: ${{ github.event.issue.title }}
+            REQUEST:
+            ${{ github.event.issue.body }}
+
+      - name: Enforce pilot scope and export patch
+        id: changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA" || { echo "::error::The agent changed Git HEAD."; exit 1; }
+          printf '\n/.gemini/\n/gemini-artifacts/\n/gemini-cli/\n/gha-creds-*.json\n' >> .git/info/exclude
+          git add -N .
+          if [ -n "$(git diff --name-only --diff-filter=DR HEAD)" ]; then
+            echo "::error::File removals and renames are not allowed in this pilot."
+            exit 1
+          fi
+          count=0
+          while IFS= read -r -d '' path; do
+            count=$((count+1))
+            case "$path" in
+              src/*|tests/*|assets/*|icons/*|index.html|*.css)
+                ;;
+              *)
+                echo "::error::File outside pilot source allowlist: $path"
+                exit 1
+                ;;
+            esac
+          done < <(git diff --name-only -z HEAD)
+          test "$count" -gt 0 || { echo "::error::Agent made no source edits."; exit 1; }
+          git diff --binary HEAD > "$RUNNER_TEMP/mobile-handoff.patch"
+          test "$(wc -c < "$RUNNER_TEMP/mobile-handoff.patch")" -le 200000 || {
+            echo "::error::Patch exceeds pilot 200 KB review limit."
+            exit 1
+          }
+
+      - name: Validate application changes
+        run: |
+          npm ci --no-audit --no-fund --ignore-scripts
+          npm run build
+          npm test
+
+      - name: Transfer reviewed patch to publish job
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mobile-ai-handoff-patch
+          path: ${{ runner.temp }}/mobile-handoff.patch
+          if-no-files-found: error
+          retention-days: 3
+
+  draft-pr:
+    name: Open draft PR, never deploy
+    needs: generate
+    if: needs.generate.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download isolated patch
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mobile-ai-handoff-patch
+          path: ${{ runner.temp }}/handoff-artifacts
+
+      - name: Apply patch and push feature branch
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          patch="$RUNNER_TEMP/handoff-artifacts/mobile-handoff.patch"
+          git apply --check "$patch"
+          branch="agent/mobile-handoff-${ISSUE_NUMBER}-${RUN_ID}"
+          git switch -c "$branch"
+          git apply "$patch"
+          git add -A
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat(agent): draft issue #${ISSUE_NUMBER} changes"
+          git push -u origin "$branch"
+          echo "BRANCH=$branch" >> "$GITHUB_ENV"
+
+      - name: Open draft pull request for human review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh pr create \
+            --draft \
+            --base main \
+            --head "$BRANCH" \
+            --title "[AI Devri] Issue #$ISSUE_NUMBER - kod önerisi" \
+            --body "Closes #$ISSUE_NUMBER only if manually merged. Generated by the Mobile AI Handoff pilot. Build and unit tests passed before opening this draft. Existing verify CI on the PR must also pass. Review every file; do not merge without owner approval. No production deployment was requested."
+
+      - name: Dispatch full release CI for bot-authored PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run verify.yml --ref "$BRANCH"
