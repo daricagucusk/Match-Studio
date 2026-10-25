@@ -46,8 +46,9 @@ jobs:
           gemini_cli_version: "0.65.0"
           settings: |
             {
-              "general": {"defaultApprovalMode": "auto_edit"},
-              "security": {"disableYoloMode": true},
+              "tools": {
+                "core": ["read_file", "write_file", "replace", "glob", "grep_search", "list_directory"]
+              },
               "model": {"maxSessionTurns": 20}
             }
           prompt: |
@@ -56,6 +57,9 @@ jobs:
             GitHub issue request below, directly editing only permitted application
             source files or tests in the checkout. Keep the change minimal and
             preserve existing working features and user data formats.
+            The tool allowlist deliberately excludes shell execution, web fetch,
+            extension tools, and MCP tools. Only source reading and direct edits
+            are permitted.
             Do NOT use shell commands, deploy, commit, push, open PRs, install
             dependencies, or access credentials. A separate locked workflow will
             run validation and prepare a draft pull request.
