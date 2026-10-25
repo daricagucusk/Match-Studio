@@ -6,7 +6,7 @@ const {splitDelimited,parseFixtureRows}=load('src/domain/fixture-import.js');
 test('weekly CSV/TSV import supports Turkish headers and quoted content',()=>{
  const rows=splitDelimited('Grup;Rakip;Tarih;Saat;Saha\nU14;"Sahil; Spor";08.11.2026;14.30;Kent Stadı');
  const plan=parseFixtureRows(rows);
- assert.deepEqual(plan.errors,[]);
+ assert.equal(plan.errors.length,0);
  assert.equal(plan.rows.length,1);
  assert.equal(plan.rows[0].opponent,'Sahil; Spor');
  assert.equal(plan.rows[0].matchDate,'2026-11-08');
@@ -14,7 +14,7 @@ test('weekly CSV/TSV import supports Turkish headers and quoted content',()=>{
 });
 test('Excel numeric date and time normalize without guessing text dates',()=>{
  const p=parseFixtureRows([['Grup','Rakip','Tarih','Saat','Saha'],['U12','Rakip Spor','46334','0.625','Saha A']]);
- assert.deepEqual(p.errors,[]);
+ assert.equal(p.errors.length,0);
  assert.match(p.rows[0].matchDate,/^\d{4}-\d{2}-\d{2}$/);
  assert.equal(p.rows[0].kickoffTime,'15:00');
 });
