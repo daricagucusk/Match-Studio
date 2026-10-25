@@ -417,3 +417,15 @@ body:has(.workspace-compact) .v22-metrics strong{font-size:24px}
 @media (prefers-reduced-motion:reduce){
   .ms-quickstart-step{transition:none!important}
 }
+
+/* Open Fold/tablet: a no-match dashboard should not waste another full
+   screen on decorative empty fixtures. Actual upcoming fixtures remain. */
+@media (min-width:768px) and (max-width:1020px) {
+ .broadcast-hero.is-empty {display:block;min-height:0}
+ .broadcast-hero.is-empty .hero-fixture {display:none}
+ .broadcast-hero.is-empty .hero-copy {padding:24px 28px}
+ .broadcast-hero.is-empty .hero-copy h1 {
+   font-size:clamp(30px,5vw,46px);line-height:1.07;margin:16px 0 11px;
+ }
+ .broadcast-hero.is-empty .hero-bottom-line {margin-top:18px}
+}
