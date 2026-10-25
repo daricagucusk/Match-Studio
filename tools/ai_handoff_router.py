@@ -52,6 +52,7 @@ def models(env):
     if env.get("OPENROUTER_API_KEY"):
         order.extend([("router", "poolside/laguna-s-2.1:free"),
                       ("router", "nvidia/nemotron-3-ultra-550b-a55b:free"),
+                      ("router", "cohere/north-mini-code:free"),
                       ("router", "openrouter/free")])
         if env.get("AI_ENABLE_PAID_FALLBACK", "").strip().lower() == "true":
             order.extend([("router", "z-ai/glm-5.3-flash"),
