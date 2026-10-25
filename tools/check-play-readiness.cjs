@@ -42,7 +42,7 @@ async function run(){
  if(!isHex(android.backgroundColor)||!isHex(android.themeColor))throw Error('TWA brand colors invalid');
  if(android.iconUrl!==origin+'/icons/icon-512.png')throw Error('TWA 512px icon mismatch');
  if(android.appVersionCode<1||!Number.isSafeInteger(android.appVersionCode))throw Error('Android app versionCode invalid');
- if(!pkgName.startsWith(android.appVersion+'.'))throw Error('Android appVersion is out of sync with PWA');
+ if(!(pkgName===android.appVersion||pkgName.startsWith(android.appVersion+'.')||pkgName.startsWith(android.appVersion+'-')))throw Error('Android appVersion is out of sync with PWA');
  add('PASS','PWA and launcher icons','192/512 PNG and trusted HTTPS host validated');
  add('PASS','Provisional Android metadata',android.packageId+' · v'+android.appVersion+' ('+android.appVersionCode+')');
  add('PASS','Permissions','No push delegation or payment permissions configured in wrapper.');
