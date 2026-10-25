@@ -27,6 +27,7 @@
   "src/domain/validation.js",
   "src/domain/workspace-quality.js",
   "src/app/pwa-updates.js",
+  "src/domain/fixture-import.js",
   "src/main.js",
   "src/pitch/pitch-export.js",
   "src/pitch/pitch-screen.js",
