@@ -88,6 +88,25 @@ class ModelRouterTests(unittest.TestCase):
         self.assertEqual((router.ROOT / "src" / "smoke.js").read_text(),
                          "const answer = 1;\n")
 
+    def test_openrouter_smoke_mode_only_free_models(self):
+        event = {"repository": {"owner": {"login": "owner"}},
+                 "issue": {"user": {"login": "owner"},
+                           "title": "[AI DEVIR][OPENROUTER SMOKE] provider canary",
+                           "body": "Add a single comment to src/smoke.js."}}
+        attempts = []
+        def mocked(provider, model, prompt, env):
+            attempts.append((provider, model))
+            return json.dumps({"edits": [{"path": "src/smoke.js",
+                                          "find": "const answer", "replace": "// canary\\nconst answer"}]})
+        with patch.object(router, "infer", side_effect=mocked):
+            router.run(event, {"GEMINI_API_KEY": "test-gemini",
+                               "OPENROUTER_API_KEY": "test-router",
+                               "AI_ENABLE_PAID_FALLBACK": "true"})
+        self.assertEqual(len(attempts), 1)
+        self.assertEqual(attempts[0][0], "router")
+        self.assertTrue(attempts[0][1].endswith(":free"))
+        self.assertIn("// canary", (router.ROOT / "src" / "smoke.js").read_text())
+
     def test_non_owner_rejected(self):
         event = {"repository": {"owner": {"login": "owner"}},
                  "issue": {"user": {"login": "visitor"}, "title": "[AI DEVIR] foo",
