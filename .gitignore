@@ -9,3 +9,18 @@ public/
 .env.*
 !.env.example
 __pycache__/
+
+# Android / Google Play upload key materials must never enter Git history
+android/*.jks
+android/*.keystore
+android/*.p12
+android/*.pfx
+android/*.pkcs12
+android/key.properties
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
+android/.idea/
+*.aab
+*.apk
