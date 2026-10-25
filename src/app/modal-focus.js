@@ -1,3 +1,4 @@
+// MATCH_STUDIO_OPENROUTER_FREE_SMOKE_20261025: free-provider handoff verified.
 // Modal focus is restored after the UI operation releases its temporary root lock.
 function createModalFocusController(root,onDismiss){
  const doc=root.ownerDocument;
