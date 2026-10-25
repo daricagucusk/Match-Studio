@@ -16,7 +16,7 @@ test('new club uses one clear team onboarding action, not duplicate step cards',
  await expect(page.locator('.broadcast-hero.is-empty')).toBeVisible();
  await expect(page.locator('.hero-bottom-line')).toContainText('V2.6.8-F.13');
  await expect(page.locator('.hero-bottom-line')).not.toContainText('F.11');
- if(page.viewportSize().width<768){
+ if(page.viewportSize().width<=1020){
    await expect(page.locator('.broadcast-hero.is-empty .hero-fixture')).toBeHidden();
  }
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
