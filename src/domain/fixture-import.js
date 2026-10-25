@@ -34,6 +34,14 @@ function excelDate(value){
  if(days<20000||days>80000)return value;
  return new Date(Date.UTC(1899,11,30)+Math.floor(days)*86400000).toISOString().slice(0,10);
 }
+function excelTime(value){
+ const raw=clean(value),num=Number(raw);
+ if(raw&&Number.isFinite(num)&&num>=0&&num<1){
+  const minutes=Math.round(num*24*60);
+  return String(Math.floor(minutes/60)%24).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
+ }
+ return raw;
+}
 function parseFixtureRows(grid){
  if(!Array.isArray(grid)||!grid.length)return{rows:[],errors:['Tablo boş.']};
  const headers=grid[0].map(headerKey),indices={};
@@ -48,7 +56,9 @@ function parseFixtureRows(grid){
  for(let i=1;i<grid.length&&i<=1000;i++){
   const row=grid[i],get=k=>clean(indices[k]<0?'':row[indices[k]]);
   if(!row.some(v=>clean(v)))continue;
-  const group=get('group'),opponent=get('opponent'),date=normalizeDate(excelDate(get('date'))),time=normalizeTime(get('time')),venue=get('venue');
+  const group=get('group'),opponent=get('opponent'),venue=get('venue');
+  let date=null;try{date=normalizeDate(excelDate(get('date')));}catch(error){date=null;}
+  const time=normalizeTime(excelTime(get('time')));
   const details=[group,opponent,date,time,venue];
   if(details.some(v=>!v)){errors.push('Satır '+(i+1)+': Grup/Rakip/Tarih/Saat/Saha geçerli olmalı.');continue;}
   if(group.length>80||opponent.length>110||venue.length>150){errors.push('Satır '+(i+1)+': Çok uzun alan.');continue;}
