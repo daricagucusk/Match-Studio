@@ -78,7 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA" || { echo "::error::The agent changed Git HEAD."; exit 1; }
-          printf '\n/.gemini/\n/gha-creds-*.json\n' >> .git/info/exclude
+          printf '\n/.gemini/\n/gemini-artifacts/\n/gemini-cli/\n/gha-creds-*.json\n' >> .git/info/exclude
           git add -N .
           if [ -n "$(git diff --name-only --diff-filter=DR HEAD)" ]; then
             echo "::error::File removals and renames are not allowed in this pilot."
@@ -88,8 +88,10 @@ jobs:
           while IFS= read -r -d '' path; do
             count=$((count+1))
             case "$path" in
-              .github/*|.gemini/*|.env*|*/.env*|package.json|package-lock.json|vercel.json|*.yml|*.yaml|*.sh|*.ps1|*.pem|*.key|*credentials*|*secret*)
-                echo "::error::Protected file changed: $path"
+              src/*|tests/*|assets/*|icons/*|index.html|*.css)
+                ;;
+              *)
+                echo "::error::File outside pilot source allowlist: $path"
                 exit 1
                 ;;
             esac
