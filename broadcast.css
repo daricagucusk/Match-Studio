@@ -299,3 +299,19 @@ h1,h2,h3{letter-spacing:-.04em;color:#f2f8f6}
 .group-setup-form .field{min-width:0}.group-setup-form .btn{min-height:46px}
 .group-setup-groups{margin-top:14px;flex-wrap:wrap;overflow-wrap:anywhere}
 @media(max-width:600px){.group-setup.setting-card{padding:18px}.group-setup h2{font-size:20px}.group-setup-form{grid-template-columns:minmax(0,1fr);gap:12px}.group-setup-form .btn{width:100%}}
+
+/* Phone/fold dock safety: avoid sideways document panning that displaces
+   the viewport hit target after editing a player photo or long form. The
+   mobile menu stays above normal page content but below modal overlays. */
+@media (max-width:767px) {
+ html, body { max-width:100%; overflow-x:clip; }
+ #app, .app-shell { min-width:0; max-width:100%; overflow-x:clip; }
+ .app-shell > .main { position:relative; z-index:0; box-sizing:border-box;
+   min-width:0; width:100%; max-width:100%; overflow-x:clip; }
+ .app-shell > .mobile-nav { position:fixed !important; left:0 !important;
+   right:0 !important; bottom:0 !important; width:100% !important;
+   box-sizing:border-box; z-index:40 !important; isolation:isolate;
+   transform:translateZ(0); pointer-events:auto; }
+ .app-shell > .mobile-nav .mobile-link { min-width:0; pointer-events:auto;
+   touch-action:manipulation; }
+}

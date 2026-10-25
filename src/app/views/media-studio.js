@@ -28,6 +28,24 @@ function weeklyPage(){
  const plan=prepareBoard(state.data.matches,state.data.groups,ids,board.size,state.club?.name,state.club?.accent);
  const goWeek=(days)=>{const dt=new Date(`${board.week}T12:00:00Z`);dt.setUTCDate(dt.getUTCDate()+days);return dt.toISOString().slice(0,10)};
  return `${pageHeader('GÖRSEL PAYLAŞIM MERKEZİ','Haftalık Maç Panosu','Kayıtlı karşılaşmaları tek bir paylaşılabilir görsele dönüştür. Oyuncu, toplantı veya özel antrenör bilgisi bu görsele girmez.')}
+ <section class="weekly-file-panel" aria-labelledby="weekly-import-heading">
+  <details ${state.fixtureImport?'open':''}>
+    <summary id="weekly-import-heading">Dosyadan haftalık maç ekle (CSV / Excel)</summary>
+    <p>Dosya yalnızca bu tarayıcıda okunur. Hiçbir maç siz onaylamadan kaydedilmez. Zorunlu sütunlar: Grup, Rakip, Tarih, Saat, Saha. İlk satır başlık olmalıdır.</p>
+    <label for="weekly-import-file">Federasyon maç programı dosyası</label>
+    <input id="weekly-import-file" type="file" accept=".csv,.tsv,.xlsx" aria-describedby="weekly-import-notice">
+    <p class="footnote" id="weekly-import-notice">PDF metin çıkarması henüz desteklenmiyor. Dosyayı CSV/Excel olarak edinmeden maçları tahmin etmeyiz.</p>
+    ${state.fixtureImport?`<div class="weekly-import-preview" role="status"><strong>${esc(state.fixtureImport.filename)} · ${state.fixtureImport.rows.length} geçerli maç</strong>
+      ${state.fixtureImport.errors.length?`<ul>${state.fixtureImport.errors.slice(0,12).map(e=>`<li>${esc(e)}</li>`).join('')}</ul>`:''}
+      ${state.fixtureImport.rows.length?`<ol>${state.fixtureImport.rows.slice(0,10).map(m=>`<li>${esc(m.group)} · ${esc(m.opponent)} · ${esc(m.matchDate)} ${esc(m.kickoffTime)} · ${esc(m.venue)}</li>`).join('')}</ol>`:''}
+      <label for="weekly-import-format">Tüm maçlarda kullanılacak oyun formatı</label>
+      <select id="weekly-import-format"><option value="11">11v11</option><option value="9">9v9</option><option value="8">8v8</option><option value="5">5v5</option><option value="3">3v3</option></select>
+      <p>Takım adları mevcut gruplarla birebir eşleşmelidir. Hatalı veya tekrarlanan kayıtlar toplu işlemi durdurur. Seçtiğiniz formatı maç düzenleme ekranında sonradan değiştirebilirsiniz.</p>
+      ${btn('Kontrol et ve maçları ekle','weekly-import-confirm','btn-primary',state.fixtureImport.errors.length?'disabled':'')}
+      ${btn('İçe aktarmayı iptal et','weekly-import-clear','btn-subtle')}
+    </div>`:''}
+  </details>
+ </section>
  <div class="weekly-layout">
   <section class="weekly-control-panel"><div class="weekly-kicker">01 / MAÇ SEÇİMİ</div><h2>Maç programını düzenle</h2>
    <div class="weekly-filter-row"><div class="field"><label for="weekly-range">Gösterilecek maçlar</label><select id="weekly-range"><option value="week" ${board.mode==='week'?'selected':''}>Seçilen hafta</option><option value="all" ${board.mode==='all'?'selected':''}>Tüm kayıtlı maçlar</option></select></div>
