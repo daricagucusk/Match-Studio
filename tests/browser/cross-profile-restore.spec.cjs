@@ -2,7 +2,21 @@ const {test,expect}=require('@playwright/test');
 async function idle(page){await expect(page.locator('#app')).not.toHaveAttribute('aria-busy','true');}
 async function nav(page,route){
  const direct=page.locator('[data-nav="'+route+'"]:visible').first();
- if(await direct.count())await direct.click();
+ if(await direct.count()){
+  if(await page.evaluate(()=>window.innerWidth<=767)){
+   const hit=await direct.evaluate(el=>{
+    const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+    const nav=el.closest('.mobile-nav'),content=document.elementFromPoint(x,y);
+    return {rectangle:{x:r.x,y:r.y,width:r.width,height:r.height},
+      viewport:{innerWidth,innerHeight,visualWidth:visualViewport?.width,visualHeight:visualViewport?.height},
+      nav:{position:getComputedStyle(nav).position,zIndex:getComputedStyle(nav).zIndex,display:getComputedStyle(nav).display},
+      mainZ:getComputedStyle(document.querySelector('.main')).zIndex,
+      hit:(content?.outerHTML||'').slice(0,260)};
+   });
+   console.log('UNIFIED_MOBILE_HIT_TEST',JSON.stringify(hit));
+  }
+  await direct.click();
+ }
  else {await page.locator('.mobile-more summary').click();await page.locator('.mobile-more [data-nav="'+route+'"]').click();}
  await idle(page);
 }
