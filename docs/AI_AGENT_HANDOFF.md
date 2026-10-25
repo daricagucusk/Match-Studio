@@ -1,4 +1,6 @@
 # MATCH STUDIO — MOBILE AI AGENT HANDOFF PILOT
+
+> **Updated 25 Oct 2026:** The single Gemini CLI workflow below is replaced by the multi-provider router described in [AI_MODEL_ROUTING.md](AI_MODEL_ROUTING.md). The router uses Gemini first, then optional OpenRouter free models, and optional strictly capped paid models. For current setup, model priority, privacy and budget rules, follow that newer document. The historical Gemini-only steps below are preserved as pilot background.
 Version: 2026-10-25 (experimental, owner review required)
 
 ## Purpose
