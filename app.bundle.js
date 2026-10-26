@@ -84,6 +84,40 @@ function createMatchDraftStore(storage){
 Object.assign(exports,{createMatchDraftStore});
 
 };
+MODS["src/app/fixture-import-session.js"]=function(exports,require){
+// A preview belongs to one club connection and one import attempt, never just a group name.
+const {clubContext,assertContext,transact}=require('src/storage/db.js');
+const {readFixtureFile}=require('src/domain/fixture-import.js');
+function createFixtureImportSession({readFile=readFixtureFile}={}){
+ let generation=0;
+ const invalidate=()=>{generation++;};
+ function assertCurrent(context){
+  if(!context||context.generation!==generation)throw Error('Program önizlemesi artık geçerli değil. Dosyayı aktif kulüpte yeniden seçin.');
+  assertContext({id:context.clubId,generation:context.databaseGeneration});
+ }
+ async function read(file){
+  invalidate();
+  const club=clubContext();
+  const context=Object.freeze({clubId:club.id,databaseGeneration:club.generation,generation});
+  const parsed=await readFile(file);
+  assertCurrent(context);
+  return {...parsed,filename:file.name,context};
+ }
+ async function commit(preview,matches){
+  const context=preview?.context;
+  assertCurrent(context);
+  // Keep the captured DB scope across Web Lock/openDatabase awaits. Check the
+  // import generation again inside the transaction, before the first write.
+  await transact(['matches'],'readwrite',tx=>{
+   assertCurrent(context);
+   for(const match of matches)tx.objectStore('matches').add(match);
+  },{id:context.clubId,generation:context.databaseGeneration});
+ }
+ return {read,commit,invalidate,assertCurrent};
+}
+Object.assign(exports,{createFixtureImportSession});
+
+};
 MODS["src/app/render-coordinator.js"]=function(exports,require){
 /* Route-level DOM reconciliation. Keep the sidebar/mobile navigation stable while
  * refreshing only the active page. Unlike an unconditional root.innerHTML rewrite,
@@ -124,7 +158,7 @@ function createClubRecordViews(deps){
 function archive(){const matches=allMatches(),settings=Object.fromEntries(state.data.settings.map(x=>[x.id,x.value]));return `${groupSetup()}${clubManager()}${pageHeader('KAYITLAR VE YEREL AYARLAR','Arşiv & Ayarlar','Maç geçmişi, kulüp logosu ve çevrimdışı veri yedekleri.')}
 <div class="settings-list"><section class="setting-card"><div class="card-top"><h3>Kayıtlı maçlar</h3><span class="stat-chip">${matches.length} maç</span></div>${matches.length?matches.map(m=>`<div class="match-row"><div class="match-mark">${I('calendar')}</div><div class="match-row-info"><b>${esc(m.opponent)}</b><span>${esc(formatTurkishDate(m.matchDate))} · ${esc(getGroup(m.groupId)?.name||'')} · ${esc(m.kickoffTime)}</span></div><div class="row-actions">${btn('Aç','open-match','btn-ghost btn-small',`data-id="${esc(m.id)}"`)}${btn(m.state==='archived'?'Kilidi aç':'Arşivle','toggle-archive','btn-subtle btn-small',`data-id="${esc(m.id)}" title="Arşivlenen maçın geçmiş kadro isimleri sabit tutulur"`)}${btn(I('copy'),'duplicate-match','btn-subtle btn-icon',`title="Maçı kopyala" aria-label="Maçı kopyala" data-id="${esc(m.id)}"`)}${btn(I('trash'),'delete-match','btn-danger btn-icon',`title="Maçı sil" aria-label="Maçı sil" data-id="${esc(m.id)}"`)}</div></div>`).join(''):`<p class="muted">Henüz kaydedilmiş maç yok.</p>`}</section>
 <section class="setting-card"><h3>Kulüp arması</h3><p>Kendi kulübünüzün PNG veya WEBP logosunu yükleyin. Logo yüklenmediyse kişisel veri veya resmî arma içermeyen genel bir simge kullanılır.</p><div class="file-picker"><img id="logo-preview" class="logo-preview" src="" alt="Logo önizlemesi"><div class="field" style="flex:1;min-width:190px"><label for="club-logo">Kulüp logosu (PNG / WEBP)</label><input type="file" id="club-logo" accept="image/png,image/webp"></div></div></section>
-<section class="setting-card"><h3>Güvenli yedek ve kurtarma</h3><p>Oyuncu kayıtları ve görseller hassas veri içerebilir. <strong>Önerilen:</strong> en az 12 karakterlik parola ile şifreli yedek alın. Parolayı unutursanız yedek açılamaz; uygulama parolanızı saklamaz.</p><div class="row-actions">${btn(I('shield')+' Şifreli Yedek Al','backup-export-secure','btn-primary')}${btn(I('upload')+' Yedeği Kontrol Et / Geri Yükle','backup-import','btn-ghost')}</div><details class="ms-manager-details"><summary>Eski sürümlerle uyumluluk · şifresiz JSON</summary><p class="footnote">Şifresiz JSON kişisel verileri açık içerir. Yalnızca gerektiğinde ve güvenli bir ortamda kullanın.</p>${btn(I('download')+' Şifresiz JSON Al','backup-export','btn-subtle btn-small')}</details><input id="backup-file" type="file" accept=".json,application/json" style="display:none"><p class="footnote">İndirme başlatılması dosyanın telefona kaydedildiğini kanıtlamaz. Dosyayı İndirilenler'de bulup güvenli yerde sakladığınızda doğrulama düğmesini kullanın. Geri yükleme önce önizlenir ve <strong>tek seferde</strong> uygulanır.</p>${btn('İndirilen dosyayı kontrol ettim','backup-confirm','btn-subtle btn-small')}<p class="footnote">${settings.lastBackup?'Son kullanıcı doğrulaması: '+esc(typeof settings.lastBackup==='string'?settings.lastBackup:settings.lastBackup.date||''):'Henüz doğrulanmış bir yedek kaydı yok.'}</p></section>
+<section class="setting-card" data-simple-transfer><h3>Verilerini güvenle taşı</h3><p>Oyuncu, maç, grup ve görsellerini başka cihaza taşımak için önce <strong>şifreli yedek indir</strong>, sonra diğer cihazda dosyayı yükle. Parola en az 12 karakter olmalı ve uygulama tarafından saklanmaz.</p><div class="row-actions">${btn(I('shield')+' Şifreli yedeği indir','backup-export-secure','btn-primary')}${btn(I('upload')+' Dosyadan geri yükle','backup-import','btn-ghost')}</div><details class="ms-manager-details"><summary>Eski sürümlerle uyumluluk · şifresiz JSON</summary><p class="footnote">Şifresiz JSON kişisel verileri açık içerir. Yalnızca gerektiğinde ve güvenli bir ortamda kullanın.</p>${btn(I('download')+' Şifresiz JSON Al','backup-export','btn-subtle btn-small')}</details><input id="backup-file" type="file" accept=".json,application/json" style="display:none"><p class="footnote">İndirme başlatılması dosyanın telefona kaydedildiğini kanıtlamaz. Dosyayı İndirilenler'de bulup güvenli yerde sakladığınızda doğrulama düğmesini kullanın. Geri yükleme önce önizlenir ve <strong>tek seferde</strong> uygulanır.</p>${btn('İndirilen dosyayı kontrol ettim','backup-confirm','btn-subtle btn-small')}<p class="footnote">${settings.lastBackup?'Son kullanıcı doğrulaması: '+esc(typeof settings.lastBackup==='string'?settings.lastBackup:settings.lastBackup.date||''):'Henüz doğrulanmış bir yedek kaydı yok.'}</p></section>
 <section class="setting-card"><h3>Yerel kurtarma ve kayıt bütünlüğü</h3><p class="footnote">Her JSON geri yüklemesinden önce, mevcut kulüp verilerinin aynı tarayıcıda <strong>7 gün geçerli</strong> yerel kurtarma noktası oluşturulur. Bu, başka cihazda çalışmaz; tarayıcı verileri silinirse kaybolur. Kurtarma noktası şifreli değildir, disk alanı kullanır; dosya yedeğinin yerine geçmez.</p><div class="row-actions">${btn('Önceki geri yüklemeyi geri al','backup-rollback','btn-ghost')}${btn('Kurtarma noktasını kaldır','backup-recovery-discard','btn-subtle')}${btn('Kayıt bütünlüğünü denetle','integrity-audit','btn-subtle')}</div>${state.integrityAudit?`<div class="ms-integrity-report" role="status"><b>${state.integrityAudit.issueCount?esc(state.integrityAudit.issueCount)+' problem':'Bağlantı hatası tespit edilmedi'}</b><p>${esc(state.integrityAudit.total)} kayıt; ${esc(state.integrityAudit.durationMs)} ms kontrol. ${state.integrityAudit.overBudget?'Büyük kayıt/performans uyarısı.':'Süre yalnızca bu cihazda ölçülmüştür.'}</p>${state.integrityAudit.issues.length?`<ul>${state.integrityAudit.issues.slice(0,8).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</div>`:''}</section>
 
 <section class="setting-card"><h3>Çevrimdışı çalışma</h3><p>Bu sürüm internet bağlantısı olmadan çalışacak şekilde tasarlandı. İlk PWA kurulumu HTTPS/localhost üzerinde yapılmalı. Veriler cihazlar arasında otomatik eşitlenmez.</p><span class="stat-chip" id="sw-status">Yerel uygulama kontrol ediliyor…</span></section>
@@ -214,7 +248,7 @@ function createLiveMatchViews({state,esc,btn,I,allMatches,getGroup,activeLineup,
   const actions=snap.status==='prepared'?action('İlk devreyi başlat','start','btn-primary'):snap.status==='running'?action('Saati duraklat','pause','btn-primary')+action('Devreyi bitir','end'):snap.status==='paused'?action('Devam et','resume','btn-primary')+action('Devreyi bitir','end'):snap.status==='interval'?action('Sonraki devreyi başlat','next','btn-primary'):snap.status==='awaitFinal'?action('Maçı tamamla','finish','btn-primary'):'<span class="live-complete">Maç tamamlandı</span>';
   const canCorrect=['running','paused'].includes(snap.status);
   const canCreate=['running','paused','interval','awaitFinal'].includes(session.status);
-  const shortcuts=`<div class="live-event-shortcuts" role="group" aria-label="Hızlı maç olayı">${[['GOAL','Gol'],['OPPONENT_GOAL','Rakip golü'],['YELLOW_CARD','Sarı kart'],['RED_CARD','Kırmızı kart']].map(([type,label])=>`<button type="button" class="btn btn-ghost" data-action="live-quick-event" data-event-type="${type}" aria-controls="live-event-form" ${canCreate?'':'disabled'}>${label}</button>`).join('')}</div>`;
+  const shortcuts=`<div class="live-event-shortcuts" role="group" aria-label="Hızlı maç olayı">${[['GOAL','Gol'],['OPPONENT_GOAL','Rakip golü'],['YELLOW_CARD','Sarı kart'],['RED_CARD','Kırmızı kart']].map(([type,label])=>`<button type="button" class="btn btn-ghost" data-action="live-quick-event" data-event-type="${type}" aria-controls="live-event-form" ${canCreate?'':'disabled'}>${label}</button>`).join('')}<a href="#live-substitution-form" class="btn btn-ghost live-day-sub-link" aria-label="Oyuncu değişikliğine git">Değişim</a></div>`;
 
   const events=(state.liveEvents||[]).slice(-14).reverse();
   const labels={...LABEL,EVENT_CORRECTION:'Olay düzeltildi',SUBSTITUTION:'Oyuncu değişimi',PERIOD_START:'Devre başlatıldı',PERIOD_END:'Devre sona erdi',CLOCK_PAUSE:'Saat duraklatıldı',CLOCK_RESUME:'Saat devam etti',CLOCK_CORRECTION:'Saat düzeltildi',FINALIZE:'Maç tamamlandı'};
@@ -265,8 +299,21 @@ function dashboard(){
  const incomplete=fixtures.filter(m=>!state.data.rosters.find(r=>r.matchId===m.id)?.entries?.length).length;
  const meters=[{title:'KAYITLI OYUNCU',value:players,note:'Aktif kulübün sporcu havuzu',ic:'users',nav:'players'},{title:'TAKIM / GRUP',value:groups,note:'Yaş kategorisi ve takımlar',ic:'roster',nav:'team'},{title:'YAKLAŞAN MAÇ',value:fixtures.length,note:'Planlanmış karşılaşmalar',ic:'calendar',nav:'weekly'},{title:'KADRO BEKLEYEN',value:incomplete,note:incomplete?'Tamamlanması gereken maç':'Kadro bekleyen maç yok',ic:'shield',nav:'archive'}];
  const tasks=[...(!groups?[['Yaş gruplarını oluştur','archive','Kulüp altyapısı']]:[]),...(!players?[['Oyuncuları kaydet veya CSV aktar','players','Oyuncu merkezi']]:[]),...(incomplete?[['Kadro bekleyen maçları tamamla','archive',`${incomplete} karşılaşma`]]:[]),...(!lastBackup?[['İlk şifreli yedeğini al','archive','Veri güvenliği']]:[])].slice(0,4);
- return `${!groups?groupSetup():''}<section class="broadcast-dashboard" aria-label="Kulüp operasyon merkezi"><div class="broadcast-page-kicker"><span class="kicker-led"></span> MAÇ GÜNÜ <span class="kicker-rule"></span> SEZON ÖZETİ</div>
- <div class="broadcast-hero"><div class="hero-copy"><div class="hero-overline"><span class="onair-dot"></span> ${esc(state.club?.name||'SPOR KULÜBÜ')} / MAÇ MERKEZİ</div><h1>HER MAÇIN<br><em>BİR HİKÂYESİ VAR.</em></h1><p>Kadrodan ilk düdüğe, maç günü görselinden paylaşımına kadar tüm hazırlıklar tek kontrol merkezinde.</p><div class="hero-buttons">${btn(I('plus')+' YENİ MAÇ OLUŞTUR','new-match','btn-primary btn-hero')}${btn(I('users')+' OYUNCU MERKEZİ','go-players','btn-ghost btn-hero')}</div><div class="hero-bottom-line"><span><i></i> ${esc(state.club?.name||'KULÜBÜNÜZ')}</span><span>V2.6.8-F.11 / KULÜP YÖNETİMİ</span></div></div>
+ const hasMatches=state.data.matches.length>0;
+ const firstSteps=[
+  {label:'Takım / yaş grubunu oluştur',done:groups>0,route:'archive',hint:'Takımlarını ve yaş gruplarını yönet'},
+  {label:'Oyuncu listesini ekle',done:players>0,route:'players',hint:'Oyuncu ekleyebilir veya listenizi aktarabilirsiniz'},
+  {label:'İlk maçını hazırla',done:hasMatches,route:'matches',hint:'Rakip, tarih, saat ve sahayı kaydedin'}
+ ];
+ const completedSteps=firstSteps.filter(x=>x.done).length;
+ const quickStart=!groups||completedSteps===3?'':`<section class="ms-quickstart" aria-labelledby="ms-quickstart-heading">
+  <div class="ms-quickstart-title"><span class="ms-quickstart-kicker">HIZLI BAŞLANGIÇ · ${completedSteps}/3 TAMAMLANDI</span><h2 id="ms-quickstart-heading">İlk maçını 3 adımda hazırla</h2></div>
+  <div class="ms-quickstart-steps">${firstSteps.map((x,i)=>`<button type="button" class="ms-quickstart-step ${x.done?'is-done':'is-pending'}" data-nav="${x.route}" aria-label="${i+1}. adım: ${esc(x.label)}">
+   <span class="ms-quickstart-count" aria-hidden="true">${x.done?'✓':i+1}</span>
+   <span class="ms-quickstart-copy"><strong>${esc(x.label)}</strong><small>${esc(x.hint)}</small></span>
+   <span class="ms-quickstart-arrow" aria-hidden="true">${I('arrow')}</span></button>`).join('')}</div></section>`;
+ return `${!groups?groupSetup():''}${quickStart}<section class="broadcast-dashboard" aria-label="Kulüp operasyon merkezi"><div class="broadcast-page-kicker"><span class="kicker-led"></span> MAÇ GÜNÜ <span class="kicker-rule"></span> SEZON ÖZETİ</div>
+ <div class="broadcast-hero ${next?'has-fixture':'is-empty'}"><div class="hero-copy"><div class="hero-overline"><span class="onair-dot"></span> ${esc(state.club?.name||'SPOR KULÜBÜ')} / MAÇ MERKEZİ</div><h1>HER MAÇIN<br><em>BİR HİKÂYESİ VAR.</em></h1><p>Kadrodan ilk düdüğe, maç günü görselinden paylaşımına kadar tüm hazırlıklar tek kontrol merkezinde.</p><div class="hero-buttons">${btn(I('plus')+' YENİ MAÇ OLUŞTUR','new-match','btn-primary btn-hero')}${btn(I('users')+' OYUNCU MERKEZİ','go-players','btn-ghost btn-hero')}</div><div class="hero-bottom-line"><span><i></i> ${esc(state.club?.name||'KULÜBÜNÜZ')}</span><span>V2.6.8-F.13 / KULÜP YÖNETİMİ</span></div></div>
  <div class="hero-fixture"><div class="fixture-topline"><span>SIRADAKİ MAÇ</span><span class="fixture-index">MAÇ TAKVİMİ</span></div><div class="fixture-date">${esc(dateParts)}</div><div class="fixture-stage"><div class="fixture-team"><div class="fixture-home-mark">${esc((state.club?.name||'MS').slice(0,2).toLocaleUpperCase('tr-TR'))}</div><strong>${esc(state.club?.name||'KULÜP')}</strong></div><div class="fixture-vs">VS<span class="fixture-vs-line"></span></div><div class="fixture-team"><div class="fixture-away-mark">${I('shield')}</div><strong>${next?esc(next.opponent):'RAKİP BEKLENİYOR'}</strong></div></div><div class="fixture-bottom"><span>${I('clock')} ${esc(next?.kickoffTime||'--:--')} ${next?`· ${esc(next.venue||'Saha belirtilmedi')}`:''}</span><span class="fixture-status ${hasRoster?'is-ready':''}">${!next?'PLANLANMADI':hasRoster?'KADRO KAYITLI':'KADRO BEKLİYOR'}</span></div>${next?btn('MAÇ ÇALIŞMA ALANINI AÇ '+I('arrow'),'open-match','fixture-open',`data-id="${esc(next.id)}"`):btn('İLK MAÇINI OLUŞTUR '+I('arrow'),'new-match','fixture-open')}</div></div>
  <div class="broadcast-section-title"><div><span>01 / SAHA RAPORU</span><h2>Kulüp özeti</h2></div><p>Yalnızca bu kulübün kayıtları</p></div><div class="broadcast-metrics">${meters.map(m=>`<button class="broadcast-metric" data-nav="${m.nav}"><span class="metric-icon">${I(m.ic)}</span><span class="metric-kicker">${m.title}</span><strong>${m.value.toLocaleString('tr-TR')}</strong><span class="metric-desc">${m.note}</span><span class="metric-trailing">${I('arrow')}</span></button>`).join('')}</div>
  <div class="broadcast-bottom-grid"><section class="broadcast-panel"><div class="broadcast-panel-top"><div><span class="panel-number">02 / FİKSTÜR AKIŞI</span><h2>Son karşılaşmalar</h2></div><button data-nav="weekly" class="text-action">HAFTALIK PANO ${I('arrow')}</button></div><div class="broadcast-match-list">${recent.length?recent.map(matchRow).join(''):`<div class="broadcast-empty"><div class="empty-orbit">${I('calendar')}</div><h3>Henüz maç kaydı yok</h3><p>Maç oluşturduğunda tarih, rakip ve kadro bilgileri burada listelenir.</p>${btn('İLK MAÇI OLUŞTUR','new-match','btn-ghost')}</div>`}</div></section>
@@ -376,6 +423,24 @@ function weeklyPage(){
  const plan=prepareBoard(state.data.matches,state.data.groups,ids,board.size,state.club?.name,state.club?.accent);
  const goWeek=(days)=>{const dt=new Date(`${board.week}T12:00:00Z`);dt.setUTCDate(dt.getUTCDate()+days);return dt.toISOString().slice(0,10)};
  return `${pageHeader('GÖRSEL PAYLAŞIM MERKEZİ','Haftalık Maç Panosu','Kayıtlı karşılaşmaları tek bir paylaşılabilir görsele dönüştür. Oyuncu, toplantı veya özel antrenör bilgisi bu görsele girmez.')}
+ <section class="weekly-file-panel" aria-labelledby="weekly-import-heading">
+  <details ${state.fixtureImport?'open':''}>
+    <summary id="weekly-import-heading">Dosyadan haftalık maç ekle (CSV / Excel)</summary>
+    <p>Dosya yalnızca bu tarayıcıda okunur. Hiçbir maç siz onaylamadan kaydedilmez. Zorunlu sütunlar: Grup, Rakip, Tarih, Saat, Saha. İlk satır başlık olmalıdır.</p>
+    <label for="weekly-import-file">Federasyon maç programı dosyası</label>
+    <input id="weekly-import-file" type="file" accept=".csv,.tsv,.xlsx" aria-describedby="weekly-import-notice">
+    <p class="footnote" id="weekly-import-notice">PDF metin çıkarması henüz desteklenmiyor. Dosyayı CSV/Excel olarak edinmeden maçları tahmin etmeyiz.</p>
+    ${state.fixtureImport?`<div class="weekly-import-preview" role="status"><strong>${esc(state.fixtureImport.filename)} · ${state.fixtureImport.rows.length} geçerli maç</strong>
+      ${state.fixtureImport.errors.length?`<ul>${state.fixtureImport.errors.slice(0,12).map(e=>`<li>${esc(e)}</li>`).join('')}</ul>`:''}
+      ${state.fixtureImport.rows.length?`<ol>${state.fixtureImport.rows.slice(0,10).map(m=>`<li>${esc(m.group)} · ${esc(m.opponent)} · ${esc(m.matchDate)} ${esc(m.kickoffTime)} · ${esc(m.venue)}</li>`).join('')}</ol>`:''}
+      <label for="weekly-import-format">Tüm maçlarda kullanılacak oyun formatı</label>
+      <select id="weekly-import-format"><option value="11">11v11</option><option value="9">9v9</option><option value="8">8v8</option><option value="5">5v5</option><option value="3">3v3</option></select>
+      <p>Takım adları mevcut gruplarla birebir eşleşmelidir. Hatalı veya tekrarlanan kayıtlar toplu işlemi durdurur. Seçtiğiniz formatı maç düzenleme ekranında sonradan değiştirebilirsiniz.</p>
+      ${btn('Kontrol et ve maçları ekle','weekly-import-confirm','btn-primary',state.fixtureImport.errors.length?'disabled':'')}
+      ${btn('İçe aktarmayı iptal et','weekly-import-clear','btn-subtle')}
+    </div>`:''}
+  </details>
+ </section>
  <div class="weekly-layout">
   <section class="weekly-control-panel"><div class="weekly-kicker">01 / MAÇ SEÇİMİ</div><h2>Maç programını düzenle</h2>
    <div class="weekly-filter-row"><div class="field"><label for="weekly-range">Gösterilecek maçlar</label><select id="weekly-range"><option value="week" ${board.mode==='week'?'selected':''}>Seçilen hafta</option><option value="all" ${board.mode==='all'?'selected':''}>Tüm kayıtlı maçlar</option></select></div>
@@ -777,7 +842,16 @@ function validateCorrection(input,session,events){
  // Exclude the target when validating an assist correction; prevent self-duplicate.
  const effective=effectiveSportingEvents(events).filter(e=>e.id!==targetId);
  const normalized=normalizeSportsPayload(newType,input.replacement?.payload||{},session,effective);
- if(item.type==='GOAL'&&newType==='GOAL'){const attached=effective.filter(e=>e.type==='ASSIST'&&e.payload?.goalEventId===targetId);if(attached.some(e=>e.payload?.playerId===normalized.playerId||Boolean(normalized.assistPlayerId)))throw Error('Bu gole bağlı ayrı asist kaydı var. Önce asisti düzeltin.');}
+ if(item.type==='GOAL'&&newType==='GOAL'){
+  // A goal corrected to an own goal hides linked assists in the current projection.
+  // Reconstitute the candidate goal without its previous corrections before checking
+  // linked assists, or an old assist may silently revive as a self-assist.
+  const candidateHistory=events.filter(e=>!(e.type==='EVENT_CORRECTION'&&e.payload?.targetEventId===targetId))
+   .map(e=>e.id===targetId?{...e,type:'GOAL',payload:normalized}:e);
+  const linked=effectiveSportingEvents(candidateHistory).filter(e=>e.type==='ASSIST'&&e.payload?.goalEventId===targetId);
+  if(linked.some(e=>e.payload?.playerId===normalized.playerId||Boolean(normalized.assistPlayerId)))
+   throw Error('Bu gole bağlı ayrı asist kaydı var. Önce asisti düzeltin.');
+ }
  return {targetEventId:targetId,reason,void:false,replacement:{type:newType,payload:normalized}};
 }
 function projectMatchReport(session,events=[],players=[],roster=null,nowMs=Date.now()){
@@ -786,7 +860,7 @@ function projectMatchReport(session,events=[],players=[],roster=null,nowMs=Date.
  const playerMap=new Map(players.map(p=>[p.id,p.fullName]));for(const e of roster?.entries||[])if(!playerMap.has(e.playerId))playerMap.set(e.playerId,e.nameSnapshot);
  const minute=calculatePlayerMinutes(session,events,nowMs);
  const real=effectiveSportingEvents(events);
- const byPlayer=Object.fromEntries(pool.map(id=>[id,{id,name:playerMap.get(id)||'Bilinmeyen oyuncu',starter:starter.has(id),playedMs:minute.byPlayer[id]?.playedMs||0,goals:0,assists:0,yellow:0,red:0,injuries:0,participated:starter.has(id)}]));
+ const byPlayer=Object.fromEntries(pool.map(id=>[id,{id,name:playerMap.get(id)||'Bilinmeyen oyuncu',starter:starter.has(id),playedMs:minute.byPlayer[id]?.playedMs||0,goals:0,assists:0,yellow:0,red:0,injuries:0,participated:false}]));
  let us=0,opponent=0;const notes=[];const goalsById=new Map(real.filter(e=>e.type==='GOAL').map(e=>[e.id,e]));const assignedAssists=new Set();
  for(const e of real){const p=e.payload||{},r=byPlayer[p.playerId];
   if(e.type==='GOAL'){us++;if(r)r.goals++;if(byPlayer[p.assistPlayerId]){byPlayer[p.assistPlayerId].assists++;assignedAssists.add(e.id);}}
@@ -797,9 +871,11 @@ function projectMatchReport(session,events=[],players=[],roster=null,nowMs=Date.
   if(e.type==='RED_CARD'&&r)r.red++;
   if(e.type==='INJURY'&&r)r.injuries++;
   if(e.type==='NOTE'||e.type==='INJURY')notes.push(e);
-  if(r)r.participated=r.participated||['GOAL','OWN_GOAL','ASSIST','YELLOW_CARD','RED_CARD','INJURY'].includes(e.type);
  }
- const participants=Object.values(byPlayer).map(p=>({...p,participated:p.participated||p.playedMs>0}));
+ // A disciplinary/medical event can be recorded for a substitute without an appearance.
+ // Participation is based on kickoff or a recorded entrance, not the occurrence of an event.
+ const matchStarted=session.status!=='prepared';
+ const participants=Object.values(byPlayer).map(p=>({...p,participated:matchStarted&&(p.starter||Boolean(minute.byPlayer[p.id]?.playedBefore)||p.playedMs>0)}));
  const clock=projectClock(session,nowMs);
  return {matchId:session.matchId,status:session.status,ourGoals:us,opponentGoals:opponent,players:participants,events:real,notes,minutesReviewRequired:minute.reviewRequired,clockReviewRequired:clock.reviewRequired,elapsedMatchMs:clock.elapsedMatchMs,matchTimeLabel:session.status==='finished'?'Maç tamamlandı':'Geçici maç özeti',corrections:events.filter(e=>e.type==='EVENT_CORRECTION').length};
 }
@@ -1388,9 +1464,153 @@ async function getOfflineReadiness(){
 Object.assign(exports,{setupPwaUpdates,getOfflineReadiness});
 
 };
+MODS["src/domain/fixture-import.js"]=function(exports,require){
+// Import is intentionally opt-in: no PDF/OCR guesses and no direct database writes.
+const clean = value => String(value ?? '').replace(/\u0000/g,'').trim();
+const headerKey = value => clean(value).toLocaleLowerCase('tr-TR')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[ıİ]/g,'i').replace(/[^a-z0-9]/g,'');
+const ALIASES = {
+  group:['grup','takim','takimgrup','yaskategorisi','kategori','group','team'],
+  opponent:['rakip','rakiptakim','opponent','karsitakim'],
+  date:['tarih','mactarihi','date','matchdate'],
+  time:['saat','macsaati','baslamasaati','kickoff','kickofftime'],
+  venue:['saha','stadyum','yer','tesis','venue','stadium'],
+  competition:['organizasyon','turnuva','lig','competition']
+};
+function splitDelimited(text){
+ const value=String(text||'').replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n');
+ const line=value.split('\n').find(x=>x.trim())||'';
+ const options=[';','\t',','];
+ const separator=options.sort((a,b)=>line.split(b).length-line.split(a).length)[0];
+ let inQuote=false, field='',record=[],rows=[];
+ for(let i=0;i<value.length;i++){
+  const char=value[i];
+  if(char==='"'){if(inQuote&&value[i+1]==='"'){field+='"';i++;}else inQuote=!inQuote;}
+  else if(char===separator&&!inQuote){record.push(field.trim());field='';}
+  else if(char==='\n'&&!inQuote){record.push(field.trim());if(record.some(Boolean))rows.push(record);record=[];field='';}
+  else field+=char;
+ }
+ if(inQuote)throw Error('CSV içinde kapanmamış tırnak alanı.');
+ record.push(field.trim());if(record.some(Boolean))rows.push(record);
+ return rows;
+}
+function excelDate(value){
+ if(!/^\d{5}(?:\.\d+)?$/.test(value))return value;
+ const days=Number(value);
+ if(days<20000||days>80000)return value;
+ return new Date(Date.UTC(1899,11,30)+Math.floor(days)*86400000).toISOString().slice(0,10);
+}
+function excelTime(value){
+ const raw=clean(value),num=Number(raw);
+ if(raw&&Number.isFinite(num)&&num>=0&&num<1){
+  const minutes=Math.round(num*24*60);
+  return String(Math.floor(minutes/60)%24).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
+ }
+ return raw;
+}
+function parseFixtureRows(grid){
+ if(!Array.isArray(grid)||!grid.length)return{rows:[],errors:['Tablo boş.']};
+ const headers=grid[0].map(headerKey),indices={};
+ for(const [field,synonyms] of Object.entries(ALIASES)){
+  indices[field]=headers.findIndex(h=>synonyms.map(headerKey).includes(h));
+ }
+ const mandatory=['group','opponent','date','time','venue'];
+ const absent=mandatory.filter(k=>indices[k]<0);
+ if(absent.length)return{rows:[],errors:['Zorunlu sütunlar eksik: '+absent.join(', ')+'. Beklenen: Grup, Rakip, Tarih, Saat, Saha.']};
+ const rows=[],errors=[],seen=new Set();
+ const {normalizeDate,normalizeTime}=require('src/domain/validation.js');
+ for(let i=1;i<grid.length&&i<=1000;i++){
+  const row=grid[i],get=k=>clean(indices[k]<0?'':row[indices[k]]);
+  if(!row.some(v=>clean(v)))continue;
+  const group=get('group'),opponent=get('opponent'),venue=get('venue');
+  let date=null;try{date=normalizeDate(excelDate(get('date')));}catch(error){date=null;}
+  const time=normalizeTime(excelTime(get('time')));
+  const details=[group,opponent,date,time,venue];
+  if(details.some(v=>!v)){errors.push('Satır '+(i+1)+': Grup/Rakip/Tarih/Saat/Saha geçerli olmalı.');continue;}
+  if(group.length>80||opponent.length>110||venue.length>150){errors.push('Satır '+(i+1)+': Çok uzun alan.');continue;}
+  const signature=[group.toLocaleLowerCase('tr-TR'),opponent.toLocaleLowerCase('tr-TR'),date,time].join('|');
+  if(seen.has(signature)){errors.push('Satır '+(i+1)+': Aynı maç dosyada tekrar edilmiş.');continue;}
+  seen.add(signature);
+  rows.push({group,opponent,matchDate:date,kickoffTime:time,venue,competition:get('competition').slice(0,150)});
+ }
+ if(grid.length>1001)errors.push('En fazla 1000 maç satırı kabul edilir.');
+ if(!rows.length&&!errors.length)errors.push('İçe aktarılacak maç bulunamadı.');
+ return{rows,errors};
+}
+function xmlElements(node,name){return [...node.getElementsByTagNameNS('*',name)];}
+function xmlText(text){
+ const doc=new DOMParser().parseFromString(text,'application/xml');
+ if(doc.getElementsByTagName('parsererror').length)throw Error('Excel XML bozuk.');
+ return doc;
+}
+async function readXlsx(file){
+ const bytes=new Uint8Array(await file.arrayBuffer()),view=new DataView(bytes.buffer);
+ const u16=at=>view.getUint16(at,true),u32=at=>view.getUint32(at,true);
+ let eocd=-1;
+ for(let i=bytes.length-22;i>=Math.max(0,bytes.length-65557);i--){if(u32(i)===0x06054b50){eocd=i;break;}}
+ if(eocd<0)throw Error('Excel ZIP yapısı okunamadı.');
+ const count=u16(eocd+10),limit=u32(eocd+12);let offset=u32(eocd+16);
+ if(count>250||limit>8_000_000)throw Error('Excel ZIP içeriği beklenen sınırın dışında.');
+ const entries=new Map(),decoder=new TextDecoder('utf-8');
+ for(let i=0;i<count;i++){
+  if(offset+46>bytes.length||u32(offset)!==0x02014b50)throw Error('Excel ZIP tablo hatası.');
+  const method=u16(offset+10),comp=u32(offset+20),uncomp=u32(offset+24),nameLen=u16(offset+28);
+  const extra=u16(offset+30),comment=u16(offset+32),local=u32(offset+42);
+  const name=decoder.decode(bytes.subarray(offset+46,offset+46+nameLen));
+  if((name==='xl/sharedStrings.xml'||/^xl\/worksheets\/sheet\d+\.xml$/.test(name))&&uncomp<=12_000_000){
+   if(local+30>bytes.length||u32(local)!==0x04034b50)throw Error('Excel ZIP local header hatası.');
+   const start=local+30+u16(local+26)+u16(local+28);
+   if(start+comp>bytes.length)throw Error('Excel ZIP verisi eksik.');
+   entries.set(name,{method,compressed:bytes.slice(start,start+comp),uncompressed:uncomp});
+  }
+  offset+=46+nameLen+extra+comment;
+ }
+ async function decompress(entry){
+  if(!entry)return null;
+  let output=entry.compressed;
+  if(entry.method===8){
+   if(typeof DecompressionStream!=='function')throw Error('Bu tarayıcı Excel açmayı desteklemiyor. CSV seçin.');
+   const ds=new DecompressionStream('deflate-raw');
+   output=new Uint8Array(await new Response(new Blob([output]).stream().pipeThrough(ds)).arrayBuffer());
+  }else if(entry.method!==0)throw Error('Desteklenmeyen Excel sıkıştırma yöntemi.');
+  if(output.byteLength>12_000_000||output.byteLength!==entry.uncompressed)throw Error('Excel sayfa boyutu uyuşmuyor.');
+  return decoder.decode(output);
+ }
+ const sheet= [...entries.keys()].filter(k=>k.startsWith('xl/worksheets/')).sort()[0];
+ if(!sheet)throw Error('Excel çalışma sayfası bulunamadı.');
+ const sharedXML=await decompress(entries.get('xl/sharedStrings.xml'));
+ const shared=sharedXML?xmlElements(xmlText(sharedXML),'si').map(node=>xmlElements(node,'t').map(t=>t.textContent).join('')):[];
+ const doc=xmlText(await decompress(entries.get(sheet))),grid=[];
+ for(const row of xmlElements(doc,'row').slice(0,1002)){
+  const cells=[];
+  for(const cell of xmlElements(row,'c')){
+   const letters=(cell.getAttribute('r')||'').match(/^[A-Z]+/i)?.[0]||'';
+   let col=0;for(const char of letters.toUpperCase())col=col*26+char.charCodeAt(0)-64;col--;
+   if(col<0||col>40)continue;
+   const t=cell.getAttribute('t');
+   const value=xmlElements(cell,'v')[0]?.textContent??'';
+   cells[col]=t==='s'?(shared[Number(value)]||''):t==='inlineStr'?xmlElements(cell,'t').map(x=>x.textContent).join(''):value;
+  }
+  grid.push(Array.from({length:Math.max(cells.length,5)},(_,i)=>cells[i]||''));
+ }
+ return grid;
+}
+async function readFixtureFile(file){
+ if(!file||file.size>8_000_000)throw Error('Dosya en fazla 8 MB olabilir.');
+ const ext=file.name.toLowerCase().split('.').pop();
+ if(ext==='pdf')throw Error('PDF içe aktarma bu sürümde henüz doğrulanmadı. Resmî programı CSV veya XLSX olarak alın; PDF içeriğini otomatik tahmin etmiyoruz.');
+ if(!['csv','tsv','xlsx'].includes(ext))throw Error('CSV, TSV veya XLSX dosyası seçin.');
+ const grid=ext==='xlsx'?await readXlsx(file):splitDelimited(await file.text());
+ return parseFixtureRows(grid);
+}
+Object.assign(exports,{splitDelimited,parseFixtureRows,readFixtureFile});
+
+};
 MODS["src/main.js"]=function(exports,require){
 const {createModalFocusController}=require('src/app/modal-focus.js');
 const {createMatchDraftStore}=require('src/app/match-form-drafts.js');
+const {createFixtureImportSession}=require('src/app/fixture-import-session.js');
 const {setupPwaUpdates,getOfflineReadiness}=require('src/app/pwa-updates.js');
 
 const {uid,now,validatePlayer,validateMatch,formatTurkishDate,validateOverrides}=require("src/domain/validation.js");
@@ -1467,6 +1687,8 @@ function listenRoot(type,handler){
  if(handler.constructor.name!=='AsyncFunction'){root.addEventListener(type,handler);return;}
  root.addEventListener(type,event=>{
   if(uiBusy){event.preventDefault();return;}
+  // Fixture parsing is read-only and carries its own club/generation token,
+  // so a slow file need not block switching clubs or restoring a backup.
   if(type==='change'&&!event.target.matches('#club-switch,#club-switch-mobile,#pitch-role,#pitch-formation,#team-group,#team-pitch-formation,#team-formation-select,#team-pitch-depth,#team-depth-factor,#team-depth-select,[data-team-role-player],[data-player-id],[data-override],#club-logo,#poster-bg-file,#csv-file,#backup-file')){Promise.resolve(handler(event)).catch(error=>toast(error.message,true));return;}
   if(type==='click'&&event.target.closest('[data-action=backup-import],[data-action=live-quick-event]')){Promise.resolve(handler(event)).catch(error=>toast(error.message,true));return;}
   if(type==='click'&&!event.target.closest('[data-action],[data-team-priority],[data-pitch-remove],[data-pitch-slot],[data-template],[data-size]')){Promise.resolve(handler(event)).catch(error=>toast(error.message,true));return;}
@@ -1485,7 +1707,9 @@ function I(k){return `<span class="inline-icon" aria-hidden="true"><svg viewBox=
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const groupNames=[]; // New clubs start without seeded roster data.
 const nav=[['dashboard','home','Genel Bakış'],['players','users','Oyuncular'],['matches','calendar','Yeni Maç'],['roster','roster','Kadro Seçimi'],['team','users','Genel Takım Kadrosu'],['pitch','pitch','Saha / Diziliş'],['studio','studio','Afiş Stüdyosu'],['weekly','calendar','Haftalık Maç Panosu'],['archive','archive','Arşiv / Ayarlar']];
-const state={club:null,clubs:[],legacy:null,integrityAudit:null,route:'dashboard',data:{players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]},currentId:null,filterGroup:'all',query:'',modal:null,tab:'design',previewResult:null,csvPending:null,sessionMatch:null,liveSession:null,liveEvents:[],liveLoading:false,notice:null,rosterPoolScope:'all',rosterQuery:'',pitchMode:'match',pitchSelectedId:null,pitchContext:null,rosterPoolGroups:[],rosterFilterMatchId:null,teamGroupId:null,teamRoleSelected:'GK',teamQuery:'',teamPitchPrefs:{formation:'4-3-3',depthFactor:2},board:{week:mondayOf(new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'}))||new Date().toISOString().slice(0,10),mode:'week',size:'portrait-post',selected:null}};
+const state={club:null,clubs:[],legacy:null,integrityAudit:null,route:'dashboard',data:{players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]},currentId:null,filterGroup:'all',query:'',modal:null,tab:'design',previewResult:null,csvPending:null,sessionMatch:null,liveSession:null,liveEvents:[],liveLoading:false,notice:null,rosterPoolScope:'all',rosterQuery:'',pitchMode:'match',pitchSelectedId:null,pitchContext:null,rosterPoolGroups:[],rosterFilterMatchId:null,teamGroupId:null,teamRoleSelected:'GK',teamQuery:'',teamPitchPrefs:{formation:'4-3-3',depthFactor:2},board:{week:mondayOf(new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'}))||new Date().toISOString().slice(0,10),mode:'week',size:'portrait-post',selected:null},fixtureImport:null};
+const fixtureImports=createFixtureImportSession();
+function invalidateFixtureImport(){fixtureImports.invalidate();state.fixtureImport=null;}
 let draftStorage=null;try{draftStorage=sessionStorage;}catch(error){}
 const matchDrafts=createMatchDraftStore(draftStorage);
 const matchDraftScope=()=>({clubId:state.club?.id,matchId:state.currentId||null});
@@ -1615,7 +1839,7 @@ function shell(content){
  const navLink=([id,ic,label])=>`<button class="nav-link ${state.route===id?'active':''}" data-nav="${id}" ${state.route===id?'aria-current="page"':''}><span class="nav-icon">${I(ic)}</span><span>${esc(label)}</span>${state.route===id?'<span class="nav-active-indicator"></span>':''}</button>`;
  const mobileTabs=[['dashboard','home','Ana Ekran'],['matches','calendar','Maç'],['players','users','Oyuncular'],['studio','studio','Afiş']];
  const moreNav=[['live','clock','Canlı Maç Saati'],['roster','roster','Kadro Seçimi'],['team','users','Takım Derinliği'],['pitch','pitch','Saha Dizilişi'],['weekly','calendar','Haftalık Pano'],['archive','archive','Arşiv & Ayarlar']];
- return `<div class="app-shell"><aside class="sidebar"><div class="brand">${logo()}<div class="brand-identity"><div class="brand-super">V2.6.8-F.11</div><div class="brand-title">MATCH <span>STUDIO.</span></div><div class="brand-sub">KULÜP YÖNETİMİ</div></div></div><div class="sidebar-club">${clubQuickSwitcher()}</div><div class="sidebar-scroll"><div class="nav-heading">ÇALIŞMA ALANI</div><nav class="nav-list" aria-label="Ana menü">${mainNav.map(navLink).join('')}<div class="nav-divider"></div><div class="nav-heading nav-heading-inset">MAÇ OPERASYONU</div>${workspaceNav.map(navLink).join('')}<div class="nav-divider"></div>${studioNav.map(navLink).join('')}</nav></div><div class="sidebar-foot"><div class="status-row"><span class="status-dot"></span><span id="offline-readiness">Çevrimdışı kurulum denetleniyor</span></div><p>Veriler bu cihazda saklanır. Düzenli yedek oluşturun.</p></div></aside><div class="main"><header class="topbar"><div class="topbar-left"><span class="broadcast-live"><span></span> MAÇ MERKEZİ</span><div class="crumb">${esc(state.club?.name||'MATCH STUDIO')} ${I('chevron')} <strong>${esc(subtitle[state.route]||'Kontrol Merkezi')}</strong></div></div><div class="top-actions"><span class="local-status">${I('shield')} <span>VERİLER BU CİHAZDA</span></span><span class="connection-indicator" id="connection-indicator" role="status" aria-live="polite">${navigator.onLine?'Yerel kayıt hazır':'Çevrimdışı · yerel kayıt hazır'}</span>${btn(I('plus')+' Yeni Maç','new-match','btn-primary btn-small top-new-match')}</div></header><div class="ms-mobile-club">${clubQuickSwitcher('mobile')}</div><div class="page">${location.protocol==='file:'?'<div class="offline-alert">Güvenilir kayıt için bu uygulamayı HTTPS veya yerel sunucuyla başlatın.</div>':''}${content}</div></div><nav class="mobile-nav" aria-label="Mobil menü">${mobileTabs.map(([id,ic,label])=>`<button class="mobile-link ${state.route===id?'active':''}" data-nav="${id}" ${state.route===id?'aria-current="page"':''}>${I(ic)}<span>${label}</span></button>`).join('')}<details class="mobile-more ${moreNav.some(([id])=>state.route===id)?'active':''}"><summary aria-label="Diğer bölümler">${I('roster')}<span>Diğer</span></summary><div class="mobile-more-panel"><div class="mobile-more-title">DİĞER BÖLÜMLER</div>${moreNav.map(navLink).join('')}</div></details></nav></div>${state.modal?modalHtml():''}`;
+ return `<div class="app-shell"><aside class="sidebar"><div class="brand">${logo()}<div class="brand-identity"><div class="brand-super">V2.6.8-F.13</div><div class="brand-title">MATCH <span>STUDIO.</span></div><div class="brand-sub">KULÜP YÖNETİMİ</div></div></div><div class="sidebar-club">${clubQuickSwitcher()}</div><div class="sidebar-scroll"><div class="nav-heading">ÇALIŞMA ALANI</div><nav class="nav-list" aria-label="Ana menü">${mainNav.map(navLink).join('')}<div class="nav-divider"></div><div class="nav-heading nav-heading-inset">MAÇ OPERASYONU</div>${workspaceNav.map(navLink).join('')}<div class="nav-divider"></div>${studioNav.map(navLink).join('')}</nav></div><div class="sidebar-foot"><div class="status-row"><span class="status-dot"></span><span id="offline-readiness">Çevrimdışı kurulum denetleniyor</span></div><p>Veriler bu cihazda saklanır. Düzenli yedek oluşturun.</p></div></aside><div class="main"><header class="topbar"><div class="topbar-left"><span class="broadcast-live"><span></span> MAÇ MERKEZİ</span><div class="crumb">${esc(state.club?.name||'MATCH STUDIO')} ${I('chevron')} <strong>${esc(subtitle[state.route]||'Kontrol Merkezi')}</strong></div></div><div class="top-actions"><span class="local-status">${I('shield')} <span>VERİLER BU CİHAZDA</span></span><span class="connection-indicator" id="connection-indicator" role="status" aria-live="polite">${navigator.onLine?'Yerel kayıt hazır':'Çevrimdışı · yerel kayıt hazır'}</span>${btn(I('plus')+' Yeni Maç','new-match','btn-primary btn-small top-new-match')}</div></header><div class="ms-mobile-club">${clubQuickSwitcher('mobile')}</div><div class="page">${location.protocol==='file:'?'<div class="offline-alert">Güvenilir kayıt için bu uygulamayı HTTPS veya yerel sunucuyla başlatın.</div>':''}${content}</div></div><nav class="mobile-nav" aria-label="Mobil menü">${mobileTabs.map(([id,ic,label])=>`<button class="mobile-link ${state.route===id?'active':''}" data-nav="${id}" ${state.route===id?'aria-current="page"':''}>${I(ic)}<span>${label}</span></button>`).join('')}<details class="mobile-more ${moreNav.some(([id])=>state.route===id)?'active':''}"><summary aria-label="Diğer bölümler">${I('roster')}<span>Diğer</span></summary><div class="mobile-more-panel"><div class="mobile-more-title">DİĞER BÖLÜMLER</div>${moreNav.map(navLink).join('')}</div></details></nav></div>${state.modal?modalHtml():''}`;
 }
 function pageHeader(eyebrow,title,sub,action=''){return `<div class="page-head"><div><div class="eyebrow">${eyebrow}</div><h1 style="margin-top:9px">${title}</h1><p class="subtitle">${sub}</p></div>${action}</div>`;}
 function draftFor(kind){return state.data.posterDrafts.find(p=>p.matchId===state.currentId&&p.kind===kind)||{id:`${state.currentId}:${kind}`,matchId:state.currentId,kind,templateId:'classic-stadium',size:'portrait-post',overrides:{typeScale:1,logoScale:1,accent:'#176B46',showOptionalSections:true,backgroundAssetId:null}}}
@@ -1719,6 +1943,34 @@ case 'legacy-import':{if(!state.legacy?.found)throw Error('Önce eski veritaban�
 case 'delete-group':{const id=target.dataset.id;const g=state.data.groups.find(x=>x.id===id);if(!g)return;if(!confirm(g.name+' grubu silinsin mi? İlişkili kayıt varsa işlem engellenecektir.'))return;await safeDeleteGroup(id);if(state.filterGroup===id)state.filterGroup='all';state.teamGroupId=null;await refresh();render();toast('Grup silindi.');break;}
 case 'new-match':state.currentId=null;state.sessionMatch=null;selectRoute('matches');break;
 case 'weekly-prev':case 'weekly-next':{const dt=new Date(`${state.board.week}T12:00:00Z`);dt.setUTCDate(dt.getUTCDate()+(action==='weekly-next'?7:-7));state.board.week=dt.toISOString().slice(0,10);state.board.selected=null;render();break;}
+case 'weekly-import-clear':invalidateFixtureImport();render();break;
+case 'weekly-import-confirm':{
+ const pending=state.fixtureImport;if(!pending?.rows?.length||pending.errors?.length)throw Error('Önizleme hata içeriyor; veriler kaydedilmedi.');
+ fixtureImports.assertCurrent(pending.context);
+ const rawSize=Number(document.getElementById('weekly-import-format')?.value);
+ if(![3,5,8,9,11].includes(rawSize))throw Error('Oyun formatını açıkça seçin.');
+ const format=normalizeGameFormat({playersPerSide:rawSize,goalkeeperMode:rawSize<=4?'none':'required',benchLimit:Math.min(rawSize,8)});
+ const pitchLayout=normalizePitchLayout({id:'standard'},format);
+ const norm=x=>String(x||'').trim().toLocaleLowerCase('tr-TR');
+ const groups=new Map(state.data.groups.map(g=>[norm(g.name),g]));
+ const signatures=new Set(state.data.matches.map(m=>[m.groupId,norm(m.opponent),m.matchDate,m.kickoffTime].join('|')));
+ const errors=[],prepared=[];
+ for(const [idx,item] of pending.rows.entries()){
+  const group=groups.get(norm(item.group));
+  if(!group){errors.push('Satır '+(idx+2)+': mevcut takım bulunamadı: '+item.group);continue;}
+  const signature=[group.id,norm(item.opponent),item.matchDate,item.kickoffTime].join('|');
+  if(signatures.has(signature)){errors.push('Satır '+(idx+2)+': aynı maç zaten kayıtlı veya dosyada tekrar var.');continue;}
+  signatures.add(signature);
+  const result=validateMatch({...item,groupId:group.id,ageCategory:group.name,gameFormat:format,pitchLayout,state:'draft'});
+  if(!result.ok){errors.push('Satır '+(idx+2)+': '+result.errors.join(', '));continue;}
+  prepared.push(result.data);
+ }
+ if(errors.length)throw Error(errors.slice(0,5).join(' | ')+'; hiçbir maç eklenmedi.');
+ if(!prepared.length||!confirm(prepared.length+' maç kontrol edildi. Tümünü mevcut kulübe kaydetmek istiyor musunuz?'))return;
+ await fixtureImports.commit(pending,prepared);
+ invalidateFixtureImport();state.board.selected=null;await refresh();render();
+ toast(prepared.length+' maç aynı işlemde kaydedildi.');break;
+}
 case 'weekly-export':case 'weekly-share':{const plan=boardPlan();if(!plan.ok)throw Error(plan.issues.join(' '));const clubLogo=await bundledCrest();const blob=await exportWeeklyBoard(plan,{logo:clubLogo});const name=`${clubSlug()}_${plan.size==='story'?'HIKAYE':'MAC_PROGRAMI'}_${plan.items[0].date}.png`;if(action==='weekly-share'){const result=await sharePng(blob,name);toast(result==='shared'?'Paylaşım tamamlandı.':result==='cancelled'?'İşlem iptal edildi.':'PNG indirildi. WhatsApp grubunda dosyayı paylaşabilirsin.');}else{downloadPng(blob,name);toast('Haftalık maç panosu indirildi.');}break;}
 case 'go-live':{if(!activeMatch())throw Error('Önce maç seçmelisiniz.');selectRoute('live');break;}
 case 'live-quick-event':{
@@ -1884,7 +2136,7 @@ case 'backup-rollback':{
  const label=Object.entries(restorePoint.counts).map(([k,n])=>`${k}: ${n}`).join(' | ');
  if(!confirm(`UYARI: ${new Date(restorePoint.createdAt).toLocaleString('tr-TR')} tarihli kurtarma noktasına dönülecek. ŞİMDİKİ VERİLERİN TÜMÜ DEĞİŞECEK. Kaydedilen eski durum: ${label}. Devam mı?`))return;
  if(prompt('Geri alma işlemini onaylamak için GERİ AL yazın:')!=='GERİ AL')return;
- const result=await rollbackToRestorePoint(state.club.id);matchDrafts.clearClub(state.club.id);state.currentId=null;state.sessionMatch=null;state.integrityAudit=null;await refresh();selectRoute('dashboard');toast('Önceki kulüp verileri yerel kurtarma noktasından geri alındı; içerikleri kontrol edin.');break;
+ invalidateFixtureImport();const result=await rollbackToRestorePoint(state.club.id);matchDrafts.clearClub(state.club.id);state.currentId=null;state.sessionMatch=null;state.integrityAudit=null;await refresh();selectRoute('dashboard');toast('Önceki kulüp verileri yerel kurtarma noktasından geri alındı; içerikleri kontrol edin.');break;
 }
 case 'backup-recovery-discard':{const point=await readRestorePoint(state.club.id);if(!point)throw Error('Kurtarma noktası yok.');if(!confirm('Tek yerel kurtarma noktasını kalıcı olarak kaldırmak istediğinizden emin misiniz?'))return;await discardRestorePoint(state.club.id);toast('Yerel kurtarma noktası kaldırıldı.');break;}
 case 'club-delete':{
@@ -2033,6 +2285,13 @@ listenRoot('change',async e=>{const el=e.target;if(el.id==='club-switch'||el.id=
  if(el.id==='club-logo'&&el.files[0]){const f=el.files[0];if(!['image/png','image/webp'].includes(f.type))throw Error('Şeffaf PNG veya WEBP yükleyin.');const blob=await prepareLogo(f),id=await saveAsset(blob);await putRecord('settings',{id:'clubLogo',value:id});await refresh();render();toast('Kulüp logosu cihazda saklandı.');return;}
  if(el.id==='poster-bg-file'&&el.files[0]){const blob=await preparePhoto(el.files[0],1920);const id=await saveAsset(blob);await persistDraft({overrides:{backgroundAssetId:id}});toast('Arka plan görseli uygulandı.');return;}
  if(el.id==='csv-file'&&el.files[0]){const groupId=document.getElementById('csv-group').value;const res=parsePlayersCsv(await el.files[0].text(),groupId);state.csvPending=res;const review=document.getElementById('csv-review');review.textContent=`${res.rows.length} geçerli kayıt. ${res.errors.length} hatalı satır.`+(res.errors.length?' Hatalar: '+res.errors.map(x=>`${x.row}. satır: ${x.message}`).join(' | '):'');document.getElementById('csv-confirm').disabled=!res.rows.length||!!res.errors.length;return;}
+ if(el.id==='weekly-import-file'&&el.files[0]){
+ const file=el.files[0];el.value='';invalidateFixtureImport();render();
+ const parsed=await fixtureImports.read(file);
+ state.fixtureImport=parsed;render();
+ toast(parsed.errors.length?'Program hataları var; hiçbir kayıt eklenmedi.':'Program okundu, kontrol edip onaylayın.',!!parsed.errors.length);
+ return;
+ }
  if(el.id==='backup-file'&&el.files[0]){
  const file=el.files[0];el.value='';if(file.size>105*1024*1024)throw Error('Yedek dosyası 105 MB sınırını aşıyor.');
  let password=null,report=await inspectBackup(file);
@@ -2042,7 +2301,7 @@ listenRoot('change',async e=>{const el=e.target;if(el.id==='club-switch'||el.id=
  if(report.integrityWarnings?.length){if(!confirm(`Yedekte ${report.integrityWarnings.length} eski/tutarsız bağlantı tespit edildi: ${report.integrityWarnings.slice(0,3).join(' | ')}. Kayıtların eksiksiz işlenmesi garanti edilemez. Devam edilsin mi?`))return;}
  const older=await readRestorePoint(state.club.id);if(older&&!confirm('Bu kulüp için önceki yerel kurtarma noktası bulunuyor. Yeni geri yükleme, eski kurtarma noktasını değiştirecek. Önceki noktayı kaybetmeyi kabul ediyor musunuz?'))return;
  if(!confirm(`${report.encrypted?'ŞİFRELİ':'ŞİFRESİZ'} YEDEK ÖNİZLEME: ${report.counts.players} oyuncu, ${report.counts.groups} grup, ${report.counts.matches} maç, ${report.counts.assets} görsel. ${state.club.name} kulübündeki MEVCUT TÜM VERİLER değişecek. Önce mevcut kulübün yedeğini aldınız mı?`))return;
- const outcome=await restoreBackup(file,true,password);matchDrafts.clearClub(state.club.id);state.integrityAudit=null;state.currentId=null;state.sessionMatch=null;state.liveSession=null;state.liveEvents=[];el.value='';await refresh();selectRoute('dashboard');toast('Yedek geri yüklendi. Önceki veriler için 7 günlük yerel geri alma noktası hazır; kayıtları kontrol edin.');return;}
+ invalidateFixtureImport();const outcome=await restoreBackup(file,true,password);matchDrafts.clearClub(state.club.id);state.integrityAudit=null;state.currentId=null;state.sessionMatch=null;state.liveSession=null;state.liveEvents=[];el.value='';await refresh();selectRoute('dashboard');toast('Yedek geri yüklendi. Önceki veriler için 7 günlük yerel geri alma noktası hazır; kayıtları kontrol edin.');return;}
  }catch(err){console.error(err);toast(err.message||'İşlem başarısız.',true)}});
 listenRoot('submit',async e=>{
  if(e.target.id==='pitch-number-form'||e.target.id==='pitch-role-form'){const action=e.target.id==='pitch-number-form'?'pitch-number-save':'pitch-role-save';await clickAction(action,e.target);return;}
@@ -2100,8 +2359,8 @@ listenRoot('submit',async e=>{
  }
  if(e.target.id==='club-create-form'){e.preventDefault();try{const form=new FormData(e.target);const club={id:crypto.randomUUID().replaceAll('-',''),name:validClubName(form.get('clubName')),accent:safeColor(form.get('accent')),createdAt:new Date().toISOString()};await saveClub(club);state.clubs=await listClubs();await chooseClub(club.id);}catch(error){toast(error.message,true)}return;}if(e.target.id==='club-settings-form'){e.preventDefault();try{const data=new FormData(e.target);state.club={...state.club,name:validClubName(data.get('clubName')),accent:safeColor(data.get('accent'))};await saveClub(state.club);state.clubs=await listClubs();render();toast('Kulüp kimliği güncellendi.')}catch(error){toast(error.message,true)}return;}if(e.target.id==='group-form'){e.preventDefault();const name=String(new FormData(e.target).get('name')||'').trim();if(!name)return;if(state.data.groups.some(x=>x.name.toLocaleLowerCase('tr')===name.toLocaleLowerCase('tr'))){toast('Bu grup zaten kayıtlı.',true);return}await putRecord('groups',{id:uid(),name,seasonLabel:(()=>{const d=new Date();const start=d.getMonth()>=6?d.getFullYear():d.getFullYear()-1;return `${start}-${start+1}`})(),isActive:true,sortOrder:state.data.groups.length});await refresh();render();toast('Grup eklendi.')}});
 const clubSlug=()=>safeFilenamePart(state.club?.name||'KULUP',40);
-async function chooseClub(id){rememberMatchDraft();workspaceSnapshot.invalidate();const c=state.clubs.find(x=>x.id===id);if(!c)throw Error('Kulüp bulunamadı.');setClubDatabase(c.id);state.club=c;setBackupClub(c);setActiveId(c.id);state.legacy=null;state.route='dashboard';state.data={players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]};state.currentId=null;state.sessionMatch=null;state.liveSession=null;state.liveEvents=[];state.liveLoading=false;liveLoadSequence++;state.filterGroup='all';state.query='';state.modal=null;state.rosterPoolGroups=[];state.board.selected=null;state.teamGroupId=null;state.integrityAudit=null;await openDatabase();await refresh();render();window.scrollTo(0,0);}
-function clubWelcome(){return `<div class="ms-onboarding bd-onboarding"><div class="bd-onboarding-layout"><div class="bd-onboarding-editorial"><img src="./assets/match-studio-brand-preview.png" class="brand-feature-lockup" alt="MATCH STUDIO mavi-mor futbol taktik logosu"><div class="bd-onboarding-eyebrow"><span class="onair-dot"></span> MATCH STUDIO / V2.6.8-F.11</div><h1>KULÜBÜNÜZ.<br><em>SAHNE SİZİN.</em></h1><p>Maç günü hazırlığı, kadro ve profesyonel yayın grafikleri. Kulüp kimliğinizi belirleyin, saha operasyonuna başlayın.</p><div class="bd-onboarding-features"><span>${I('shield')} Her kulüp için ayrı kayıtlar</span><span>${I('studio')} Yayına hazır maç tasarımları</span><span>${I('users')} Tek yerden kadro yönetimi</span></div><div class="bd-onboarding-footer">MAÇ GÖRSELLERİ / KULÜP YÖNETİMİ</div></div><div class="ms-onboarding-card bd-onboarding-form"><div class="eyebrow">01 / KULÜP KİMLİĞİ</div><h2>İlk kulübünüzü oluşturun</h2><p>Her kulüp ayrı yerel veritabanında saklanır. Başlangıç paketinde gerçek sporcu bilgisi yoktur.</p><form id="club-create-form" class="ms-form"><label>Kulüp adı<input name="clubName" maxlength="80" minlength="2" required placeholder="Örn. Atabey Spor Kulübü"></label><label>Kurumsal vurgu rengi<input name="accent" type="color" value="#4669D9"></label><button class="btn btn-primary" type="submit">KULÜP OLUŞTUR VE BAŞLA ${I('arrow')}</button></form><div class="bd-migration-note">${I('shield')} Eski Darıca Gücü V2.4 verileri korunur. Önce kulübü oluşturun; ardından Arşiv & Ayarlar bölümünden eski JSON yedeğinizi aktarabilirsiniz.</div></div></div></div>`;}
+async function chooseClub(id){invalidateFixtureImport();rememberMatchDraft();workspaceSnapshot.invalidate();const c=state.clubs.find(x=>x.id===id);if(!c)throw Error('Kulüp bulunamadı.');setClubDatabase(c.id);state.club=c;setBackupClub(c);setActiveId(c.id);state.legacy=null;state.route='dashboard';state.data={players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]};state.currentId=null;state.sessionMatch=null;state.liveSession=null;state.liveEvents=[];state.liveLoading=false;liveLoadSequence++;state.filterGroup='all';state.query='';state.modal=null;state.rosterPoolGroups=[];state.board.selected=null;state.teamGroupId=null;state.integrityAudit=null;await openDatabase();await refresh();render();window.scrollTo(0,0);}
+function clubWelcome(){return `<div class="ms-onboarding bd-onboarding"><div class="bd-onboarding-layout"><div class="bd-onboarding-editorial"><img src="./assets/match-studio-brand-preview.png" class="brand-feature-lockup" alt="MATCH STUDIO mavi-mor futbol taktik logosu"><div class="bd-onboarding-eyebrow"><span class="onair-dot"></span> MATCH STUDIO / V2.6.8-F.13</div><h1>KULÜBÜNÜZ.<br><em>SAHNE SİZİN.</em></h1><p>Maç günü hazırlığı, kadro ve profesyonel yayın grafikleri. Kulüp kimliğinizi belirleyin, saha operasyonuna başlayın.</p><div class="bd-onboarding-features"><span>${I('shield')} Her kulüp için ayrı kayıtlar</span><span>${I('studio')} Yayına hazır maç tasarımları</span><span>${I('users')} Tek yerden kadro yönetimi</span></div><div class="bd-onboarding-footer">MAÇ GÖRSELLERİ / KULÜP YÖNETİMİ</div></div><div class="ms-onboarding-card bd-onboarding-form"><div class="eyebrow">01 / KULÜP KİMLİĞİ</div><h2>İlk kulübünüzü oluşturun</h2><p>Her kulüp ayrı yerel veritabanında saklanır. Başlangıç paketinde gerçek sporcu bilgisi yoktur.</p><form id="club-create-form" class="ms-form"><label>Kulüp adı<input name="clubName" maxlength="80" minlength="2" required placeholder="Örn. Atabey Spor Kulübü"></label><label>Kurumsal vurgu rengi<input name="accent" type="color" value="#4669D9"></label><button class="btn btn-primary" type="submit">KULÜP OLUŞTUR VE BAŞLA ${I('arrow')}</button></form><div class="bd-migration-note">${I('shield')} Eski Darıca Gücü V2.4 verileri korunur. Önce kulübü oluşturun; ardından Arşiv & Ayarlar bölümünden eski JSON yedeğinizi aktarabilirsiniz.</div></div></div></div>`;}
 function clubQuickSwitcher(position="desktop"){const selectId=position==="mobile"?"club-switch-mobile":"club-switch";return `<div class="ms-quick"><label for="${selectId}">Aktif kulüp</label><select id="${selectId}" aria-label="Kulüp değiştir">${state.clubs.map(c=>`<option value="${esc(c.id)}" ${state.club?.id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select><small>Her kulübün verileri ayrı saklanır</small></div>`;}
 function clubManager(){return `<section class="ms-club-manager"><h2>Kulüp Yönetimi</h2><p class="muted small">Mevcut kulüp: ${esc(state.club?.name)} · Veriler bu cihaza özeldir ve diğer kulüplerin kayıtlarına karışmaz.</p><form id="club-settings-form" class="ms-form"><label>Kulüp adı<input name="clubName" required minlength="2" maxlength="80" value="${esc(state.club?.name)}"></label><label>Kurumsal vurgu rengi<input type="color" name="accent" value="${esc(safeColor(state.club?.accent))}"></label><button class="btn btn-primary" type="submit">Kulüp kimliğini kaydet</button></form><details class="ms-manager-details"><summary>Yeni kulüp oluştur</summary><form id="club-create-form" class="ms-form"><label>Yeni kulüp adı<input name="clubName" minlength="2" maxlength="80" required></label><label>Renk<input name="accent" type="color" value="#4669D9"></label><button class="btn btn-ghost" type="submit">Yeni bağımsız kulüp oluştur</button></form></details><div class="ms-import-panel"><h3>Eski V2.4 kayıtlarını koruyarak taşı</h3><p class="muted small">Eski Darıca Gücü kayıtları yalnızca aynı tarayıcı profili ve aynı site adresi üzerinden taşınabilir. Farklı bir adres kullanıyorsanız eski sürümden JSON yedeği indirip aşağıdaki geri yükleme seçeneğini kullanın. Önce eski kayıtlarınızın yedeğini alın. Kayıtların taşınacağı kulüp boş olmalıdır. Eski kayıtlar değiştirilmez.</p>${btn('Eski kayıtları kontrol et','legacy-preview','btn-ghost')}${state.legacy?`<p class="muted small">${esc(state.legacy.message||(state.legacy.found?`${state.legacy.counts.players||0} oyuncu, ${state.legacy.counts.matches||0} maç, ${state.legacy.counts.groups||0} grup bulundu.`:'Veri bulunamadı.'))}</p>${state.legacy.found?btn('Eski verileri bu kulübe kopyala','legacy-import','btn-primary'):''}`:''}</div><div class="ms-group-tools"><h3>Gruplar</h3>${state.data.groups.map(g=>`<div class="ms-group-row"><span>${esc(g.name)}</span>${btn('Grubu Sil','delete-group','btn-danger btn-small',`data-id="${esc(g.id)}"`)}</div>`).join('')||'<p class="muted">Henüz grup oluşturulmadı.</p>'}</div><section class="ms-danger-zone" aria-labelledby="danger-zone-title"><h3 id="danger-zone-title">Kulüp silme — geri alınamaz</h3><p class="footnote">Silmeden önce şifreli yedeği indirip dosyayı cihaz dışında kontrol edin. Yanlış kulüp silinmesini önlemek için kulüp adını birebir girmeniz gerekir. Bu işlem yalnızca aktif kulübü etkiler, diğer kulüpler korunur. Açık diğer sekmeler silme işlemini engelleyebilir.</p>${btn('Bu kulübü kalıcı sil','club-delete','btn-danger')}</section></section>`;}
 
