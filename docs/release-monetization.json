@@ -1,0 +1,42 @@
+{
+  "recordVersion": 1,
+  "decisionDate": "2026-10-26",
+  "appName": "Match Studio",
+  "firstLaunch": {
+    "distribution": "google_play",
+    "priceModel": "free",
+    "ads": false,
+    "playBillingEnabled": false
+  },
+  "laterPro": {
+    "pricingModel": "one_time_non_consumable",
+    "productIdProposal": "matchstudio_pro_lifetime",
+    "suggestedLaunchPriceTRY": 699,
+    "priceConfirmed": false,
+    "releasePhase": "after_free_launch",
+    "entitlementsConfigured": false
+  },
+  "account": {
+    "accountType": "personal",
+    "accountActiveUserConfirmed": true,
+    "appCreatedInConsole": false,
+    "accountCreationDateVerified": false
+  },
+  "android": {
+    "host": "match-studio-telefon.vercel.app",
+    "packageIdProposal": "com.daricagucusk.matchstudio",
+    "targetApi": 36,
+    "signedAab": false
+  },
+  "baseline": {
+    "main": "4cbf8f899cc1466fe1621d42900fa959357d985f",
+    "preserveLive": true,
+    "preserveCodexWork": true
+  },
+  "restrictions": [
+    "no_paid_gate_on_free_launch",
+    "no_fake_store_pricing_claim",
+    "no_hardcoded_play_signing_fingerprint",
+    "no_release_signing_keys_in_repo"
+  ]
+}

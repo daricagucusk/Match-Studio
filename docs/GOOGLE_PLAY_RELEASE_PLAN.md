@@ -83,3 +83,11 @@ Kaynaklar:
 - **Güvenlik:** `.unsigned-twa/` dizini build çıktısıdır; Git'e girmez. CI'dan çıkan `unsigned-qa.aab` **Play Console'a yüklenemez** ve imzalı yayın paketi olarak kullanılmaz.
 - **Gerçek yayın paketi:** Android TWA projesi, Google Play uygulama paket kimliği ve gerçek sahibin güvenli yükleme anahtarıyla imzalanmalıdır. İmzalı AAB ve Play App Signing SHA-256 doğrulanmadan `assetlinks.json` yayımlanmaz.
 - **Kaynak:** https://support.google.com/googleplay/android-developer/answer/14151465 ; https://support.google.com/googleplay/android-developer/answer/11926878 ; https://github.com/GoogleChromeLabs/bubblewrap/blob/main/packages/cli/README.md
+
+## 26.10.2026 — Onaylı ücretsiz lansman + sonraki Pro planı
+
+- Kullanıcı bireysel Play Console hesabının aktif olduğunu, ancak Match Studio uygulamasının henüz oluşturulmadığını bildirdi.
+- **İlk Play Console uygulama kaydı** Türkçe, Match Studio, Uygulama, **Ücretsiz** olarak yapılacak.
+- İlk yayına sahte/bitmemiş ödeme ve Pro lisans kapısı dahil edilmeyecek. Sonraki Pro: tek seferlik non-consumable, nihai fiyat ve ayrı özellik sınırı onaya tabi.
+- 26.10.2026 QA Android API 36 unsigned AAB 5.407.998 bayt, Actions 40370419012 PASS. **Signed Store AAB henüz yok.**
+- `docs/PLAY_LAUNCH_AND_PRO_PLAN_2026-10-26.md` tüm Play Console adımları, GO/NO-GO ve ikinci aşama lisans/ödeme güvenliği kaydıdır.

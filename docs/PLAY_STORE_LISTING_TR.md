@@ -48,3 +48,10 @@ Gizlilik URL'si: **YAYINLANDIKTAN SONRA DOLDURULACAK**
 Kategori, hedef yaş, reklam, ülkeler, veri güvenliği: **nihai paket denetiminden sonra onaylanacak**
 
 **Yayın öncesi söylenmemesi gerekenler:** Otomatik federasyon PDF tanıma, bulut hesap senkronizasyonu, tüm cihazlar arası otomatik kayıt taşıma, tüm modüllerin ilk kurulumdan itibaren internetsiz çalışması. Bunlar mevcut teslimle kanıtlanmış özellikler değildir.
+
+## ONAYLI ÜCRETLENDİRME KARARI — 26.10.2026
+
+- **İlk sürüm ücretsiz indirme**; henüz reklam, abonelik veya Google Play Billing ile Pro satın alma sunulmuyor.
+- İlerleyen ayrı sürümde **tek seferlik Pro** (non-consumable) düşünülecek. 699 TL yalnızca öneri; mağazada aktif değildir.
+- Mevcut gerçek uygulama özellikleri dışında ücretli işlev veya gelecekteki Pro satın alma ekranı varmış gibi mağaza metni yazılmamalı.
+- Karar/teknik kapılar: `docs/PLAY_LAUNCH_AND_PRO_PLAN_2026-10-26.md`.
