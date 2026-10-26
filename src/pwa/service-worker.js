@@ -37,6 +37,8 @@ self.addEventListener('fetch',event=>{
  if(req.method!=='GET'||url.origin!==self.location.origin)return;
  // Ignore navigation query strings; the HTML and all its assets stay in one release.
  const canonical=new URL(url);canonical.search='';canonical.hash='';
+ // Legal privacy policy is a distinct public document, not a SPA navigation.
+ if(req.mode==='navigate'&&canonical.pathname==='/privacy.html')return;
  if(!shellUrls.has(canonical.href)&&req.mode!=='navigate')return;
  event.respondWith((async()=>{
   const cache=await caches.open(CACHE);
