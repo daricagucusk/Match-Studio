@@ -33,7 +33,7 @@ test('P0: unconfirmed fixture from club A never appears or writes in B sharing s
  await createClub(page,'Kulüp A Test');
  await createGroup(page);
  await nav(page,'archive');
- await page.locator('.ms-manager-details summary').click();
+ await page.locator('.ms-manager-details summary').filter({hasText:'Yeni kulüp oluştur'}).click();
  await createClub(page,'Kulüp B Test');
  await createGroup(page);
  await switchClub(page,'Kulüp A Test');
@@ -56,7 +56,7 @@ test('P0: club switch while fixture file is still being read discards delayed pr
  await createClub(page,'Kulüp A Yavaş');
  await createGroup(page);
  await nav(page,'archive');
- await page.locator('.ms-manager-details summary').click();
+ await page.locator('.ms-manager-details summary').filter({hasText:'Yeni kulüp oluştur'}).click();
  await createClub(page,'Kulüp B Yavaş');
  await createGroup(page);
  await switchClub(page,'Kulüp A Yavaş');
