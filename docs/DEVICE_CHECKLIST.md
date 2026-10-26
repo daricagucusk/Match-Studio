@@ -1,6 +1,8 @@
 # Samsung Z Fold 7 / Android kabul kontrolü
 
-Durum: **Gerçek cihazda henüz uygulanmadı.** Ekran boyutu emülasyonu gerçek cihaz testi sayılmaz.
+Durum: **PR #20 için kullanıcı fiziksel kabulü alındı; genel listenin madde bazında sonuçları kayıtlı değil.** Ekran boyutu emülasyonu gerçek cihaz testi sayılmaz.
+
+26 Ekim 2026: Kullanıcı PR #20 / `a69480b` P0-01 düzeltmesinin fiziksel testinin geçtiğini bildirdi. Cihaz, Android ve Chrome sürümleri belirtilmedi. Bu kayıt aşağıdaki genel kontrol listesinin tüm maddelerini veya sonraki yatay menü düzeltmesini onaylamaz.
 
 Her denemede Android/Chrome sürümünü, ekran modunu, sonucu ve varsa hata adımlarını kaydedin. Gerçek sporcu verileri yerine deneme kulübü kullanın.
 
