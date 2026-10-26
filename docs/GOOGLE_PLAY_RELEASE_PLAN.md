@@ -77,7 +77,7 @@ Kaynaklar:
 
 ## ANDROID CI — bireysel Play hesabı / 26.10.2026
 
-- **Hesap türü:** kullanıcı beyanı: aktif bireysel Google Play Console hesabı. Hesap açılış tarihi, Play Console üretim erişimi ve uygulama kimliği erişim kanıtı **henüz alınmadı**.
+- **Hesap durumu:** kimlik belgeleri incelemede. Hesap açılış tarihi, Play Console üretim erişimi ve uygulama kaydı **doğrulanmadı**; hesabın yayın için aktif olduğu varsayılmaz.
 - **Koşullu test gereği:** 13 Kasım 2023 sonrası açılan bireysel hesap için en az **12 kapalı testçi / 14 gün kesintisiz** katılım ve üretim erişimi başvurusu. Daha eski hesapta aynı kuralı otomatik uygulama.
 - **Yeni build kontrolü:** `.github/workflows/android-twa-unsigned.yml` imza anahtarı kullanmadan Bubblewrap TWA Gradle projesi üretir; `tools/ensure-android-api36.cjs` generated Gradle içinde Android API 36 hedef/derleme seviyesini fail-closed doğrular ve gerekirse yükseltir.
 - **Güvenlik:** `.unsigned-twa/` dizini build çıktısıdır; Git'e girmez. CI'dan çıkan `unsigned-qa.aab` **Play Console'a yüklenemez** ve imzalı yayın paketi olarak kullanılmaz.
@@ -86,7 +86,7 @@ Kaynaklar:
 
 ## 26.10.2026 — Onaylı ücretsiz lansman + sonraki Pro planı
 
-- Kullanıcı bireysel Play Console hesabının aktif olduğunu, ancak Match Studio uygulamasının henüz oluşturulmadığını bildirdi.
+- Kullanıcının güncel beyanına göre geliştirici kimlik belgeleri incelemede; Match Studio uygulama kaydı henüz doğrulanmadı.
 - **İlk Play Console uygulama kaydı** Türkçe, Match Studio, Uygulama, **Ücretsiz** olarak yapılacak.
 - İlk yayına sahte/bitmemiş ödeme ve Pro lisans kapısı dahil edilmeyecek. Sonraki Pro: tek seferlik non-consumable, nihai fiyat ve ayrı özellik sınırı onaya tabi.
 - 26.10.2026 QA Android API 36 unsigned AAB 5.407.998 bayt, Actions 40370419012 PASS. **Signed Store AAB henüz yok.**

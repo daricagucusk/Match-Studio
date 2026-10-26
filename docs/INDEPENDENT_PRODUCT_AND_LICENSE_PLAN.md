@@ -13,7 +13,7 @@ Tarih: 25.10.2026 · Durum: Strateji taslağı / gerçek şirket ve Google Play 
 - **Henüz hiçbir şirket/işletme temsil edilmiyorsa** kişisel kullanım hesabıyla başlamak mümkündür; şirket/işletme adına açılıyorsa kurumsal hesap seçilmelidir.
 - Kişisel hesapların Play Billing ile para kazanmasına izin verilir.
 - 13.11.2023 sonrası yeni kişisel hesaplarda production başvurusundan önce 12 testçinin 14 gün kesintisiz kapalı testte katılımı gerekir.
-- Paket adını ilk Play yüklemesinden önce kesinleştir: geçici teknik ad `com.matchdaystudio.app`. Uzun vadeli marka ve alan adı sahipliği açısından ayrıca onaylanmalı.
+- Kullanıcı paket adını `com.matchdaystudio.app` olarak kesinleştirdi. Play Console uygunluğu, marka ve alan adı sahipliği ayrıca doğrulanmalıdır.
 - Gerçek yasal isim/adres, Google Play ve ödemeler profilinin görünürlük koşulları açıklanmadan hesap tamamlanmamalı. Kimlik bilgileri GitHub, Issue veya bu sohbete kopyalanmaz.
 
 Resmî kaynaklar:
