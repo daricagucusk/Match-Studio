@@ -60,6 +60,8 @@ test('capture authentic Play listing screens with no real player or club data',a
   await snap(page,'03-mac-planlama');
   for(let i=0;i<4;i++){await page.locator('input[data-player-id]').nth(i).check();await idle(page);}
   await nav(page,'studio');
+  // On narrow phones the studio has a separate mobile preview tab.
+  await page.locator('[data-mobile-tab="preview"]').click();await idle(page);
   await expect(page.locator('#poster-canvas')).toBeVisible();
   await snap(page,'04-afis-studyo');
   expect(errors).toEqual([]);
