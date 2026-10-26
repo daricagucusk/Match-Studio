@@ -2,14 +2,37 @@
 // Images remain Blob objects and are intentionally NOT exported or synced.
 const {STORES,listRecords,transact,withExclusiveClubOperation,clubContext,assertContext}=require('src/storage/db.js');
 const {checkSnapshotIntegrity}=require('src/storage/data-safety.js');
-const DB_NAME='matchstudio-recovery-v1',STORE='points';
+const DB_NAME='matchstudio-recovery-v1',STORE='points',ERASED_STORE='erasedPlayers';
 const DAYS=7,MAX_AGE=DAYS*24*3600*1000;
 let recoveryHandle=null;
-function openRecovery(){if(recoveryHandle)return Promise.resolve(recoveryHandle);return new Promise((resolve,reject)=>{const q=indexedDB.open(DB_NAME,1);q.onupgradeneeded=()=>q.result.createObjectStore(STORE,{keyPath:'id'});q.onsuccess=()=>{recoveryHandle=q.result;recoveryHandle.onversionchange=()=>{recoveryHandle.close();recoveryHandle=null;};resolve(recoveryHandle)};q.onerror=()=>reject(q.error);});}
+function openRecovery(){if(recoveryHandle)return Promise.resolve(recoveryHandle);return new Promise((resolve,reject)=>{const q=indexedDB.open(DB_NAME,2);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains(STORE))q.result.createObjectStore(STORE,{keyPath:'id'});if(!q.result.objectStoreNames.contains(ERASED_STORE))q.result.createObjectStore(ERASED_STORE,{keyPath:'id'});};q.onsuccess=()=>{recoveryHandle=q.result;recoveryHandle.onversionchange=()=>{recoveryHandle.close();recoveryHandle=null;};resolve(recoveryHandle)};q.onerror=()=>reject(q.error);});}
 const validId=id=>{if(!/^[A-Za-z0-9_-]{8,80}$/.test(String(id||'')))throw Error('Geçersiz kurtarma kulübü kimliği.');return id;};
 async function recoveryTransaction(mode,callback){const db=await openRecovery();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,mode);let req;try{req=callback(tx.objectStore(STORE));}catch(err){tx.abort();reject(err);return;}tx.oncomplete=()=>resolve(req?.result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Kurtarma depolama iptal edildi.'));});}
 async function readRestorePoint(id){validId(id);const row=await recoveryTransaction('readonly',s=>s.get(id));if(!row)return null;if(Date.now()-Date.parse(row.createdAt)>MAX_AGE){await discardRestorePoint(id);return null;}return row;}
 async function discardRestorePoint(id){validId(id);await recoveryTransaction('readwrite',s=>s.delete(id));}
+
+// A durable per-club erasure marker blocks old backups from reintroducing an athlete.
+// Mark first and revoke the whole old restore point atomically in the recovery DB.
+// An interrupted deletion leaves the athlete in the active DB but never makes an
+// outdated recovery snapshot a route to resurrect a successfully erased athlete.
+async function listErasedPlayerIds(clubId){
+ validId(clubId);const db=await openRecovery();
+ return new Promise((resolve,reject)=>{const tx=db.transaction(ERASED_STORE,'readonly');
+  const req=tx.objectStore(ERASED_STORE).getAll();
+  req.onsuccess=()=>resolve(req.result.filter(r=>r.clubId===clubId).map(r=>r.playerId));
+  req.onerror=()=>reject(req.error||Error('Kalıcı silme geçmişi okunamadı.'));
+ });
+}
+async function recordPlayerErasure(clubId,playerId){
+ validId(clubId);if(typeof playerId!=='string'||!playerId||playerId.length>160)throw Error('Geçersiz oyuncu kimliği.');
+ const db=await openRecovery();
+ await new Promise((resolve,reject)=>{const tx=db.transaction([STORE,ERASED_STORE],'readwrite');
+  tx.objectStore(ERASED_STORE).put({id:clubId+'|'+playerId,clubId,playerId,erasedAt:new Date().toISOString()});
+  tx.objectStore(STORE).delete(clubId);
+  tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error||Error('Kalıcı silme koruması yazılamadı.'));
+  tx.onabort=()=>reject(tx.error||Error('Kalıcı silme koruması iptal edildi.'));
+ });
+}
 async function captureCurrentStores(runTransaction=transact){const stores={};await runTransaction(STORES,'readonly',tx=>{for(const n of STORES){const req=tx.objectStore(n).getAll();req.onsuccess=()=>{stores[n]=req.result;};}});if(STORES.some(n=>!Array.isArray(stores[n])))throw Error('Tutarlı kurtarma anlık görüntüsü okunamadı.');return stores;}
 function statsOf(stores){return Object.fromEntries(STORES.map(n=>[n,stores[n]?.length||0]));}
 async function saveRestorePoint(clubId,runTransaction=transact){validId(clubId);
@@ -34,4 +57,4 @@ async function rollbackToRestorePoint(clubId){const ctx=clubContext();if(ctx.id!
  return {counts:point.counts,createdAt:point.createdAt,integrityWarnings:point.integrityWarnings};
  },ctx);
 }
-Object.assign(exports,{DB_NAME,MAX_AGE,readRestorePoint,discardRestorePoint,saveRestorePoint,rollbackToRestorePoint,captureCurrentStores,statsOf});
+Object.assign(exports,{DB_NAME,MAX_AGE,readRestorePoint,discardRestorePoint,saveRestorePoint,rollbackToRestorePoint,captureCurrentStores,statsOf,listErasedPlayerIds,recordPlayerErasure});

@@ -106,3 +106,26 @@ test('database v1 upgrades to v2 without removing existing player records',async
  const db=load('src/storage/db.js');db.setClubDatabase('upgrade_01');assert.equal((await db.getRecord('players','old-player')).fullName,'Eski Oyuncu');
  const connection=await db.openDatabase();assert.equal(connection.version,2);assert.equal(connection.objectStoreNames.contains('matchEvents'),true);assert.equal(connection.transaction('matchEvents').objectStore('matchEvents').indexNames.contains('sessionIdempotency'),true);
 });
+
+test('permanent erasure revokes the recovery point and denies old encrypted backup restores',async()=>{
+ const {db,backup,load}=await fixture();
+ const recovery=load('src/storage/recovery.js');
+ const password='strong-test-only-passphrase';
+ const older=await backup.exportEncryptedBackup(password);
+ await recovery.saveRestorePoint('club_test_01');
+ assert.ok(await recovery.readRestorePoint('club_test_01'));
+ await db.erasePlayerAtomic('p1');
+ assert.equal(await db.getRecord('players','p1'),null);
+ assert.equal(await recovery.readRestorePoint('club_test_01'),null);
+ assert.ok((await recovery.listErasedPlayerIds('club_test_01')).includes('p1'));
+ await assert.rejects(backup.restoreBackup(older,true,password),/kalıcı olarak silinmiş oyuncu/);
+ assert.equal(await db.getRecord('players','p1'),null);
+ assert.equal((await db.listRecords('players')).length,2);
+});
+test('permanent erasure cannot start when recovery protection is unavailable',async()=>{
+ const {db,context}=await fixture();
+ const factory=context.indexedDB,realOpen=factory.open.bind(factory);
+ factory.open=(name,...args)=>{if(name==='matchstudio-recovery-v1')throw Error('Recoverystore blocked');return realOpen(name,...args);};
+ await assert.rejects(db.erasePlayerAtomic('p1'),/Recoverystore blocked/);
+ assert.equal((await db.getRecord('players','p1')).fullName,'Ali Bir');
+});

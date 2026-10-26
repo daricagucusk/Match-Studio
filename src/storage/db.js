@@ -53,8 +53,15 @@ async function deleteRecord(storeName,id){return transact([storeName],'readwrite
 async function deleteMatchAtomic(id){await transact(['matches','rosters','settings','posterDrafts','matchSessions','matchEvents'],'readwrite',tx=>{tx.objectStore('matches').delete(id);tx.objectStore('rosters').delete(id);tx.objectStore('settings').delete('lineup:'+id);tx.objectStore('matchSessions').delete('session:'+id);const eventStore=tx.objectStore('matchEvents');if(typeof eventStore.index==='function'){const eventsReq=eventStore.index('matchId').openCursor(IDBKeyRange.only(id));eventsReq.onsuccess=()=>{const cursor=eventsReq.result;if(cursor){cursor.delete();cursor.continue();}};}else{const eventsReq=eventStore.getAll();eventsReq.onsuccess=()=>{for(const evt of eventsReq.result)if(evt.matchId===id)eventStore.delete(evt.id);};}const req=tx.objectStore('posterDrafts').getAll();req.onsuccess=()=>{for(const d of req.result)if(d.matchId===id)tx.objectStore('posterDrafts').delete(d.id);};});}
 // One IndexedDB transaction ensures deletion and all linked cleanup either all commit or all roll back.
 async function erasePlayerAtomic(id){
- let result=null;
- await transact(['players','rosters','settings','posterDrafts','assets','matchSessions','matchEvents'],'readwrite',tx=>{
+ const ctx=clubContext();
+ return withExclusiveClubOperation(async runTransaction=>{
+  let exists=false;
+  await runTransaction(['players'],'readonly',tx=>{const req=tx.objectStore('players').get(id);req.onsuccess=()=>{exists=!!req.result;};});
+  if(!exists)throw Error('Silinecek oyuncu bulunamadı.');
+  // Fail closed before changing live data. Never leave an older restore copy alive.
+  await require('src/storage/recovery.js').recordPlayerErasure(ctx.id,id);
+  let result=null;
+  await runTransaction(['players','rosters','settings','posterDrafts','assets','matchSessions','matchEvents'],'readwrite',tx=>{
   const names=['players','rosters','settings','posterDrafts','assets','matchSessions','matchEvents'];
   const snapshot={},read=[];
   for(const n of names){const r=tx.objectStore(n).getAll();r.onsuccess=()=>{snapshot[n]=r.result;read.push(n);if(read.length===names.length){
@@ -68,8 +75,9 @@ async function erasePlayerAtomic(id){
    }catch(err){tx.abort();}
   }};}
  });
- if(!result)throw Error('Oyuncu silme işlemi tamamlanamadı; hiçbir kayıt değişmedi.');
- return result;
+  if(!result)throw Error('Oyuncu silme işlemi tamamlanamadı; veri kayıtlarını yeniden denetleyin.');
+  return result;
+ },ctx);
 }
 async function safeDeleteGroup(id){
  let problem=null;
