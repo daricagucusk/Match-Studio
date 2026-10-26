@@ -11,7 +11,9 @@
     "check": "npm run build && npm test && npm run test:browser",
     "package": "node tools/package.cjs",
     "release": "npm run check && npm run package",
-    "build:vercel": "npm run build && node tools/export-static.cjs"
+    "build:vercel": "npm run build && node tools/export-static.cjs",
+    "check:play": "node tools/check-play-readiness.cjs",
+    "check:play:strict": "node tools/check-play-readiness.cjs --strict --remote"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",

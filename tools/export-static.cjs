@@ -19,6 +19,26 @@ function exportStatic(root=path.resolve(__dirname,'..')){
  }
  if(!bytes.has('index.html')||Object.keys(integrity).length!==new Set(shell).size)throw Error('Incomplete worker manifest');
  bytes.set('robots.txt',read('robots.txt'));
+ // Play Store documents may only be staged after legal owner approval and
+ // the real Google Play App Signing SHA-256 is known. Never ship placeholder links.
+ if(fs.existsSync(path.join(root,'privacy.html'))){
+  const privacy=read('privacy.html');
+  if(!privacy.toString('utf8').includes('Gizlilik Politikası'))throw Error('Invalid privacy policy page');
+  bytes.set('privacy.html',privacy);
+ }
+ const assetLinkName='.well-known/assetlinks.json';
+ if(fs.existsSync(path.join(root,assetLinkName))){
+  const blob=read(assetLinkName);
+  const items=JSON.parse(blob.toString('utf8'));
+  const twa=JSON.parse(read('android/twa-manifest.json').toString('utf8'));
+  const valid=Array.isArray(items)&&items.some(item=>
+    (item.relation||[]).includes('delegate_permission/common.handle_all_urls')&&
+    item.target?.namespace==='android_app'&&
+    item.target?.package_name===twa.packageId&&
+    (item.target?.sha256_cert_fingerprints||[]).some(fp=>/^([A-F0-9]{2}:){31}[A-F0-9]{2}$/i.test(fp)));
+  if(!valid)throw Error('Invalid Android App Links certificate binding');
+  bytes.set(assetLinkName,blob);
+ }
  const stage=fs.mkdtempSync(path.join(root,'.static-output-'));
  try{
   for(const [name,content] of bytes){const target=path.join(stage,name);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,content);}
