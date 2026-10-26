@@ -73,3 +73,13 @@ Kaynaklar:
 - Başlıca NO-GO: Kalıcı silme Chrome/Z Fold7 kabulü, gerekli gizlilik onayı, gerçek Google Play App Signing SHA-256, assetlinks, imzalı target API 36 AAB, Data Safety ve Play Console test izinleri.
 - Proje kontrol merkezi: https://github.com/daricagucusk/Match-Studio/issues/24
 
+
+
+## ANDROID CI — bireysel Play hesabı / 26.10.2026
+
+- **Hesap türü:** kullanıcı beyanı: aktif bireysel Google Play Console hesabı. Hesap açılış tarihi, Play Console üretim erişimi ve uygulama kimliği erişim kanıtı **henüz alınmadı**.
+- **Koşullu test gereği:** 13 Kasım 2023 sonrası açılan bireysel hesap için en az **12 kapalı testçi / 14 gün kesintisiz** katılım ve üretim erişimi başvurusu. Daha eski hesapta aynı kuralı otomatik uygulama.
+- **Yeni build kontrolü:** `.github/workflows/android-twa-unsigned.yml` imza anahtarı kullanmadan Bubblewrap TWA Gradle projesi üretir; `tools/ensure-android-api36.cjs` generated Gradle içinde Android API 36 hedef/derleme seviyesini fail-closed doğrular ve gerekirse yükseltir.
+- **Güvenlik:** `.unsigned-twa/` dizini build çıktısıdır; Git'e girmez. CI'dan çıkan `unsigned-qa.aab` **Play Console'a yüklenemez** ve imzalı yayın paketi olarak kullanılmaz.
+- **Gerçek yayın paketi:** Android TWA projesi, Google Play uygulama paket kimliği ve gerçek sahibin güvenli yükleme anahtarıyla imzalanmalıdır. İmzalı AAB ve Play App Signing SHA-256 doğrulanmadan `assetlinks.json` yayımlanmaz.
+- **Kaynak:** https://support.google.com/googleplay/android-developer/answer/14151465 ; https://support.google.com/googleplay/android-developer/answer/11926878 ; https://github.com/GoogleChromeLabs/bubblewrap/blob/main/packages/cli/README.md
