@@ -24,3 +24,6 @@ android/app/build/
 android/.idea/
 *.aab
 *.apk
+
+.unsigned-twa/
+**/unsigned-qa.aab
