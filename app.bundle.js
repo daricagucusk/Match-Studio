@@ -970,8 +970,10 @@ function calculatePlayerMinutes(session,events=[],nowMs=Date.now()){
   else if(['CLOCK_PAUSE','PERIOD_END','FINALIZE','ABANDON'].includes(event.type))playing=false;
   else if(event.type==='SUBSTITUTION'){
    const out=event.payload?.outPlayerId,inside=event.payload?.inPlayerId;
-   if(!active.has(out)||active.has(inside)||!pool.includes(inside)){reviewRequired=true;continue;}
-   active.delete(out);active.add(inside);
+   const outErased=out==null&&event.payload?.outPlayerErased===true;
+   const inErased=inside==null&&event.payload?.inPlayerErased===true;
+   if((!outErased&&!active.has(out))||(!inErased&&(active.has(inside)||!pool.includes(inside)))){reviewRequired=true;continue;}
+   if(!outErased)active.delete(out);if(!inErased)active.add(inside);
   }
  }
  // Started sessions from Packet B include the full clock event history. If absent,
@@ -1629,6 +1631,7 @@ const {setBackupClub,exportBackup,exportEncryptedBackup,inspectBackup,restoreBac
 const {listClubs,saveClub,getActiveId,setActiveId,clearActiveId,validClubName,safeColor,inspectLegacy}=require("src/storage/club-registry.js");
 const {deleteClubSafely,retryPendingDeletions}=require('src/storage/club-deletion.js');
 const {readRestorePoint,rollbackToRestorePoint,discardRestorePoint}=require('src/storage/recovery.js');
+const {resumePlayerErasures}=require('src/storage/privacy-erasure.js');
 const {auditActiveClub}=require('src/storage/audit.js');
 const {makeLineup,normalizeLineup,placePlayer,removeFromPitch,changePitchPreset,setPlayerPitchRole,getPitchPresets,getPitchShirtNumber,setPitchShirtNumber}=require("src/domain/lineup.js");
 const {pitchScreen}=require("src/pitch/pitch-screen.js");
@@ -2066,7 +2069,7 @@ state.modal=null;await refresh();render();toast('Oyuncu kaydedildi. Aktif maç k
 case 'delete-player':{
  const id=target.dataset.id,p=state.data.players.find(x=>x.id===id);if(!p)return;
  const refs=state.data.rosters.reduce((n,r)=>n+(r.entries||[]).filter(e=>e.playerId===id).length,0);
- if(!confirm(`${p.fullName} kalıcı silinsin mi? ${refs} maç kadrosu bağlantısı, geçmişteki isim snapshotları, saha atamaları ve varsa kullanılmayan fotoğraf da temizlenecek. Bu işlem geri alınamaz; önce şifreli yedek önerilir.`))return;
+ if(!confirm(`${p.fullName} kalıcı silinsin mi? ${refs} maç kadrosu bağlantısı, geçmişteki isim kayıtları, saha atamaları ve varsa kullanılmayan fotoğraf temizlenecek. Eski yerel kurtarma noktası kaldırılacak. Bu işlem geri alınamaz. İndirilmiş dış yedekler silinemez; bu kopyaları ayrıca yönetmelisiniz. Silinmiş kimlikleri içeren eski yedekler bu cihazdaki aynı kulübe geri yüklenmez. Başka cihaz veya tarayıcı verilerini temizleme sonrasında bu koruma taşınmaz.`))return;
  const result=await erasePlayerAtomic(id);state.modal=null;state.pitchSelectedId=null;state.pitchContext=null;await refresh();render();toast(`Oyuncu kalıcı silindi; ${result.erasedEntryCount} kadro bağlantısı ve ${result.assetCount} kullanılmayan görsel temizlendi.`);break;}
 case 'csv-import':state.modal={type:'csv',groupId:state.filterGroup==='all'?state.data.groups[0]?.id:state.filterGroup};render();break;
 case 'csv-confirm':{if(!state.csvPending?.rows?.length)return;
@@ -2359,7 +2362,7 @@ listenRoot('submit',async e=>{
  }
  if(e.target.id==='club-create-form'){e.preventDefault();try{const form=new FormData(e.target);const club={id:crypto.randomUUID().replaceAll('-',''),name:validClubName(form.get('clubName')),accent:safeColor(form.get('accent')),createdAt:new Date().toISOString()};await saveClub(club);state.clubs=await listClubs();await chooseClub(club.id);}catch(error){toast(error.message,true)}return;}if(e.target.id==='club-settings-form'){e.preventDefault();try{const data=new FormData(e.target);state.club={...state.club,name:validClubName(data.get('clubName')),accent:safeColor(data.get('accent'))};await saveClub(state.club);state.clubs=await listClubs();render();toast('Kulüp kimliği güncellendi.')}catch(error){toast(error.message,true)}return;}if(e.target.id==='group-form'){e.preventDefault();const name=String(new FormData(e.target).get('name')||'').trim();if(!name)return;if(state.data.groups.some(x=>x.name.toLocaleLowerCase('tr')===name.toLocaleLowerCase('tr'))){toast('Bu grup zaten kayıtlı.',true);return}await putRecord('groups',{id:uid(),name,seasonLabel:(()=>{const d=new Date();const start=d.getMonth()>=6?d.getFullYear():d.getFullYear()-1;return `${start}-${start+1}`})(),isActive:true,sortOrder:state.data.groups.length});await refresh();render();toast('Grup eklendi.')}});
 const clubSlug=()=>safeFilenamePart(state.club?.name||'KULUP',40);
-async function chooseClub(id){invalidateFixtureImport();rememberMatchDraft();workspaceSnapshot.invalidate();const c=state.clubs.find(x=>x.id===id);if(!c)throw Error('Kulüp bulunamadı.');setClubDatabase(c.id);state.club=c;setBackupClub(c);setActiveId(c.id);state.legacy=null;state.route='dashboard';state.data={players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]};state.currentId=null;state.sessionMatch=null;state.liveSession=null;state.liveEvents=[];state.liveLoading=false;liveLoadSequence++;state.filterGroup='all';state.query='';state.modal=null;state.rosterPoolGroups=[];state.board.selected=null;state.teamGroupId=null;state.integrityAudit=null;await openDatabase();await refresh();render();window.scrollTo(0,0);}
+async function chooseClub(id){invalidateFixtureImport();rememberMatchDraft();workspaceSnapshot.invalidate();const c=state.clubs.find(x=>x.id===id);if(!c)throw Error('Kulüp bulunamadı.');setClubDatabase(c.id);state.club=c;setBackupClub(c);setActiveId(c.id);state.legacy=null;state.route='dashboard';state.data={players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]};state.currentId=null;state.sessionMatch=null;state.liveSession=null;state.liveEvents=[];state.liveLoading=false;liveLoadSequence++;state.filterGroup='all';state.query='';state.modal=null;state.rosterPoolGroups=[];state.board.selected=null;state.teamGroupId=null;state.integrityAudit=null;await openDatabase();await resumePlayerErasures();await refresh();render();window.scrollTo(0,0);}
 function clubWelcome(){return `<div class="ms-onboarding bd-onboarding"><div class="bd-onboarding-layout"><div class="bd-onboarding-editorial"><img src="./assets/match-studio-brand-preview.png" class="brand-feature-lockup" alt="MATCH STUDIO mavi-mor futbol taktik logosu"><div class="bd-onboarding-eyebrow"><span class="onair-dot"></span> MATCH STUDIO / V2.6.8-F.13</div><h1>KULÜBÜNÜZ.<br><em>SAHNE SİZİN.</em></h1><p>Maç günü hazırlığı, kadro ve profesyonel yayın grafikleri. Kulüp kimliğinizi belirleyin, saha operasyonuna başlayın.</p><div class="bd-onboarding-features"><span>${I('shield')} Her kulüp için ayrı kayıtlar</span><span>${I('studio')} Yayına hazır maç tasarımları</span><span>${I('users')} Tek yerden kadro yönetimi</span></div><div class="bd-onboarding-footer">MAÇ GÖRSELLERİ / KULÜP YÖNETİMİ</div></div><div class="ms-onboarding-card bd-onboarding-form"><div class="eyebrow">01 / KULÜP KİMLİĞİ</div><h2>İlk kulübünüzü oluşturun</h2><p>Her kulüp ayrı yerel veritabanında saklanır. Başlangıç paketinde gerçek sporcu bilgisi yoktur.</p><form id="club-create-form" class="ms-form"><label>Kulüp adı<input name="clubName" maxlength="80" minlength="2" required placeholder="Örn. Atabey Spor Kulübü"></label><label>Kurumsal vurgu rengi<input name="accent" type="color" value="#4669D9"></label><button class="btn btn-primary" type="submit">KULÜP OLUŞTUR VE BAŞLA ${I('arrow')}</button></form><div class="bd-migration-note">${I('shield')} Eski Darıca Gücü V2.4 verileri korunur. Önce kulübü oluşturun; ardından Arşiv & Ayarlar bölümünden eski JSON yedeğinizi aktarabilirsiniz.</div></div></div></div>`;}
 function clubQuickSwitcher(position="desktop"){const selectId=position==="mobile"?"club-switch-mobile":"club-switch";return `<div class="ms-quick"><label for="${selectId}">Aktif kulüp</label><select id="${selectId}" aria-label="Kulüp değiştir">${state.clubs.map(c=>`<option value="${esc(c.id)}" ${state.club?.id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select><small>Her kulübün verileri ayrı saklanır</small></div>`;}
 function clubManager(){return `<section class="ms-club-manager"><h2>Kulüp Yönetimi</h2><p class="muted small">Mevcut kulüp: ${esc(state.club?.name)} · Veriler bu cihaza özeldir ve diğer kulüplerin kayıtlarına karışmaz.</p><form id="club-settings-form" class="ms-form"><label>Kulüp adı<input name="clubName" required minlength="2" maxlength="80" value="${esc(state.club?.name)}"></label><label>Kurumsal vurgu rengi<input type="color" name="accent" value="${esc(safeColor(state.club?.accent))}"></label><button class="btn btn-primary" type="submit">Kulüp kimliğini kaydet</button></form><details class="ms-manager-details"><summary>Yeni kulüp oluştur</summary><form id="club-create-form" class="ms-form"><label>Yeni kulüp adı<input name="clubName" minlength="2" maxlength="80" required></label><label>Renk<input name="accent" type="color" value="#4669D9"></label><button class="btn btn-ghost" type="submit">Yeni bağımsız kulüp oluştur</button></form></details><div class="ms-import-panel"><h3>Eski V2.4 kayıtlarını koruyarak taşı</h3><p class="muted small">Eski Darıca Gücü kayıtları yalnızca aynı tarayıcı profili ve aynı site adresi üzerinden taşınabilir. Farklı bir adres kullanıyorsanız eski sürümden JSON yedeği indirip aşağıdaki geri yükleme seçeneğini kullanın. Önce eski kayıtlarınızın yedeğini alın. Kayıtların taşınacağı kulüp boş olmalıdır. Eski kayıtlar değiştirilmez.</p>${btn('Eski kayıtları kontrol et','legacy-preview','btn-ghost')}${state.legacy?`<p class="muted small">${esc(state.legacy.message||(state.legacy.found?`${state.legacy.counts.players||0} oyuncu, ${state.legacy.counts.matches||0} maç, ${state.legacy.counts.groups||0} grup bulundu.`:'Veri bulunamadı.'))}</p>${state.legacy.found?btn('Eski verileri bu kulübe kopyala','legacy-import','btn-primary'):''}`:''}</div><div class="ms-group-tools"><h3>Gruplar</h3>${state.data.groups.map(g=>`<div class="ms-group-row"><span>${esc(g.name)}</span>${btn('Grubu Sil','delete-group','btn-danger btn-small',`data-id="${esc(g.id)}"`)}</div>`).join('')||'<p class="muted">Henüz grup oluşturulmadı.</p>'}</div><section class="ms-danger-zone" aria-labelledby="danger-zone-title"><h3 id="danger-zone-title">Kulüp silme — geri alınamaz</h3><p class="footnote">Silmeden önce şifreli yedeği indirip dosyayı cihaz dışında kontrol edin. Yanlış kulüp silinmesini önlemek için kulüp adını birebir girmeniz gerekir. Bu işlem yalnızca aktif kulübü etkiler, diğer kulüpler korunur. Açık diğer sekmeler silme işlemini engelleyebilir.</p>${btn('Bu kulübü kalıcı sil','club-delete','btn-danger')}</section></section>`;}
@@ -2912,7 +2915,7 @@ const {STORES,listRecords,transact,clubContext,assertContext,withExclusiveClubOp
 const {normalizeGameFormat,normalizePitchLayout}=require("src/domain/match-format.js");
 const {decodeBackupBlob,encryptBackupBlob}=require('src/storage/secure-backup.js');
 const {checkSnapshotIntegrity}=require('src/storage/data-safety.js');
-const {saveRestorePoint,captureCurrentStores}=require('src/storage/recovery.js');
+const {saveRestorePoint,captureCurrentStores,assertNoErasedPlayers}=require('src/storage/recovery.js');
 let selectedClub=null;const setBackupClub=club=>{selectedClub=club;};
 
 const serial=async blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(blob)});
@@ -2953,13 +2956,28 @@ async function inspectBackup(file,password){
   const data=decoded.payload,warnings=validateBackup(data);
   // Report legacy orphaned references separately; do not silently change them.
   const integrityWarnings=warnings.length?[]:checkSnapshotIntegrity(normalizeBackupStores(data));
+  if(!warnings.length&&selectedClub?.id)await assertNoErasedPlayers(selectedClub.id,normalizeBackupStores(data));
   return {valid:!warnings.length,encrypted:decoded.encrypted,counts:Object.fromEntries(STORES.map(s=>[s,data?.stores?.[s]?.length||0])),warnings,integrityWarnings,club:data?.club?.name||null,clubId:data?.club?.id||null,schemaVersion:data?.schemaVersion};
  }catch(e){return {valid:false,counts:{},warnings:[e.message]};}
 }
 async function exportEncryptedBackup(password){return encryptBackupBlob(await exportBackup(),password);}
 
 const dataURIToBlob=url=>{const [meta,s]=url.split(',');const bytes=atob(s);const out=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)out[i]=bytes.charCodeAt(i);return new Blob([out],{type:meta.match(/^data:([^;]+)/)?.[1]||'image/jpeg'});};
-async function restoreBackup(file,confirmed,password){if(!confirmed)throw Error('Geri yükleme için onay verilmeli.');const ctx=clubContext();if(selectedClub?.id!==ctx.id)throw Error('Aktif kulüp kimliği uyuşmuyor.');const decoded=await decodeBackupBlob(file,password);if(decoded.needsPassword)throw Error('Şifreli yedek parolası gerekli.');const data=decoded.payload;const issues=validateBackup(data);if(issues.length)throw Error(issues.slice(0,3).join(' '));const incoming=normalizeBackupStores(data);const converted={...incoming,assets:incoming.assets.map(a=>({...a,blob:dataURIToBlob(a.blob)}))}; if(!selectedClub?.id)throw Error('Kurtarma işlemi için aktif kulüp bulunamadı.');assertContext(ctx);return withExclusiveClubOperation(async runTransaction=>{const recovery=await saveRestorePoint(ctx.id,runTransaction);await runTransaction(STORES,'readwrite',tx=>{for(const s of STORES){const store=tx.objectStore(s);store.clear();for(const row of converted[s])store.put(row);}});return {recovery,counts:Object.fromEntries(STORES.map(s=>[s,converted[s].length]))};},ctx);}
+async function restoreBackup(file,confirmed,password){
+ if(!confirmed)throw Error('Geri yükleme için onay verilmeli.');
+ const ctx=clubContext();if(selectedClub?.id!==ctx.id)throw Error('Aktif kulüp kimliği uyuşmuyor.');
+ const decoded=await decodeBackupBlob(file,password);if(decoded.needsPassword)throw Error('Şifreli yedek parolası gerekli.');
+ const data=decoded.payload,issues=validateBackup(data);if(issues.length)throw Error(issues.slice(0,3).join(' '));
+ const incoming=normalizeBackupStores(data),converted={...incoming,assets:incoming.assets.map(a=>({...a,blob:dataURIToBlob(a.blob)}))};
+ assertContext(ctx);
+ return withExclusiveClubOperation(async runTransaction=>{
+  // Check after decoding AND after acquiring the same lock used by erasure.
+  await assertNoErasedPlayers(ctx.id,converted);
+  const recovery=await saveRestorePoint(ctx.id,runTransaction);
+  await runTransaction(STORES,'readwrite',tx=>{for(const s of STORES){const store=tx.objectStore(s);store.clear();for(const row of converted[s])store.put(row);}});
+  return {recovery,counts:Object.fromEntries(STORES.map(s=>[s,converted[s].length]))};
+ },ctx);
+}
 
 Object.assign(exports,{setBackupClub,exportBackup,exportEncryptedBackup,validateBackup,normalizeBackupStores,inspectBackup,restoreBackup});
 
@@ -3053,9 +3071,14 @@ Object.assign(exports,{parsePlayersCsv,playerImportKey,mergeCsvPlayers});
 MODS["src/storage/data-safety.js"]=function(exports,require){
 // Pure reconciliation for a permanent athlete erasure. No names/photos remain
 // in roster snapshots, even for archived matches; match event records survive.
-function planPlayerErasure(playerId, snapshot){
+function containsPlayerReference(value,playerId){
+ if(value===playerId)return true;
+ if(Array.isArray(value))return value.some(v=>containsPlayerReference(v,playerId));
+ return Boolean(value&&typeof value==='object'&&Object.entries(value).some(([k,v])=>k===playerId||containsPlayerReference(v,playerId)));
+}
+function planPlayerErasure(playerId, snapshot,{allowMissing=false}={}){
  const player=snapshot.players.find(p=>p.id===playerId);
- if(!player)throw Error('Silinecek oyuncu bulunamadı.');
+ if(!player&&!allowMissing)throw Error('Silinecek oyuncu bulunamadı.');
  const rosters=snapshot.rosters.filter(r=>(r.entries||[]).some(e=>e.playerId===playerId)).map(r=>({
   ...r,entries:(r.entries||[]).filter(e=>e.playerId!==playerId).map((e,i)=>({...e,order:i})),updatedAt:new Date().toISOString()
  }));
@@ -3081,13 +3104,33 @@ function planPlayerErasure(playerId, snapshot){
  // must not survive a permanent privacy erasure in sessions or event payloads.
  const eraseIdentity=v=>{
   if(Array.isArray(v))return v.filter(item=>item!==playerId).map(eraseIdentity);
-  if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).filter(([k])=>k!==playerId).map(([k,val])=>[k,val===playerId?null:eraseIdentity(val)]));
+  if(v&&typeof v==='object'){
+   const cleaned=Object.fromEntries(Object.entries(v).filter(([k])=>k!==playerId).map(([k,val])=>[k,val===playerId?null:eraseIdentity(val)]));
+   // Preserve substitution chronology without retaining the erased identity.
+   if(v.outPlayerId===playerId)cleaned.outPlayerErased=true;
+   if(v.inPlayerId===playerId)cleaned.inPlayerErased=true;
+   return cleaned;
+  }
   return v===playerId?null:v;
  };
- const matchSessions=(snapshot.matchSessions||[]).filter(x=>JSON.stringify(x).includes(playerId)).map(x=>eraseIdentity(x));
- const matchEvents=(snapshot.matchEvents||[]).filter(x=>JSON.stringify(x).includes(playerId)).map(x=>eraseIdentity(x));
- const removedAssets=snapshot.assets.filter(a=>a.id===player.photoAssetId&&!refs.has(a.id)).map(a=>a.id);
+ const matchSessions=(snapshot.matchSessions||[]).filter(x=>containsPlayerReference(x,playerId)).map(x=>eraseIdentity(x));
+ const matchEvents=(snapshot.matchEvents||[]).filter(x=>containsPlayerReference(x,playerId)).map(x=>eraseIdentity(x));
+ const removedAssets=snapshot.assets.filter(a=>a.id===player?.photoAssetId&&!refs.has(a.id)).map(a=>a.id);
  return {player,rosters,settings,matchSessions,matchEvents,removedAssets,rosterCount:rosters.length,erasedEntryCount:snapshot.rosters.reduce((n,r)=>n+(r.entries||[]).filter(e=>e.playerId===playerId).length,0)};
+}
+function applyPlayerErasures(snapshot,playerIds=[]){
+ let stores=snapshot;let erasedEntryCount=0,assetCount=0,rosterCount=0;
+ for(const id of playerIds){
+  const plan=planPlayerErasure(id,stores,{allowMissing:true});
+  if(!plan.player&&!plan.rosters.length&&!plan.settings.length&&!plan.matchSessions.length&&!plan.matchEvents.length)continue;
+  stores={...stores,players:stores.players.filter(p=>p.id!==id),assets:stores.assets.filter(a=>!plan.removedAssets.includes(a.id))};
+  for(const name of ['rosters','settings','matchSessions','matchEvents']){
+   const updates=new Map(plan[name].map(row=>[row.id,row]));
+   stores[name]=(stores[name]||[]).map(row=>updates.get(row.id)||row);
+  }
+  erasedEntryCount+=plan.erasedEntryCount;assetCount+=plan.removedAssets.length;rosterCount+=plan.rosterCount;
+ }
+ return {stores,changed:stores!==snapshot,erasedEntryCount,assetCount,rosterCount};
 }
 function checkSnapshotIntegrity(stores){
  // Read-only audits can inspect v1 backup fixtures that predate live stores.
@@ -3133,11 +3176,10 @@ function checkSnapshotIntegrity(stores){
  for(const session of sessionMap.values())if((session.sequence||0)!==(seqForSession.get(session.id)||0))issues.push(`Canlı oturum ${session.id}: son olay sırası uyuşmuyor.`);
  return issues;
 }
-Object.assign(exports,{planPlayerErasure,checkSnapshotIntegrity});
+Object.assign(exports,{planPlayerErasure,applyPlayerErasures,containsPlayerReference,checkSnapshotIntegrity});
 
 };
 MODS["src/storage/db.js"]=function(exports,require){
-const {planPlayerErasure}=require('src/storage/data-safety.js');
 const DB_VERSION=2,LEGACY_STORES=['players','groups','matches','rosters','posterDrafts','assets','settings'],LIVE_STORES=['matchSessions','matchEvents'],STORES=[...LEGACY_STORES,...LIVE_STORES];
 let currentClubId=null,opening=null,connection=null,generation=0;
 const changed=()=>Error('Aktif kulüp değişti. İşlem iptal edildi; yeniden deneyin.');
@@ -3190,26 +3232,8 @@ async function getRecord(storeName,id){const db=await openDatabase();return new 
 async function listRecords(storeName){const db=await openDatabase();return new Promise((resolve,reject)=>{const req=db.transaction(storeName).objectStore(storeName).getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});}
 async function deleteRecord(storeName,id){return transact([storeName],'readwrite',tx=>tx.objectStore(storeName).delete(id));}
 async function deleteMatchAtomic(id){await transact(['matches','rosters','settings','posterDrafts','matchSessions','matchEvents'],'readwrite',tx=>{tx.objectStore('matches').delete(id);tx.objectStore('rosters').delete(id);tx.objectStore('settings').delete('lineup:'+id);tx.objectStore('matchSessions').delete('session:'+id);const eventStore=tx.objectStore('matchEvents');if(typeof eventStore.index==='function'){const eventsReq=eventStore.index('matchId').openCursor(IDBKeyRange.only(id));eventsReq.onsuccess=()=>{const cursor=eventsReq.result;if(cursor){cursor.delete();cursor.continue();}};}else{const eventsReq=eventStore.getAll();eventsReq.onsuccess=()=>{for(const evt of eventsReq.result)if(evt.matchId===id)eventStore.delete(evt.id);};}const req=tx.objectStore('posterDrafts').getAll();req.onsuccess=()=>{for(const d of req.result)if(d.matchId===id)tx.objectStore('posterDrafts').delete(d.id);};});}
-// One IndexedDB transaction ensures deletion and all linked cleanup either all commit or all roll back.
-async function erasePlayerAtomic(id){
- let result=null;
- await transact(['players','rosters','settings','posterDrafts','assets','matchSessions','matchEvents'],'readwrite',tx=>{
-  const names=['players','rosters','settings','posterDrafts','assets','matchSessions','matchEvents'];
-  const snapshot={},read=[];
-  for(const n of names){const r=tx.objectStore(n).getAll();r.onsuccess=()=>{snapshot[n]=r.result;read.push(n);if(read.length===names.length){
-   try{
-    const plan=planPlayerErasure(id,{...snapshot});
-    tx.objectStore('players').delete(id);
-    for(const row of plan.rosters)tx.objectStore('rosters').put(row);
-    for(const row of plan.settings)tx.objectStore('settings').put(row);
-    for(const aid of plan.removedAssets)tx.objectStore('assets').delete(aid);for(const row of plan.matchSessions)tx.objectStore('matchSessions').put(row);for(const row of plan.matchEvents)tx.objectStore('matchEvents').put(row);
-    result={rosterCount:plan.rosterCount,erasedEntryCount:plan.erasedEntryCount,assetCount:plan.removedAssets.length};
-   }catch(err){tx.abort();}
-  }};}
- });
- if(!result)throw Error('Oyuncu silme işlemi tamamlanamadı; hiçbir kayıt değişmedi.');
- return result;
-}
+// Live writes remain atomic; the recovery journal makes interrupted erasure restartable.
+async function erasePlayerAtomic(id){return require('src/storage/privacy-erasure.js').erasePlayerPermanently(id);}
 async function safeDeleteGroup(id){
  let problem=null;
  await transact(['players','matches','groups','settings'],'readwrite',tx=>{
@@ -3449,23 +3473,62 @@ MODS["src/storage/recovery.js"]=function(exports,require){
 // P0.2 local recovery: one pre-import restore point per club. Same browser/origin only.
 // Images remain Blob objects and are intentionally NOT exported or synced.
 const {STORES,listRecords,transact,withExclusiveClubOperation,clubContext,assertContext}=require('src/storage/db.js');
-const {checkSnapshotIntegrity}=require('src/storage/data-safety.js');
-const DB_NAME='matchstudio-recovery-v1',STORE='points';
+const {checkSnapshotIntegrity,applyPlayerErasures}=require('src/storage/data-safety.js');
+const DB_NAME='matchstudio-recovery-v1',STORE='points',ERASED_STORE='erasedPlayers';
 const DAYS=7,MAX_AGE=DAYS*24*3600*1000;
 let recoveryHandle=null;
-function openRecovery(){if(recoveryHandle)return Promise.resolve(recoveryHandle);return new Promise((resolve,reject)=>{const q=indexedDB.open(DB_NAME,1);q.onupgradeneeded=()=>q.result.createObjectStore(STORE,{keyPath:'id'});q.onsuccess=()=>{recoveryHandle=q.result;recoveryHandle.onversionchange=()=>{recoveryHandle.close();recoveryHandle=null;};resolve(recoveryHandle)};q.onerror=()=>reject(q.error);});}
+function openRecovery(){if(recoveryHandle)return Promise.resolve(recoveryHandle);return new Promise((resolve,reject)=>{let rejected=false;const q=indexedDB.open(DB_NAME,2);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains(STORE))q.result.createObjectStore(STORE,{keyPath:'id'});if(!q.result.objectStoreNames.contains(ERASED_STORE))q.result.createObjectStore(ERASED_STORE,{keyPath:'id'});};q.onblocked=()=>{rejected=true;reject(Error('Kurtarma depolamasını güncellemek için eski uygulama sekmelerini kapatın.'));};q.onsuccess=()=>{if(rejected){q.result.close();return;}const db=q.result;recoveryHandle=db;db.onversionchange=()=>{db.close();if(recoveryHandle===db)recoveryHandle=null;};db.onclose=()=>{if(recoveryHandle===db)recoveryHandle=null;};resolve(db);};q.onerror=()=>reject(q.error);});}
 const validId=id=>{if(!/^[A-Za-z0-9_-]{8,80}$/.test(String(id||'')))throw Error('Geçersiz kurtarma kulübü kimliği.');return id;};
 async function recoveryTransaction(mode,callback){const db=await openRecovery();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,mode);let req;try{req=callback(tx.objectStore(STORE));}catch(err){tx.abort();reject(err);return;}tx.oncomplete=()=>resolve(req?.result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Kurtarma depolama iptal edildi.'));});}
-async function readRestorePoint(id){validId(id);const row=await recoveryTransaction('readonly',s=>s.get(id));if(!row)return null;if(Date.now()-Date.parse(row.createdAt)>MAX_AGE){await discardRestorePoint(id);return null;}return row;}
+async function readRestorePoint(id){validId(id);const row=await recoveryTransaction('readonly',s=>s.get(id));if(!row)return null;if(Date.now()-Date.parse(row.createdAt)>MAX_AGE){await discardRestorePoint(id);return null;}const erased=await listErasedPlayerIds(id);if(applyPlayerErasures(row.stores,erased).changed)return null;return row;}
 async function discardRestorePoint(id){validId(id);await recoveryTransaction('readwrite',s=>s.delete(id));}
+
+// A durable per-club erasure marker blocks old backups from reintroducing an athlete.
+// Mark first and revoke the whole old restore point atomically in the recovery DB.
+// Startup reconciliation completes an interrupted deletion from these markers.
+async function listErasedPlayerIds(clubId){
+ validId(clubId);const db=await openRecovery();
+ return new Promise((resolve,reject)=>{const tx=db.transaction(ERASED_STORE,'readonly');
+  const req=tx.objectStore(ERASED_STORE).getAll();
+  req.onsuccess=()=>resolve(req.result.filter(r=>r.clubId===clubId).map(r=>r.playerId));
+  req.onerror=()=>reject(req.error||Error('Kalıcı silme geçmişi okunamadı.'));
+ });
+}
+async function recordPlayerErasure(clubId,playerId){
+ validId(clubId);if(typeof playerId!=='string'||!playerId||playerId.length>160)throw Error('Geçersiz oyuncu kimliği.');
+ const db=await openRecovery();
+ await new Promise((resolve,reject)=>{const tx=db.transaction([STORE,ERASED_STORE],'readwrite');
+  tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error||Error('Kalıcı silme koruması yazılamadı.'));
+  tx.onabort=()=>reject(tx.error||Error('Kalıcı silme koruması iptal edildi.'));
+  try{
+   tx.objectStore(ERASED_STORE).put({id:clubId+'|'+playerId,clubId,playerId,erasedAt:new Date().toISOString(),pending:true});
+   tx.objectStore(STORE).delete(clubId);
+  }catch(error){tx.abort();reject(error);}
+ });
+}
+async function completePlayerErasures(clubId){
+ const db=await openRecovery();validId(clubId);
+ await new Promise((resolve,reject)=>{const tx=db.transaction(ERASED_STORE,'readwrite'),store=tx.objectStore(ERASED_STORE),q=store.getAll();
+  q.onsuccess=()=>{for(const row of q.result)if(row.clubId===clubId&&row.pending)store.put({...row,pending:false});};
+  tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Silme kaydı tamamlanamadı.'));
+ });
+}
+async function purgeErasedRestorePoint(clubId){
+ const point=await recoveryTransaction('readonly',s=>s.get(validId(clubId)));
+ if(point&&applyPlayerErasures(point.stores,await listErasedPlayerIds(clubId)).changed)await discardRestorePoint(clubId);
+}
+async function assertNoErasedPlayers(clubId,stores){
+ if(applyPlayerErasures(stores,await listErasedPlayerIds(clubId)).changed)throw Error('Bu yedek kalıcı olarak silinmiş oyuncu içeriyor. Gizlilik gereği eski yedekten geri yükleme engellendi.');
+}
 async function captureCurrentStores(runTransaction=transact){const stores={};await runTransaction(STORES,'readonly',tx=>{for(const n of STORES){const req=tx.objectStore(n).getAll();req.onsuccess=()=>{stores[n]=req.result;};}});if(STORES.some(n=>!Array.isArray(stores[n])))throw Error('Tutarlı kurtarma anlık görüntüsü okunamadı.');return stores;}
 function statsOf(stores){return Object.fromEntries(STORES.map(n=>[n,stores[n]?.length||0]));}
-async function saveRestorePoint(clubId,runTransaction=transact){validId(clubId);
+async function saveRestorePoint(clubId,runTransaction=null){validId(clubId);
+ if(!runTransaction){const ctx=clubContext();if(ctx.id!==clubId)throw Error('Kurtarma kulübü aktif kulüple eşleşmiyor.');return withExclusiveClubOperation(run=>saveRestorePoint(clubId,run),ctx);}
  if(clubContext().id!==clubId)throw Error('Kurtarma kulübü aktif kulüple eşleşmiyor.');
  // Fail closed: a corrupted existing club must not be discarded, but a recovery
  // copy still preserves the original state including its legacy inconsistencies.
  const existing=await readRestorePoint(clubId);
- const snapshot=await captureCurrentStores(runTransaction);
+ const snapshot=applyPlayerErasures(await captureCurrentStores(runTransaction),await listErasedPlayerIds(clubId)).stores;
  const row={id:clubId,createdAt:new Date().toISOString(),stores:snapshot,counts:statsOf(snapshot),integrityWarnings:checkSnapshotIntegrity(snapshot)};
  await recoveryTransaction('readwrite',s=>s.put(row));
  const verify=await readRestorePoint(clubId);
@@ -3482,7 +3545,37 @@ async function rollbackToRestorePoint(clubId){const ctx=clubContext();if(ctx.id!
  return {counts:point.counts,createdAt:point.createdAt,integrityWarnings:point.integrityWarnings};
  },ctx);
 }
-Object.assign(exports,{DB_NAME,MAX_AGE,readRestorePoint,discardRestorePoint,saveRestorePoint,rollbackToRestorePoint,captureCurrentStores,statsOf});
+Object.assign(exports,{DB_NAME,MAX_AGE,readRestorePoint,discardRestorePoint,saveRestorePoint,rollbackToRestorePoint,captureCurrentStores,statsOf,listErasedPlayerIds,recordPlayerErasure,completePlayerErasures,purgeErasedRestorePoint,assertNoErasedPlayers});
+
+};
+MODS["src/storage/privacy-erasure.js"]=function(exports,require){
+// Complete the candidate's existing durable erasedPlayers markers after a crash.
+const {STORES,clubContext,withExclusiveClubOperation}=require('src/storage/db.js');
+const {applyPlayerErasures}=require('src/storage/data-safety.js');
+const {captureCurrentStores,listErasedPlayerIds,recordPlayerErasure,completePlayerErasures,purgeErasedRestorePoint}=require('src/storage/recovery.js');
+async function reconcile(run,ctx,ids){
+ if(!ids.length)return {erasedEntryCount:0,assetCount:0,rosterCount:0};
+ await purgeErasedRestorePoint(ctx.id);
+ const cleaned=applyPlayerErasures(await captureCurrentStores(run),ids);
+ if(cleaned.changed)await run(STORES,'readwrite',tx=>{for(const name of STORES){const store=tx.objectStore(name);store.clear();for(const row of cleaned.stores[name])store.put(row);}});
+ await completePlayerErasures(ctx.id);
+ return {erasedEntryCount:cleaned.erasedEntryCount,assetCount:cleaned.assetCount,rosterCount:cleaned.rosterCount};
+}
+async function resumePlayerErasures(){
+ const ctx=clubContext();if(!(await listErasedPlayerIds(ctx.id)).length)return;
+ return withExclusiveClubOperation(async run=>reconcile(run,ctx,await listErasedPlayerIds(ctx.id)),ctx);
+}
+async function erasePlayerPermanently(id){
+ const ctx=clubContext();
+ return withExclusiveClubOperation(async run=>{
+  const before=await captureCurrentStores(run),previous=await listErasedPlayerIds(ctx.id);
+  if(!before.players.some(p=>p.id===id)&&!previous.includes(id))throw Error('Silinecek oyuncu bulunamadı.');
+  await recordPlayerErasure(ctx.id,id);
+  try{return await reconcile(run,ctx,[...new Set([...previous,id])]);}
+  catch(error){throw Error('Kalıcı silme başlatıldı ancak tamamlanamadı. Uygulamayı yeniden açın; silme otomatik yeniden denenecek. '+error.message);}
+ },ctx);
+}
+Object.assign(exports,{erasePlayerPermanently,resumePlayerErasures});
 
 };
 MODS["src/storage/secure-backup.js"]=function(exports,require){

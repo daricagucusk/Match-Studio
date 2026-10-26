@@ -1,8 +1,13 @@
 // Pure reconciliation for a permanent athlete erasure. No names/photos remain
 // in roster snapshots, even for archived matches; match event records survive.
-function planPlayerErasure(playerId, snapshot){
+function containsPlayerReference(value,playerId){
+ if(value===playerId)return true;
+ if(Array.isArray(value))return value.some(v=>containsPlayerReference(v,playerId));
+ return Boolean(value&&typeof value==='object'&&Object.entries(value).some(([k,v])=>k===playerId||containsPlayerReference(v,playerId)));
+}
+function planPlayerErasure(playerId, snapshot,{allowMissing=false}={}){
  const player=snapshot.players.find(p=>p.id===playerId);
- if(!player)throw Error('Silinecek oyuncu bulunamadı.');
+ if(!player&&!allowMissing)throw Error('Silinecek oyuncu bulunamadı.');
  const rosters=snapshot.rosters.filter(r=>(r.entries||[]).some(e=>e.playerId===playerId)).map(r=>({
   ...r,entries:(r.entries||[]).filter(e=>e.playerId!==playerId).map((e,i)=>({...e,order:i})),updatedAt:new Date().toISOString()
  }));
@@ -28,13 +33,33 @@ function planPlayerErasure(playerId, snapshot){
  // must not survive a permanent privacy erasure in sessions or event payloads.
  const eraseIdentity=v=>{
   if(Array.isArray(v))return v.filter(item=>item!==playerId).map(eraseIdentity);
-  if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).filter(([k])=>k!==playerId).map(([k,val])=>[k,val===playerId?null:eraseIdentity(val)]));
+  if(v&&typeof v==='object'){
+   const cleaned=Object.fromEntries(Object.entries(v).filter(([k])=>k!==playerId).map(([k,val])=>[k,val===playerId?null:eraseIdentity(val)]));
+   // Preserve substitution chronology without retaining the erased identity.
+   if(v.outPlayerId===playerId)cleaned.outPlayerErased=true;
+   if(v.inPlayerId===playerId)cleaned.inPlayerErased=true;
+   return cleaned;
+  }
   return v===playerId?null:v;
  };
- const matchSessions=(snapshot.matchSessions||[]).filter(x=>JSON.stringify(x).includes(playerId)).map(x=>eraseIdentity(x));
- const matchEvents=(snapshot.matchEvents||[]).filter(x=>JSON.stringify(x).includes(playerId)).map(x=>eraseIdentity(x));
- const removedAssets=snapshot.assets.filter(a=>a.id===player.photoAssetId&&!refs.has(a.id)).map(a=>a.id);
+ const matchSessions=(snapshot.matchSessions||[]).filter(x=>containsPlayerReference(x,playerId)).map(x=>eraseIdentity(x));
+ const matchEvents=(snapshot.matchEvents||[]).filter(x=>containsPlayerReference(x,playerId)).map(x=>eraseIdentity(x));
+ const removedAssets=snapshot.assets.filter(a=>a.id===player?.photoAssetId&&!refs.has(a.id)).map(a=>a.id);
  return {player,rosters,settings,matchSessions,matchEvents,removedAssets,rosterCount:rosters.length,erasedEntryCount:snapshot.rosters.reduce((n,r)=>n+(r.entries||[]).filter(e=>e.playerId===playerId).length,0)};
+}
+function applyPlayerErasures(snapshot,playerIds=[]){
+ let stores=snapshot;let erasedEntryCount=0,assetCount=0,rosterCount=0;
+ for(const id of playerIds){
+  const plan=planPlayerErasure(id,stores,{allowMissing:true});
+  if(!plan.player&&!plan.rosters.length&&!plan.settings.length&&!plan.matchSessions.length&&!plan.matchEvents.length)continue;
+  stores={...stores,players:stores.players.filter(p=>p.id!==id),assets:stores.assets.filter(a=>!plan.removedAssets.includes(a.id))};
+  for(const name of ['rosters','settings','matchSessions','matchEvents']){
+   const updates=new Map(plan[name].map(row=>[row.id,row]));
+   stores[name]=(stores[name]||[]).map(row=>updates.get(row.id)||row);
+  }
+  erasedEntryCount+=plan.erasedEntryCount;assetCount+=plan.removedAssets.length;rosterCount+=plan.rosterCount;
+ }
+ return {stores,changed:stores!==snapshot,erasedEntryCount,assetCount,rosterCount};
 }
 function checkSnapshotIntegrity(stores){
  // Read-only audits can inspect v1 backup fixtures that predate live stores.
@@ -80,4 +105,4 @@ function checkSnapshotIntegrity(stores){
  for(const session of sessionMap.values())if((session.sequence||0)!==(seqForSession.get(session.id)||0))issues.push(`Canlı oturum ${session.id}: son olay sırası uyuşmuyor.`);
  return issues;
 }
-Object.assign(exports,{planPlayerErasure,checkSnapshotIntegrity});
+Object.assign(exports,{planPlayerErasure,applyPlayerErasures,containsPlayerReference,checkSnapshotIntegrity});

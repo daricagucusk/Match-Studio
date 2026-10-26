@@ -2,6 +2,12 @@
   "recordVersion": 1,
   "decisionDate": "2026-10-26",
   "appName": "Match Studio",
+  "publicDeveloperName": "Matchday Studio",
+  "publicDeveloperNameConfirmedByOwner": true,
+  "publicSupportEmail": "clupulse@gmail.com",
+  "publicSupportEmailConfirmedByOwner": true,
+  "legalOperatorName": "Mehmet Yılmaz",
+  "legalOperatorNameConfirmedByOwner": true,
   "firstLaunch": {
     "distribution": "google_play",
     "priceModel": "free",
@@ -18,13 +24,16 @@
   },
   "account": {
     "accountType": "personal",
-    "accountActiveUserConfirmed": true,
+    "accountActiveUserConfirmed": false,
+    "identityVerificationStatus": "under_review",
     "appCreatedInConsole": false,
     "accountCreationDateVerified": false
   },
   "android": {
     "host": "match-studio-telefon.vercel.app",
-    "packageIdProposal": "com.daricagucusk.matchstudio",
+    "packageIdProposal": "com.matchdaystudio.app",
+    "packageIdConfirmedByOwner": true,
+    "packageIdAvailableInConsole": null,
     "targetApi": 36,
     "signedAab": false
   },

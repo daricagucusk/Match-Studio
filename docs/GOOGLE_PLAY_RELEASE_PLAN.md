@@ -5,10 +5,10 @@ Tarih: 25 Ekim 2026 | Kanonik uygulama: https://match-studio-telefon.vercel.app
 
 ## A. Mevcut teknik temel
 - Tek ürün: Match Studio V2.6.8-F.13 PWA + Android Trusted Web Activity (TWA).
-- PR #15 canlı main commit 5c186735; Vercel Production READY; PWA, manifest, offline servis çalışanı, ikonlar ve önceki tarayıcı testleri mevcut.
+- Kanonik main `4cbf8f899cc1466fe1621d42900fa959357d985f`; PR #25 yayın adayıdır, üretime dağıtım yapılmamıştır. Güncel kabul ve imzalama adımları: [aday kabul belgesi](PLAY_CANDIDATE_ACCEPTANCE_2026-10-26.md).
 - TWA başlangıç yolu /index.html; sabit HTTPS host match-studio-telefon.vercel.app.
 - Önizleme originleri farklı yerel IndexedDB kullandığı için Play paketinde preview URL kesinlikle kullanılmayacak.
-- Android package ID önerisi **com.daricagucusk.matchstudio**. GEÇİCİDİR; ilk Play kaydından önce sahibi onaylamalı. Play'e ilk yüklemeden sonra paket ID değiştirilemez.
+- Android package ID **com.matchdaystudio.app** kullanıcı tarafından kesinleştirildi; Play Console uygunluğu henüz doğrulanmadı. İlk yayından sonra paket ID değiştirilemez.
 - Android sürüm adı 2.6.8, ilk versionCode 1. İleride versionCode monoton artmalı.
 - PWA verileri tarayıcı profiline bağlıdır. ChatGPT içi tarayıcı, Chrome ve TWA'nın hepsinde aynı kayıtların bulunduğu varsayılmamalıdır. Şifreli dışa aktarma ve geri yükleme ile doğrulanmalıdır.
 

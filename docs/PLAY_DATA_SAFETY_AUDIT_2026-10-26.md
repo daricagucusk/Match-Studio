@@ -19,7 +19,7 @@ Tarih: 26 Ekim 2026 — `main` ve production değişmeden PR #25 hazırlığı.
 
 ## Yayımlamadan önce kanıtı gerekli işlemler
 
-- [ ] Sahibi ve destek e-postası için açıkça onaylanmış **kamuya açık** kimlik ve iletişim bilgileri
+- [x] Kullanıcının bildirdiği kamuya açık bilgiler: Mehmet Yılmaz; geliştirici markası Matchday Studio; clupulse@gmail.com. Bu bilgi hukuki politika onayı değildir.
 - [ ] Gerçek SDK ve ağ incelemesi (Android App Bundle analizi, tarayıcı network HAR, host log politikası)
 - [ ] Veri koruma, saklama, silme ve velilerin hakları için doğru hukuki metin
 - [ ] Policy'nin hem site üzerinden hem de uygulama içinde erişilebilir olduğunun testi

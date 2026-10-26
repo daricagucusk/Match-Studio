@@ -1,4 +1,3 @@
-const {planPlayerErasure}=require('src/storage/data-safety.js');
 const DB_VERSION=2,LEGACY_STORES=['players','groups','matches','rosters','posterDrafts','assets','settings'],LIVE_STORES=['matchSessions','matchEvents'],STORES=[...LEGACY_STORES,...LIVE_STORES];
 let currentClubId=null,opening=null,connection=null,generation=0;
 const changed=()=>Error('Aktif kulüp değişti. İşlem iptal edildi; yeniden deneyin.');
@@ -51,34 +50,8 @@ async function getRecord(storeName,id){const db=await openDatabase();return new 
 async function listRecords(storeName){const db=await openDatabase();return new Promise((resolve,reject)=>{const req=db.transaction(storeName).objectStore(storeName).getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});}
 async function deleteRecord(storeName,id){return transact([storeName],'readwrite',tx=>tx.objectStore(storeName).delete(id));}
 async function deleteMatchAtomic(id){await transact(['matches','rosters','settings','posterDrafts','matchSessions','matchEvents'],'readwrite',tx=>{tx.objectStore('matches').delete(id);tx.objectStore('rosters').delete(id);tx.objectStore('settings').delete('lineup:'+id);tx.objectStore('matchSessions').delete('session:'+id);const eventStore=tx.objectStore('matchEvents');if(typeof eventStore.index==='function'){const eventsReq=eventStore.index('matchId').openCursor(IDBKeyRange.only(id));eventsReq.onsuccess=()=>{const cursor=eventsReq.result;if(cursor){cursor.delete();cursor.continue();}};}else{const eventsReq=eventStore.getAll();eventsReq.onsuccess=()=>{for(const evt of eventsReq.result)if(evt.matchId===id)eventStore.delete(evt.id);};}const req=tx.objectStore('posterDrafts').getAll();req.onsuccess=()=>{for(const d of req.result)if(d.matchId===id)tx.objectStore('posterDrafts').delete(d.id);};});}
-// One IndexedDB transaction ensures deletion and all linked cleanup either all commit or all roll back.
-async function erasePlayerAtomic(id){
- const ctx=clubContext();
- return withExclusiveClubOperation(async runTransaction=>{
-  let exists=false;
-  await runTransaction(['players'],'readonly',tx=>{const req=tx.objectStore('players').get(id);req.onsuccess=()=>{exists=!!req.result;};});
-  if(!exists)throw Error('Silinecek oyuncu bulunamadı.');
-  // Fail closed before changing live data. Never leave an older restore copy alive.
-  await require('src/storage/recovery.js').recordPlayerErasure(ctx.id,id);
-  let result=null;
-  await runTransaction(['players','rosters','settings','posterDrafts','assets','matchSessions','matchEvents'],'readwrite',tx=>{
-  const names=['players','rosters','settings','posterDrafts','assets','matchSessions','matchEvents'];
-  const snapshot={},read=[];
-  for(const n of names){const r=tx.objectStore(n).getAll();r.onsuccess=()=>{snapshot[n]=r.result;read.push(n);if(read.length===names.length){
-   try{
-    const plan=planPlayerErasure(id,{...snapshot});
-    tx.objectStore('players').delete(id);
-    for(const row of plan.rosters)tx.objectStore('rosters').put(row);
-    for(const row of plan.settings)tx.objectStore('settings').put(row);
-    for(const aid of plan.removedAssets)tx.objectStore('assets').delete(aid);for(const row of plan.matchSessions)tx.objectStore('matchSessions').put(row);for(const row of plan.matchEvents)tx.objectStore('matchEvents').put(row);
-    result={rosterCount:plan.rosterCount,erasedEntryCount:plan.erasedEntryCount,assetCount:plan.removedAssets.length};
-   }catch(err){tx.abort();}
-  }};}
- });
-  if(!result)throw Error('Oyuncu silme işlemi tamamlanamadı; veri kayıtlarını yeniden denetleyin.');
-  return result;
- },ctx);
-}
+// Live writes remain atomic; the recovery journal makes interrupted erasure restartable.
+async function erasePlayerAtomic(id){return require('src/storage/privacy-erasure.js').erasePlayerPermanently(id);}
 async function safeDeleteGroup(id){
  let problem=null;
  await transact(['players','matches','groups','settings'],'readwrite',tx=>{

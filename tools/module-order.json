@@ -51,6 +51,7 @@
   "src/storage/match-sporting-events.js",
   "src/storage/match-substitutions.js",
   "src/storage/recovery.js",
+  "src/storage/privacy-erasure.js",
   "src/storage/secure-backup.js",
   "src/team/team-pitch.js"
 ]

@@ -6,6 +6,8 @@ on:
     paths:
       - 'android/**'
       - 'tools/ensure-android-api36.cjs'
+      - 'tools/inspect-android-aab.py'
+      - 'tools/test_android_aab.py'
       - '.github/workflows/android-twa-unsigned.yml'
   workflow_dispatch:
 
@@ -61,10 +63,19 @@ jobs:
           fi
           cp "$bundle" unsigned-qa.aab
           echo "Generated unsigned QA bundle: $(wc -c < unsigned-qa.aab) bytes"
-      - name: Upload unsigned QA bundle
+      - name: Inspect built bundle identity, API and unsigned state
+        # Inspect the artifact itself; a successful Gradle task alone is insufficient.
+        run: |
+          curl -fLsS https://github.com/google/bundletool/releases/download/1.18.2/bundletool-all-1.18.2.jar -o "$RUNNER_TEMP/bundletool.jar"
+          echo "378b5434cd1378bef6b2bc527b8c7f0ff2584b273830335bce54d6d0813c8584  $RUNNER_TEMP/bundletool.jar" | sha256sum -c -
+          python3 -m unittest discover -s tools -p 'test_android_aab.py' -v
+          python3 tools/inspect-android-aab.py --aab .unsigned-twa/unsigned-qa.aab --bundletool "$RUNNER_TEMP/bundletool.jar" --mode unsigned --commit "$(git rev-parse HEAD)" --report .unsigned-twa/aab-report.json
+      - name: Upload inspected unsigned QA bundle
         uses: actions/upload-artifact@v4
         with:
           name: matchstudio-android-unsigned-qa
-          path: .unsigned-twa/unsigned-qa.aab
+          path: |
+            .unsigned-twa/unsigned-qa.aab
+            .unsigned-twa/aab-report.json
           if-no-files-found: error
           retention-days: 5

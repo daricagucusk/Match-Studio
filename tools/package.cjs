@@ -12,14 +12,14 @@ fs.writeFileSync(path.join(root,'SHA256SUMS.txt'),sums);files.push('SHA256SUMS.t
 const dist=path.join(root,'dist');fs.mkdirSync(dist,{recursive:true});
 const script=`import sys,json,pathlib,zipfile
 root=pathlib.Path(sys.argv[1]); public=json.loads(sys.argv[2]); tag=sys.argv[3]
-source=[str(p.relative_to(root)) for p in root.rglob('*') if p.is_file() and not p.name.startswith('.env') and not any(part in {'node_modules','dist','public','.vercel','test-results','playwright-report','.git','__pycache__'} for part in p.relative_to(root).parts)]
+source=json.loads(sys.argv[4])
 for name,files in [(f'MatchStudio_{tag}_PWA.zip',public),(f'MatchStudio_{tag}_Source.zip',source)]:
  with zipfile.ZipFile(root/'dist'/name,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
   for f in sorted(files):
    info=zipfile.ZipInfo(f,date_time=(2026,10,22,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=(0o100755 if f.endswith('.sh') else 0o100644)<<16;z.writestr(info,(root/f).read_bytes())
  print(name)
 `;
-execFileSync('python3',['-c',script,root,JSON.stringify(files),releaseId],{stdio:'inherit'});
+execFileSync('python3',['-c',script,root,JSON.stringify(files),releaseId,JSON.stringify(require('./package-files.cjs').sourceFiles(root))],{stdio:'inherit'});
 const pwa=`MatchStudio_${releaseId}_PWA.zip`,source=`MatchStudio_${releaseId}_Source.zip`;
 execFileSync('python3',[path.join(__dirname,'verify-release.py'),path.join(dist,pwa)],{stdio:'inherit'});
 const artifacts=[pwa,source].map(name=>{const bytes=fs.readFileSync(path.join(dist,name));return {name,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};});

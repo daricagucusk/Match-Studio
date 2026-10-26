@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 // Produce the *real* Play App Signing Digital Asset Links JSON.
-// No placeholder SHA is ever accepted. Output goes to stdout for review.
+// Validates SHA-256 syntax only; its Play Console provenance requires owner review.
+// Output goes to stdout for review, never directly to the public site.
 const fs=require('node:fs');
 const path=require('node:path');
 const cfg=JSON.parse(fs.readFileSync(path.join(__dirname,'../android/twa-manifest.json'),'utf8'));

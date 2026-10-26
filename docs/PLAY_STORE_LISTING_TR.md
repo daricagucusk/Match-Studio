@@ -1,4 +1,5 @@
 # Match Studio — Google Play Türkçe Mağaza Metni (taslak)
+Kamuya açık geliştirici: **Matchday Studio**. Destek: **clupulse@gmail.com**. Paket: `com.matchdaystudio.app` (Console uygunluğu bekleniyor).
 **Mağaza uygulama adı (30 karakteri aşmamalı):** Match Studio – Futbol Kulübü
 
 **Kısa açıklama (80 karakteri aşmamalı):**

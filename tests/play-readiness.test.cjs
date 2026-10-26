@@ -11,7 +11,7 @@ test('Play preflight validates the existing PWA icons and provisional TWA',()=>{
  });
  assert.equal(ret.status,0,ret.stdout+'\n'+ret.stderr);
  assert.match(ret.stdout,/\[PASS\] PWA and launcher icons/);
- assert.match(ret.stdout,/\[PASS\] Provisional Android metadata/);
+ assert.match(ret.stdout,/\[PASS\] Android metadata/);
  assert.match(ret.stdout,/Play readiness:/);
 });
 test('provisional Android wrapper points only to canonical production origin',()=>{
@@ -38,7 +38,7 @@ test('Play App Signing fingerprint creates Android App Links for the same packag
  });
  assert.equal(result.status,0,result.stderr);
  const json=JSON.parse(result.stdout);
- assert.equal(json[0].target.package_name,'com.daricagucusk.matchstudio');
+ assert.equal(json[0].target.package_name,'com.matchdaystudio.app');
  assert.equal(json[0].target.sha256_cert_fingerprints[0],sha);
  assert.deepEqual(json[0].relation,['delegate_permission/common.handle_all_urls']);
 });

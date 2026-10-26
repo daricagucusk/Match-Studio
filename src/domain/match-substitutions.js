@@ -47,8 +47,10 @@ function calculatePlayerMinutes(session,events=[],nowMs=Date.now()){
   else if(['CLOCK_PAUSE','PERIOD_END','FINALIZE','ABANDON'].includes(event.type))playing=false;
   else if(event.type==='SUBSTITUTION'){
    const out=event.payload?.outPlayerId,inside=event.payload?.inPlayerId;
-   if(!active.has(out)||active.has(inside)||!pool.includes(inside)){reviewRequired=true;continue;}
-   active.delete(out);active.add(inside);
+   const outErased=out==null&&event.payload?.outPlayerErased===true;
+   const inErased=inside==null&&event.payload?.inPlayerErased===true;
+   if((!outErased&&!active.has(out))||(!inErased&&(active.has(inside)||!pool.includes(inside)))){reviewRequired=true;continue;}
+   if(!outErased)active.delete(out);if(!inErased)active.add(inside);
   }
  }
  // Started sessions from Packet B include the full clock event history. If absent,

@@ -2,13 +2,14 @@
 
 **UYARI: Bu metin hukuki ve teknik taslaktır. Kamuya açık gizlilik sayfası değildir. Play Store'a eklenmeden önce veri sorumlusu, açık destek iletişimi, gerçek SDK/network davranışları, KVKK yükümlülükleri ve çocukların sporcu verileri açısından doğrulanmalıdır.**
 
-Sürüm: 25 Ekim 2026
+Sürüm: 26 Ekim 2026 — yayınlanmamış taslak
 Uygulama: Match Studio
 Hedef kullanıcılar: Futbol antrenörleri, kulüp yöneticileri ve yetkili yetişkin personel.
 
 ## 1. Veri sorumlusu ve iletişim
-Veri sorumlusu (kuruluş / kişi): [ONAYLANACAK RESMİ KİMLİK]
-İletişim e-postası: [KAMUYA AÇIK DESTEK E-POSTASI]
+Veri sorumlusu / yasal işletmeci: Mehmet Yılmaz (kullanıcı tarafından bildirildi).
+Kamuya açık geliştirici markası: Matchday Studio.
+İletişim e-postası: clupulse@gmail.com
 Gizlilik politikası adresi (yayın sonrasında): https://match-studio-telefon.vercel.app/privacy.html
 
 ## 2. Uygulamaya girilebilen bilgiler
@@ -27,7 +28,8 @@ Uygulama Vercel'de HTTPS üzerinden sunulur; host sağlayıcısı ve tarayıcı 
 Kulüp/oyuncu kayıtları ve maç günü yönetimi, kadro oluşturma, saha taktiği, skor/olay takibi, rapor/afiş oluşturma, şifreli yedekleme ve kullanıcı taleplerinin karşılanması. Veri, uygulamada tanımlanmamış pazarlama veya profil çıkarmaya kullanılacağı iddia edilmeksizin ele alınacaktır.
 
 ## 6. Kullanıcı tercihleri, silme ve kurtarma
-Kullanıcı ilgili uygulama modüllerinde kayıt silme işlemleri yapabilir. Yerel tarayıcı verilerini temizlemek veya PWA/TWA'yı kaldırmak yerel verilere erişimi sonlandırabilir. Önce şifreli yedek alınmalıdır.
+Oyuncunun kalıcı silinmesi, oyuncu kaydını ve bağlı kişisel referansları temizler; diğer oyuncuların süreleri ve takım skoru korunur. Önceki yerel kurtarma noktası iptal edilir. İşlem yarıda kesilirse uygulama yeniden açılırken temizlik tamamlanır. Aynı kulüp ve tarayıcı profilinde silinen oyuncu kimliği içeren eski yedeklerin geri yüklenmesi engellenir. Bu engelin çalışması için kulüp/oyuncu kimliklerinden oluşan yerel silme kaydı tutulur; isim ve fotoğraf bu kayıtta bulunmaz. Bu kayıt dışa aktarılan yedeğe taşınmaz. Başka profil/cihaz, temizlenmiş tarayıcı depolaması veya değiştirilmiş kimlikler için aynı engel garanti edilmez.
+Yerel kurtarma noktası şifreli değildir ve 7 gün geçerlidir. Tarayıcı verilerini temizlemek veya PWA/TWA'yı kaldırmak yerel verilere erişimi etkileyebilir.
 Kulüp/personel tarafından saklanan yedek dosyalarının silinmesi ve üçüncü kişilere aktarımı onların kontrolündedir. Kullanıcı hesabı oluşturma ve sunucuda hesap silme süreci varsa ayrıca açıklanmalıdır (mevcut sürümde böyle bir özellik doğrulanmadı).
 
 ## 7. Çocukların bilgileri ve KVKK
@@ -40,7 +42,7 @@ Uygulama HTTPS ve yerel kayıtlar ile şifreli yedekleme özelliklerini kullanı
 Politikadaki önemli değişiklikler, güncel sürüm ve yayın tarihiyle kamuya açık politikada gösterilmelidir. Play Console ve uygulama içi bağlantı aynı güncel belgeyi göstermelidir.
 
 ### Teknik yayına alma kapıları
-- [ ] Destek e-postası ve veri sorumlusunun hukuken doğru adı girildi.
+- [x] Kullanıcının bildirdiği işletmeci adı ve kamuya açık destek e-postası girildi (hukuki doğrulama veya politika onayı anlamına gelmez).
 - [ ] Android/TWA + PWA network ve tüm SDK'lar denetlendi.
 - [ ] Veriye erişim, silme, saklama ve kullanıcı onayı iş akışı doğrulandı.
 - [ ] Hukuki metin nihai olarak onaylandı.

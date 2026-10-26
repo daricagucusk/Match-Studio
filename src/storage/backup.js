@@ -3,7 +3,7 @@ const {STORES,listRecords,transact,clubContext,assertContext,withExclusiveClubOp
 const {normalizeGameFormat,normalizePitchLayout}=require("src/domain/match-format.js");
 const {decodeBackupBlob,encryptBackupBlob}=require('src/storage/secure-backup.js');
 const {checkSnapshotIntegrity}=require('src/storage/data-safety.js');
-const {saveRestorePoint,captureCurrentStores,listErasedPlayerIds}=require('src/storage/recovery.js');
+const {saveRestorePoint,captureCurrentStores,assertNoErasedPlayers}=require('src/storage/recovery.js');
 let selectedClub=null;const setBackupClub=club=>{selectedClub=club;};
 
 const serial=async blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(blob)});
@@ -44,12 +44,27 @@ async function inspectBackup(file,password){
   const data=decoded.payload,warnings=validateBackup(data);
   // Report legacy orphaned references separately; do not silently change them.
   const integrityWarnings=warnings.length?[]:checkSnapshotIntegrity(normalizeBackupStores(data));
+  if(!warnings.length&&selectedClub?.id)await assertNoErasedPlayers(selectedClub.id,normalizeBackupStores(data));
   return {valid:!warnings.length,encrypted:decoded.encrypted,counts:Object.fromEntries(STORES.map(s=>[s,data?.stores?.[s]?.length||0])),warnings,integrityWarnings,club:data?.club?.name||null,clubId:data?.club?.id||null,schemaVersion:data?.schemaVersion};
  }catch(e){return {valid:false,counts:{},warnings:[e.message]};}
 }
 async function exportEncryptedBackup(password){return encryptBackupBlob(await exportBackup(),password);}
 
 const dataURIToBlob=url=>{const [meta,s]=url.split(',');const bytes=atob(s);const out=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)out[i]=bytes.charCodeAt(i);return new Blob([out],{type:meta.match(/^data:([^;]+)/)?.[1]||'image/jpeg'});};
-async function restoreBackup(file,confirmed,password){if(!confirmed)throw Error('Geri yükleme için onay verilmeli.');const ctx=clubContext();if(selectedClub?.id!==ctx.id)throw Error('Aktif kulüp kimliği uyuşmuyor.');const decoded=await decodeBackupBlob(file,password);if(decoded.needsPassword)throw Error('Şifreli yedek parolası gerekli.');const data=decoded.payload;const issues=validateBackup(data);if(issues.length)throw Error(issues.slice(0,3).join(' '));const incoming=normalizeBackupStores(data);const converted={...incoming,assets:incoming.assets.map(a=>({...a,blob:dataURIToBlob(a.blob)}))}; if(!selectedClub?.id)throw Error('Kurtarma işlemi için aktif kulüp bulunamadı.');assertContext(ctx);return withExclusiveClubOperation(async runTransaction=>{const erasedIds=new Set(await listErasedPlayerIds(ctx.id));if(incoming.players.some(p=>erasedIds.has(p.id)))throw Error('Bu yedek kalıcı olarak silinmiş oyuncu içeriyor. Gizlilik gereği eski yedekten geri yükleme engellendi.');const recovery=await saveRestorePoint(ctx.id,runTransaction);await runTransaction(STORES,'readwrite',tx=>{for(const s of STORES){const store=tx.objectStore(s);store.clear();for(const row of converted[s])store.put(row);}});return {recovery,counts:Object.fromEntries(STORES.map(s=>[s,converted[s].length]))};},ctx);}
+async function restoreBackup(file,confirmed,password){
+ if(!confirmed)throw Error('Geri yükleme için onay verilmeli.');
+ const ctx=clubContext();if(selectedClub?.id!==ctx.id)throw Error('Aktif kulüp kimliği uyuşmuyor.');
+ const decoded=await decodeBackupBlob(file,password);if(decoded.needsPassword)throw Error('Şifreli yedek parolası gerekli.');
+ const data=decoded.payload,issues=validateBackup(data);if(issues.length)throw Error(issues.slice(0,3).join(' '));
+ const incoming=normalizeBackupStores(data),converted={...incoming,assets:incoming.assets.map(a=>({...a,blob:dataURIToBlob(a.blob)}))};
+ assertContext(ctx);
+ return withExclusiveClubOperation(async runTransaction=>{
+  // Check after decoding AND after acquiring the same lock used by erasure.
+  await assertNoErasedPlayers(ctx.id,converted);
+  const recovery=await saveRestorePoint(ctx.id,runTransaction);
+  await runTransaction(STORES,'readwrite',tx=>{for(const s of STORES){const store=tx.objectStore(s);store.clear();for(const row of converted[s])store.put(row);}});
+  return {recovery,counts:Object.fromEntries(STORES.map(s=>[s,converted[s].length]))};
+ },ctx);
+}
 
 Object.assign(exports,{setBackupClub,exportBackup,exportEncryptedBackup,validateBackup,normalizeBackupStores,inspectBackup,restoreBackup});

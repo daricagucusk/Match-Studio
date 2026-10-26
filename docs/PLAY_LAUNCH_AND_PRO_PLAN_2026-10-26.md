@@ -4,12 +4,14 @@
 **Onaylı model:** Google Play'de ücretsiz indirme; ilk yayın sonrasında isteğe bağlı, tek seferlik (non-consumable) Match Studio Pro lisansı. **Abonelik yok.**  
 **Fiyat:** 699 TL yalnızca doğrulanacak lansman fiyatı önerisi; satın alma ürünü/fiyatı henüz onaylanmış veya aktif değil.
 
-## A. Galaxy Z Fold7 üzerinde şimdi: Play Console uygulama kaydı
+## A. Hesap incelemesi tamamlandığında: Play Console uygulama kaydı
+
+Kimlik belgeleri incelemededir; aşağıdaki adımların tamamlandığı varsayılmamalıdır. Güncel [aday kabul belgesi](PLAY_CANDIDATE_ACCEPTANCE_2026-10-26.md) takip edilir.
 
 1. Chrome'da https://play.google.com/console adresini aç; aktif bireysel geliştirici hesabıyla giriş yap. Gerekirse Chrome üç nokta > Masaüstü sitesi.
 2. Home/Ana sayfa > Create app/Uygulama oluştur.
 3. Ad: **Match Studio**; varsayılan dil: **Türkçe**; tür: **Uygulama** (oyun değil); fiyatlandırma: **Ücretsiz**.
-4. Kullanıcıların erişebileceği, sahibince seçilen **destek e-postasını** gir. Burada onaylanmamış bir adres uydurma.
+4. Onaylanan destek e-postası **clupulse@gmail.com**, kamuya açık geliştirici markası **Matchday Studio**, bildirilen yasal işletmeci **Mehmet Yılmaz**. Hesap türüne göre Console'un istediği yasal bilgiler ayrıca doğru girilmelidir.
 5. Developer Program Policies, US export laws ve Play App Signing beyanlarını okuyup kabul ederek **Uygulama oluştur**.
 6. Bu işlem üretim yayını DEĞİLDİR. Dashboard görevleri açılacaktır. Uygulama oluşturulduğunda ekranın/menülerin durumunu yeniden doğrula.
 
@@ -27,7 +29,7 @@
 ## C. PLAY CONSOLE yayın kapıları — öncelikli sıra
 
 1. **Hesap ve uygulama:** Bireysel hesabın açılış tarihi, üretim erişimi ve cihaz doğrulama durumunu kontrol; uygulama kaydı oluştur.
-2. **Paket adı:** `com.daricagucusk.matchstudio` yalnız öneridir; ilk signed AAB upload'undan önce kesinleştir. TWA host `match-studio-telefon.vercel.app`.
+2. **Paket adı:** `com.matchdaystudio.app` kullanıcı tarafından onaylandı; Console uygunluğu doğrulanacak. TWA host `match-studio-telefon.vercel.app`.
 3. **Gizlilik:** Veri sorumlusu, kamuya açık destek iletişimi, gerçek ağ/SDK davranışları ve çocuk sporcu fotoğraflarının işlenmesi doğrulanmış bir HTTPS privacy URL'si; uygulama içinden de erişim.
 4. **Play bilgileri:** Spor kategorisi; Türkçe açıklama, reklamsızsa reklamsız beyanı, doğru hedef kitle/yaş değerlendirmesi, Data Safety, Play politika anketleri ve gerçek uygulamadan sentetik oyuncu verili ekran görüntüleri.
 5. **İmzalı Android paket:** Güvenilir sahibin koruduğu upload key ile Android 16 **target API 36**, benzersiz versionCode içeren signed release AAB. JKS veya parola GitHub'a/sohbete gönderilmez.
