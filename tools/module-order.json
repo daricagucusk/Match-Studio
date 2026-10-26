@@ -1,6 +1,7 @@
 [
   "src/app/modal-focus.js",
   "src/app/match-form-drafts.js",
+  "src/app/fixture-import-session.js",
   "src/app/render-coordinator.js",
   "src/app/views/club-records.js",
   "src/app/views/live-events-report.js",
