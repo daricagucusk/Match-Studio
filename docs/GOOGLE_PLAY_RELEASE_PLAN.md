@@ -62,3 +62,14 @@ Kaynaklar:
 - https://support.google.com/googleplay/android-developer/answer/9866151
 - https://github.com/pwa-builder/PWABuilder/blob/main/docs/builder/android.md
 - https://github.com/googleChromeLabs/bubblewrap/blob/main/packages/cli/README.md
+
+
+## GÜNCEL 26.10.2026 KANONİK DURUM
+
+- Kaynak: `main` = `4cbf8f899cc1466fe1621d42900fa959357d985f`; Vercel Production READY aynı commit.
+- PR #20 fikstür aktarım kulüp izolasyonu, PR #21 yatay ekran erişimi: **merged**. Eski PR #17 hazırlık olarak açık.
+- Birleşik yeni yayın adayı PR #25; Play/TWA hazırlığı #22 ve P0-02 kalıcı silme #23 birlikte; iki PR ayrıca körlemesine birleştirilmez.
+- `README.md` güncel kullanım ve test kaynak noktası; geçmiş F.11/F.3 doküman notları **geçmiş**.
+- Başlıca NO-GO: Kalıcı silme Chrome/Z Fold7 kabulü, gerekli gizlilik onayı, gerçek Google Play App Signing SHA-256, assetlinks, imzalı target API 36 AAB, Data Safety ve Play Console test izinleri.
+- Proje kontrol merkezi: https://github.com/daricagucusk/Match-Studio/issues/24
+
