@@ -34,6 +34,13 @@ jobs:
             dist/SHA256SUMS.txt
             dist/release.json
       - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: matchstudio-play-store-screenshots
+          path: dist/store-listing/*.png
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: browser-test-diagnostics
