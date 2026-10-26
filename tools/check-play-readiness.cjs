@@ -47,8 +47,11 @@ async function run(){
  add('PASS','Provisional Android metadata',android.packageId+' · v'+android.appVersion+' ('+android.appVersionCode+')');
  add('PASS','Permissions','No push delegation or payment permissions configured in wrapper.');
  const possiblePrivacy=path.join(root,'privacy.html');
- if(fs.existsSync(possiblePrivacy))add('PASS','Privacy page source','A privacy.html file exists; review its legal accuracy and public accessibility.');
- else add('BLOCKED','Public privacy policy','privacy.html is not live; privacy draft must be reviewed, approved and published first.');
+ if(fs.existsSync(possiblePrivacy)){
+  const issues=require('./play-privacy-validate.cjs').validatePrivacyPage(requireFile('privacy.html').toString('utf8'),requireFile('index.html').toString('utf8'));
+  if(issues.length)add('BLOCKED','Public privacy policy',issues.join(' '));
+  else add('CHECK','Privacy page source','Static safety checks passed; legal accuracy, in-app navigation and public HTTPS URL still require manual confirmation.');
+ }else add('BLOCKED','Public privacy policy','privacy.html is not live; privacy draft must be reviewed, approved and published first.');
  if((android.fingerprints||[]).length===0)add('BLOCKED','Digital Asset Links','Play App Signing SHA-256 fingerprint not yet provided. Do not publish a placeholder.');
  else add('CHECK','Play signing','Check the fingerprint is from Play Console App signing certificate, not upload key.');
  if(!process.env.GOOGLE_PLAY_ACCOUNT_VERIFIED)add('BLOCKED','Play developer account','Play Console registration, identity and test-track availability unconfirmed.');

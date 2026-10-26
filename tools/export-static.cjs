@@ -23,7 +23,8 @@ function exportStatic(root=path.resolve(__dirname,'..')){
  // the real Google Play App Signing SHA-256 is known. Never ship placeholder links.
  if(fs.existsSync(path.join(root,'privacy.html'))){
   const privacy=read('privacy.html');
-  if(!privacy.toString('utf8').includes('Gizlilik Politikası'))throw Error('Invalid privacy policy page');
+  const problems=require('./play-privacy-validate.cjs').validatePrivacyPage(privacy.toString('utf8'),read('index.html').toString('utf8'));
+  if(problems.length)throw Error('Privacy page cannot be published: '+problems.join(' '));
   bytes.set('privacy.html',privacy);
  }
  const assetLinkName='.well-known/assetlinks.json';
