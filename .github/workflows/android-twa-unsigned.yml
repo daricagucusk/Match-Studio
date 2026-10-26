@@ -50,6 +50,8 @@ jobs:
         run: |
           set -euo pipefail
           cd .unsigned-twa
+          # Generated Gradle project inherits the hidden QA folder name unless set.
+          printf "\nrootProject.name = 'matchstudio-android'\n" >> settings.gradle
           chmod +x ./gradlew
           ./gradlew --no-daemon bundleRelease
           bundle="$(find . -type f -name '*.aab' -size +100k -print -quit)"
