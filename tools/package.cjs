@@ -1,5 +1,6 @@
 'use strict';
 const {execFileSync}=require('node:child_process');
+const {execPython}=require('./python.cjs');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),version=require('../package.json').version;
 const releaseId='V'+version.toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -19,9 +20,9 @@ for name,files in [(f'MatchStudio_{tag}_PWA.zip',public),(f'MatchStudio_{tag}_So
    info=zipfile.ZipInfo(f,date_time=(2026,10,22,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=(0o100755 if f.endswith('.sh') else 0o100644)<<16;z.writestr(info,(root/f).read_bytes())
  print(name)
 `;
-execFileSync('python3',['-c',script,root,JSON.stringify(files),releaseId,JSON.stringify(require('./package-files.cjs').sourceFiles(root))],{stdio:'inherit'});
+execPython(['-c',script,root,JSON.stringify(files),releaseId,JSON.stringify(require('./package-files.cjs').sourceFiles(root))],{stdio:'inherit'});
 const pwa=`MatchStudio_${releaseId}_PWA.zip`,source=`MatchStudio_${releaseId}_Source.zip`;
-execFileSync('python3',[path.join(__dirname,'verify-release.py'),path.join(dist,pwa)],{stdio:'inherit'});
+execPython([path.join(__dirname,'verify-release.py'),path.join(dist,pwa)],{stdio:'inherit'});
 const artifacts=[pwa,source].map(name=>{const bytes=fs.readFileSync(path.join(dist,name));return {name,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};});
 fs.writeFileSync(path.join(dist,'SHA256SUMS.txt'),artifacts.map(a=>`${a.sha256}  ${a.name}`).join('\n')+'\n');
 fs.writeFileSync(path.join(dist,'release.json'),JSON.stringify({version,releaseId,archiveVerification:'passed',artifacts},null,2)+'\n');
