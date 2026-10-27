@@ -1,0 +1,118 @@
+path,state,decision
+.github/ISSUE_TEMPLATE/mobile-ai-handoff.md,play-only,keep Play baseline; preserve source-specific reference
+.github/workflows/android-twa-unsigned.yml,play-only,keep Play baseline; preserve source-specific reference
+.github/workflows/mobile-ai-handoff.yml,play-only,keep Play baseline; preserve source-specific reference
+.github/workflows/verify.yml,different,keep Play baseline; preserve source-specific reference
+.gitignore,different,keep Play baseline; preserve source-specific reference
+AGENTS.md,play-only,keep Play baseline; preserve source-specific reference
+README.md,different,keep Play baseline; preserve source-specific reference
+SHA256SUMS.txt,different,preserve originals; regenerate outputs only in candidate
+android/twa-manifest.json,play-only,keep Play baseline; preserve source-specific reference
+app.bundle.js,different,preserve originals; regenerate outputs only in candidate
+broadcast.css,different,keep Play baseline; preserve source-specific reference
+docs/AI_AGENT_HANDOFF.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/AI_MODEL_ROUTING.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/DEVICE_CHECKLIST.md,different,keep Play docs; merge current evidence and Python usage
+docs/GITHUB_SYNC_2026-10-23.md,local-only,keep Play docs; merge current evidence and Python usage
+docs/GITHUB_VERCEL.md,different,keep Play docs; merge current evidence and Python usage
+docs/GOOGLE_PLAY_RELEASE_PLAN.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/INDEPENDENT_PRODUCT_AND_LICENSE_PLAN.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/PLAY_CANDIDATE_ACCEPTANCE_2026-10-26.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/PLAY_DATA_SAFETY_AUDIT_2026-10-26.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/PLAY_LAUNCH_AND_PRO_PLAN_2026-10-26.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/PLAY_PRIVACY_PUBLICATION_SOP_TR.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/PLAY_STORE_FEATURE_GRAPHIC_2026-10-26.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/PLAY_STORE_LISTING_TR.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/PLAY_STORE_PRIVACY_DRAFT_TR.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/PLAY_STORE_VISUAL_PACKAGE_2026-10-26.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/RELEASE.md,different,keep Play docs; merge current evidence and Python usage
+docs/UNIFIED_RELEASE_2026-10-25.md,play-only,keep Play docs; merge current evidence and Python usage
+docs/VALIDATION.md,different,keep Play docs; merge current evidence and Python usage
+docs/release-monetization.json,play-only,keep Play docs; merge current evidence and Python usage
+index.html,different,keep Play identity/runtime baseline; no F14 metadata rollback
+live-events-v268e.css,different,keep Play baseline; preserve source-specific reference
+manifest.webmanifest,different,keep Play identity/runtime baseline; no F14 metadata rollback
+package-lock.json,different,keep Play identity/runtime baseline; no F14 metadata rollback
+package.json,different,keep Play identity/runtime baseline; no F14 metadata rollback
+premium-v267.css,different,keep Play baseline; preserve source-specific reference
+reviews/update-02/friendly-public.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-02/league-public.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-03/completed-report.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-04/first-group-phone.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-05/quick-events-phone.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/desktop-measurements.json,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/fold-open-measurements.json,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/phone-measurements.json,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/pitch-desktop.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/pitch-fold-open.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/pitch-phone.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/roster-desktop.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/roster-fold-open.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/roster-phone.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/studio-desktop.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/studio-fold-open.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-06/studio-phone.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-07/modal-focus-phone.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-08/settings-copy-phone.png,different,preserve originals; regenerate outputs only in candidate
+reviews/update-08/studio-consistent-phone.png,different,preserve originals; regenerate outputs only in candidate
+robots.txt,different,keep Play baseline; preserve source-specific reference
+src/app/fixture-import-session.js,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+src/app/modal-focus.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/app/views/club-records.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/app/views/live-match-clock.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/app/views/match-operations.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/app/views/media-studio.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/domain/fixture-import.js,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+src/domain/match-substitutions.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/main.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/pitch/pitch-screen.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/pwa/service-worker.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/storage/backup.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/storage/data-safety.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/storage/db.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+src/storage/privacy-erasure.js,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+src/storage/recovery.js,different,keep Play baseline; verify F12/F13 and workflow coverage
+sw.js,different,preserve originals; regenerate outputs only in candidate
+tests/browser/app.spec.cjs,different,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/cross-profile-restore.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/dashboard-mobile-polish.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/fixture-import-isolation.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/fixture-import.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/live-quick-events.spec.cjs,different,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/modal-focus.spec.cjs,different,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/play-store-feature.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/play-store-screenshots.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/privacy-erasure.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/sidebar-landscape.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/simple-data-transfer.spec.cjs,local-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/ui-consistency.spec.cjs,different,keep Play baseline; verify F12/F13 and workflow coverage
+tests/browser/unified-transfer.spec.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/fixture-import-isolation.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/fixture-import.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/package-files.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/play-privacy-validate.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/play-readiness.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/play-release-evidence.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/privacy-erasure.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/privacy-route.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/python.test.cjs,local-only,port local helper/test
+tests/release-monetization.test.cjs,play-only,keep Play baseline; verify F12/F13 and workflow coverage
+tests/release.test.cjs,different,port spawnPython integration
+tests/storage.test.cjs,different,keep Play baseline; verify F12/F13 and workflow coverage
+tools/ai_handoff_router.py,play-only,keep Play baseline; preserve source-specific reference
+tools/build.cjs,different,keep Play baseline; preserve source-specific reference
+tools/check-play-readiness.cjs,play-only,keep Play baseline; preserve source-specific reference
+tools/ensure-android-api36.cjs,play-only,keep Play baseline; preserve source-specific reference
+tools/export-static.cjs,different,keep Play baseline; preserve source-specific reference
+tools/generate-play-assetlinks.cjs,play-only,keep Play baseline; preserve source-specific reference
+tools/inspect-android-aab.py,play-only,keep Play baseline; preserve source-specific reference
+tools/module-order.json,different,keep Play baseline; preserve source-specific reference
+tools/package-files.cjs,play-only,keep Play baseline; preserve source-specific reference
+tools/package.cjs,different,semantic port Python calls; KEEP Play sourceFiles filter
+tools/play-privacy-validate.cjs,play-only,keep Play baseline; preserve source-specific reference
+tools/play-release-evidence.cjs,play-only,keep Play baseline; preserve source-specific reference
+tools/play-store-feature.html,play-only,keep Play baseline; preserve source-specific reference
+tools/python.cjs,local-only,port local helper/test
+tools/serve.cjs,different,keep Play baseline; preserve source-specific reference
+tools/test_ai_handoff_router.py,play-only,keep Play baseline; preserve source-specific reference
+tools/test_android_aab.py,play-only,keep Play baseline; preserve source-specific reference

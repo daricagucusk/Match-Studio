@@ -1,3 +1,16 @@
+## Birleşik yerel aday — 27 Ekim 2026
+Aday yolu: D:/beyin2/Projeler/MatchStudio/Calisma/Birlesik-Aday.
+Taban: Play2b17cc594686e6650d3f409f6e09af63a70ef4c5; dal kervan/match-studio-tek-surum. Bu aday ana çalışma girişine yönlendirilmedi ve yayınlanmadı.
+Node24 ve Python3.8+ kullanılır. Paket/test araçları Windows'ta python, py -3, python3; diğer sistemlerde python3, python sırasını dener. PYTHON verilirse yalnız belirtilen tam yürütücü kullanılır; shell yoktur.
+Play'in kaynak paketinden özel/imza dosyalarını dışlama filtresi korunuyor; geçici .superpowers alanı da dışlanır. Windows'ta link dışlama testi ayrıcalık gerektirmeyen gerçek dizin junction'ı ile, Linux'ta dosya symlink'i ile çalışır.
+Şifreli yedek varsayılandır; JSONv1/v2/v3, kalıcı silme ve bekleyen silme korumaları korunur. Uygulama src/ modülleri bu uyarlamada değiştirilmedi.
+Kesin yeni test/paket kanıtı docs/MERGE-ACCEPTANCE.md içinde tamamlanacaktır. Eski76/127CI ve yerelF.14/45test bu adayın kabulü değildir. Play için7açık kapı, gerçek cihaz kabulü ve yeni commit'in uzakCIsonucu ayrıdır.
+
+---
+
+## Önceki kaynak belgesi — tarihsel kayıt
+Aşağıdaki eski sürüm/test/yayın iddiaları kaynakta yazıldıkları zamana aittir; güncel aday kabulünü yukarıdaki bölüm ve MERGE-ACCEPTANCE.md belirler.
+
 # Doğrulama raporu — V2.6.8-F.11
 
 Tarih: 22 Ekim 2026. Ortam: Linux, Node.js 24.19.0, Playwright Chromium. Testler sentetik kulüp/oyuncularla çalıştırılır; gerçek sporcu bilgisi kullanılmaz.
