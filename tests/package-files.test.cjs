@@ -3,7 +3,7 @@ const {sourceFiles}=require('../tools/package-files.cjs');
 test('source archive excludes synthetic signing material, build folders and symlinks',()=>{
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'matchstudio-package-'));
  try{
-  for(const name of ['src/app.js','android/twa-manifest.json','android/upload-key.jks','nested/release.KEY','.env.local','.unsigned-twa/gradle.properties','nested/key.properties','dist/old.zip']){
+  for(const name of ['src/app.js','android/twa-manifest.json','android/upload-key.jks','nested/release.KEY','.env.local','.unsigned-twa/gradle.properties','nested/key.properties','dist/old.zip','.superpowers/sdd/plan/progress.md']){
    fs.mkdirSync(path.dirname(path.join(root,name)),{recursive:true});fs.writeFileSync(path.join(root,name),'synthetic');
   }
   // Windows directory junctions exercise real link exclusion without admin privileges.
