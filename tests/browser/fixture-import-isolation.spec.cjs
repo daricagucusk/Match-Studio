@@ -1,6 +1,7 @@
 const {test,expect}=require('@playwright/test');
 const {idle,nav}=require('./live-fixture.cjs');
-const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
+const fs=require('node:fs'),path=require('node:path');
+const {execPython}=require('../../tools/python.cjs');
 const root=path.resolve(__dirname,'../..');
 const sources=Object.fromEntries(['src/storage/club-registry.js','src/storage/db.js','src/storage/data-safety.js'].map(id=>[id,fs.readFileSync(path.join(root,id),'utf8')]));
 const clubA='fixture_isolation_a',clubB='fixture_isolation_b';
@@ -85,7 +86,7 @@ test('P0: cancelling a preview and rejecting a file leave both club databases un
 });
 test('XLSX preview still requires approval and writes only to its source club',async({page})=>{
  // A real, small ZIP/XML workbook, generated entirely from synthetic strings.
- const xlsx=execFileSync('python3',['-c',`import io,zipfile,sys
+ const xlsx=execPython(['-c',`import io,zipfile,sys
 from xml.sax.saxutils import escape
 rows=[['Grup','Rakip','Tarih','Saat','Saha'],['U14','Sentetik Excel Rakibi','2026-11-08','14:00','Deneme Saha']]
 xml='<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'
@@ -99,7 +100,7 @@ with zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED) as z:
  z.writestr('xl/_rels/workbook.xml.rels','<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>')
  z.writestr('_rels/.rels','<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>')
  z.writestr('[Content_Types].xml','<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>')
-sys.stdout.buffer.write(b.getvalue())`]);
+sys.stdout.buffer.write(b.getvalue())`]).stdout;
  await setup(page);const before=await snapshot(page);
  await upload(page,'fixtures.xlsx',xlsx);await expect(page.locator('.weekly-import-preview')).toContainText('1 geçerli maç');
  expect(await snapshot(page)).toEqual(before);
