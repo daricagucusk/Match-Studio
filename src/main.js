@@ -688,7 +688,7 @@ listenRoot('change',async e=>{const el=e.target;if(el.id==='club-switch'||el.id=
  let password=null,report=await inspectBackup(file);
  if(report.needsPassword){password=prompt('Bu yedek şifrelenmiş. Yedek parolasını girin:');if(password===null)return;report=await inspectBackup(file,password);}
  if(!report.valid)throw Error('Yedek geçersiz: '+report.warnings.join(' '));
- if(report.clubId&&report.clubId!==state.club.id&&!confirm(`Bu yedek farklı kulüp kimliğine (${report.club||'bilinmiyor'}) ait. Verileri ${state.club.name} kulübüne aktarmak istediğinizi onaylıyor musunuz?`))return;
+ if(report.clubId!==state.club.id&&!confirm(`Bu yedek ${report.club||'kimliği bilinmeyen başka bir kulüp'} kaynağından geliyor. Yalnızca TAMAMEN BOŞ bir kulübe aktarılabilir; dolu kulüpte işlem reddedilir. ${state.club.name} kulübüne aktarmak istiyor musunuz?`))return;
  if(report.integrityWarnings?.length){if(!confirm(`Yedekte ${report.integrityWarnings.length} eski/tutarsız bağlantı tespit edildi: ${report.integrityWarnings.slice(0,3).join(' | ')}. Kayıtların eksiksiz işlenmesi garanti edilemez. Devam edilsin mi?`))return;}
  const older=await readRestorePoint(state.club.id);if(older&&!confirm('Bu kulüp için önceki yerel kurtarma noktası bulunuyor. Yeni geri yükleme, eski kurtarma noktasını değiştirecek. Önceki noktayı kaybetmeyi kabul ediyor musunuz?'))return;
  if(!confirm(`${report.encrypted?'ŞİFRELİ':'ŞİFRESİZ'} YEDEK ÖNİZLEME: ${report.counts.players} oyuncu, ${report.counts.groups} grup, ${report.counts.matches} maç, ${report.counts.assets} görsel. ${state.club.name} kulübündeki MEVCUT TÜM VERİLER değişecek. Önce mevcut kulübün yedeğini aldınız mı?`))return;

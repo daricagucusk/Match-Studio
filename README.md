@@ -25,7 +25,7 @@ Aşağıdaki eski sürüm/test/yayın iddiaları kaynakta yazıldıkları zamana
 
 Yerel/çevrimdışı odaklı kulüp, grup, sporcu ve maç yönetimi; kadro hazırlama, sahada yerleşim, canlı maç saati/olayları, istatistikler, yayınlanabilir afiş/PNG, şifreli dışa aktarım/geri yükleme ve kulüp bazlı IndexedDB ayrımı. Kayıtların web origin ve tarayıcı profiline bağlı olması sebebiyle düzenli şifreli dış yedek gerekir.
 
-Kulüp ve sporcu verileri farklı ürünlerle/paylaşımlarla otomatik eşitlenmez. Çocukların isim, fotoğraf ve özel sporcu bilgilerini mağaza görsellerinde göstermeyin.
+Kulüp ve sporcu verileri farklı ürünlerle/paylaşımlarla otomatik eşitlenmez. Şifreli yedek aynı kulübe geri yüklenebilir; farklı veya kimliği eksik bir kulüp yedeği yalnızca tamamen boş bir kulübe açık onayla taşınabilir. Çocukların isim, fotoğraf ve özel sporcu bilgilerini mağaza görsellerinde göstermeyin.
 
 ## Hızlı çalışma
 

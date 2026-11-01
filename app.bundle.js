@@ -2300,7 +2300,7 @@ listenRoot('change',async e=>{const el=e.target;if(el.id==='club-switch'||el.id=
  let password=null,report=await inspectBackup(file);
  if(report.needsPassword){password=prompt('Bu yedek şifrelenmiş. Yedek parolasını girin:');if(password===null)return;report=await inspectBackup(file,password);}
  if(!report.valid)throw Error('Yedek geçersiz: '+report.warnings.join(' '));
- if(report.clubId&&report.clubId!==state.club.id&&!confirm(`Bu yedek farklı kulüp kimliğine (${report.club||'bilinmiyor'}) ait. Verileri ${state.club.name} kulübüne aktarmak istediğinizi onaylıyor musunuz?`))return;
+ if(report.clubId!==state.club.id&&!confirm(`Bu yedek ${report.club||'kimliği bilinmeyen başka bir kulüp'} kaynağından geliyor. Yalnızca TAMAMEN BOŞ bir kulübe aktarılabilir; dolu kulüpte işlem reddedilir. ${state.club.name} kulübüne aktarmak istiyor musunuz?`))return;
  if(report.integrityWarnings?.length){if(!confirm(`Yedekte ${report.integrityWarnings.length} eski/tutarsız bağlantı tespit edildi: ${report.integrityWarnings.slice(0,3).join(' | ')}. Kayıtların eksiksiz işlenmesi garanti edilemez. Devam edilsin mi?`))return;}
  const older=await readRestorePoint(state.club.id);if(older&&!confirm('Bu kulüp için önceki yerel kurtarma noktası bulunuyor. Yeni geri yükleme, eski kurtarma noktasını değiştirecek. Önceki noktayı kaybetmeyi kabul ediyor musunuz?'))return;
  if(!confirm(`${report.encrypted?'ŞİFRELİ':'ŞİFRESİZ'} YEDEK ÖNİZLEME: ${report.counts.players} oyuncu, ${report.counts.groups} grup, ${report.counts.matches} maç, ${report.counts.assets} görsel. ${state.club.name} kulübündeki MEVCUT TÜM VERİLER değişecek. Önce mevcut kulübün yedeğini aldınız mı?`))return;
@@ -2917,6 +2917,11 @@ const {decodeBackupBlob,encryptBackupBlob}=require('src/storage/secure-backup.js
 const {checkSnapshotIntegrity}=require('src/storage/data-safety.js');
 const {saveRestorePoint,captureCurrentStores,assertNoErasedPlayers}=require('src/storage/recovery.js');
 let selectedClub=null;const setBackupClub=club=>{selectedClub=club;};
+async function assertBackupTarget(data,clubId,runTransaction){
+ if(data?.club?.id===clubId)return;
+ const current=await captureCurrentStores(runTransaction);
+ if(STORES.some(name=>current[name].length))throw Error('Bu yedek farklı bir kulübe ait veya kulüp kimliği eksik. Yalnızca boş bir kulübe aktarılabilir; mevcut kayıtlar değiştirilmedi.');
+}
 
 const serial=async blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(blob)});
 async function exportBackup(){const ctx=clubContext(),club=selectedClub?{id:selectedClub.id,name:selectedClub.name}:null;const stores=await captureCurrentStores();stores.assets=await Promise.all(stores.assets.map(async a=>({...a,blob:await serial(a.blob)})));assertContext(ctx);const body={application:'MatchStudioUniversal',schemaVersion:3,club,exportedAt:new Date().toISOString(),stores};return new Blob([JSON.stringify(body)],{type:'application/json'});}
@@ -2954,6 +2959,7 @@ async function inspectBackup(file,password){
   const decoded=await decodeBackupBlob(file,password);
   if(decoded.needsPassword)return {valid:false,needsPassword:true,encrypted:true,counts:{},warnings:[]};
   const data=decoded.payload,warnings=validateBackup(data);
+  if(!warnings.length&&selectedClub?.id)await assertBackupTarget(data,selectedClub.id);
   // Report legacy orphaned references separately; do not silently change them.
   const integrityWarnings=warnings.length?[]:checkSnapshotIntegrity(normalizeBackupStores(data));
   if(!warnings.length&&selectedClub?.id)await assertNoErasedPlayers(selectedClub.id,normalizeBackupStores(data));
@@ -2971,6 +2977,7 @@ async function restoreBackup(file,confirmed,password){
  const incoming=normalizeBackupStores(data),converted={...incoming,assets:incoming.assets.map(a=>({...a,blob:dataURIToBlob(a.blob)}))};
  assertContext(ctx);
  return withExclusiveClubOperation(async runTransaction=>{
+  await assertBackupTarget(data,ctx.id,runTransaction);
   // Check after decoding AND after acquiring the same lock used by erasure.
   await assertNoErasedPlayers(ctx.id,converted);
   const recovery=await saveRestorePoint(ctx.id,runTransaction);

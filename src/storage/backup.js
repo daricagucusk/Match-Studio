@@ -5,6 +5,11 @@ const {decodeBackupBlob,encryptBackupBlob}=require('src/storage/secure-backup.js
 const {checkSnapshotIntegrity}=require('src/storage/data-safety.js');
 const {saveRestorePoint,captureCurrentStores,assertNoErasedPlayers}=require('src/storage/recovery.js');
 let selectedClub=null;const setBackupClub=club=>{selectedClub=club;};
+async function assertBackupTarget(data,clubId,runTransaction){
+ if(data?.club?.id===clubId)return;
+ const current=await captureCurrentStores(runTransaction);
+ if(STORES.some(name=>current[name].length))throw Error('Bu yedek farklı bir kulübe ait veya kulüp kimliği eksik. Yalnızca boş bir kulübe aktarılabilir; mevcut kayıtlar değiştirilmedi.');
+}
 
 const serial=async blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(blob)});
 async function exportBackup(){const ctx=clubContext(),club=selectedClub?{id:selectedClub.id,name:selectedClub.name}:null;const stores=await captureCurrentStores();stores.assets=await Promise.all(stores.assets.map(async a=>({...a,blob:await serial(a.blob)})));assertContext(ctx);const body={application:'MatchStudioUniversal',schemaVersion:3,club,exportedAt:new Date().toISOString(),stores};return new Blob([JSON.stringify(body)],{type:'application/json'});}
@@ -42,6 +47,7 @@ async function inspectBackup(file,password){
   const decoded=await decodeBackupBlob(file,password);
   if(decoded.needsPassword)return {valid:false,needsPassword:true,encrypted:true,counts:{},warnings:[]};
   const data=decoded.payload,warnings=validateBackup(data);
+  if(!warnings.length&&selectedClub?.id)await assertBackupTarget(data,selectedClub.id);
   // Report legacy orphaned references separately; do not silently change them.
   const integrityWarnings=warnings.length?[]:checkSnapshotIntegrity(normalizeBackupStores(data));
   if(!warnings.length&&selectedClub?.id)await assertNoErasedPlayers(selectedClub.id,normalizeBackupStores(data));
@@ -59,6 +65,7 @@ async function restoreBackup(file,confirmed,password){
  const incoming=normalizeBackupStores(data),converted={...incoming,assets:incoming.assets.map(a=>({...a,blob:dataURIToBlob(a.blob)}))};
  assertContext(ctx);
  return withExclusiveClubOperation(async runTransaction=>{
+  await assertBackupTarget(data,ctx.id,runTransaction);
   // Check after decoding AND after acquiring the same lock used by erasure.
   await assertNoErasedPlayers(ctx.id,converted);
   const recovery=await saveRestorePoint(ctx.id,runTransaction);
