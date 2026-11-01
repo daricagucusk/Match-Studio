@@ -42,3 +42,29 @@ test('Play App Signing fingerprint creates Android App Links for the same packag
  assert.equal(json[0].target.sha256_cert_fingerprints[0],sha);
  assert.deepEqual(json[0].relation,['delegate_permission/common.handle_all_urls']);
 });
+test('assetlinks generator validates package identity matches TWA manifest',()=>{
+ const sha=Array(32).fill('CD').join(':');
+ const result=cp.spawnSync(process.execPath,['tools/generate-play-assetlinks.cjs','--play-sha256='+sha],{
+   cwd:root,encoding:'utf8',timeout:15000
+ });
+ assert.equal(result.status,0,result.stderr);
+ const json=JSON.parse(result.stdout);
+ assert.equal(json[0].target.package_name,'com.matchdaystudio.app');
+ assert.equal(json[0].target.sha256_cert_fingerprints[0],sha);
+});
+test('assetlinks generator rejects malformed SHA-256 fingerprints',()=>{
+ const bad='NOT_A_VALID_FINGERPRINT';
+ const result=cp.spawnSync(process.execPath,['tools/generate-play-assetlinks.cjs','--play-sha256='+bad],{
+   cwd:root,encoding:'utf8',timeout:15000
+ });
+ assert.notEqual(result.status,0);
+ assert.doesNotMatch(result.stdout,/delegate_permission/);
+});
+test('assetlinks generator rejects incomplete SHA-256 (31 pairs)',()=>{
+ const sha=Array(31).fill('EF').join(':');
+ const result=cp.spawnSync(process.execPath,['tools/generate-play-assetlinks.cjs','--play-sha256='+sha],{
+   cwd:root,encoding:'utf8',timeout:15000
+ });
+ assert.notEqual(result.status,0);
+ assert.doesNotMatch(result.stdout,/delegate_permission/);
+});

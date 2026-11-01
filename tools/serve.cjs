@@ -7,6 +7,7 @@ const port=Number(process.argv[2]||8904);
 const files=new Map([
  ['/','index.html'],['/index.html','index.html'],['/app.bundle.js','app.bundle.js'],['/broadcast.css','broadcast.css'],
  ['/sw.js','sw.js'],['/manifest.webmanifest','manifest.webmanifest'],['/device-test.html','device-test.html'],
+ ['/privacy.html','privacy.html'],
  ['/icons/icon-192.png','icons/icon-192.png'],['/icons/icon-512.png','icons/icon-512.png'],['/premium-v267.css','premium-v267.css'],['/live-clock-v268b.css','live-clock-v268b.css'],['/live-substitutions-v268c.css','live-substitutions-v268c.css'],['/live-pitch-v268d.css','live-pitch-v268d.css'],['/live-events-v268e.css','live-events-v268e.css'],['/assets/ms-emblem-mark.png','assets/ms-emblem-mark.png'],['/assets/match-studio-brand-preview.png','assets/match-studio-brand-preview.png'],['/assets/match-studio-blue-violet-brand.png','assets/match-studio-blue-violet-brand.png']
 ]);
 const types={'.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.webmanifest':'application/manifest+json; charset=utf-8','.png':'image/png'};
