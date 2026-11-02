@@ -58,7 +58,7 @@ jobs:
           while IFS= read -r -d '' path; do
             count=$((count+1))
             case "$path" in
-              src/*|tests/*|assets/*|icons/*|index.html|*.css)
+              src/*|tests/*|web/*)
                 ;;
               *)
                 echo "::error::File outside pilot source allowlist: $path"

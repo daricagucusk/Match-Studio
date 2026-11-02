@@ -1,6 +1,6 @@
 {
   "name": "match-studio",
-  "version": "2.6.8-f.13",
+  "version": "2.6.8-f.17",
   "private": true,
   "description": "Offline football club operations PWA",
   "scripts": {
@@ -13,7 +13,8 @@
     "release": "npm run check && npm run package",
     "build:vercel": "npm run build && node tools/export-static.cjs",
     "check:play": "node tools/check-play-readiness.cjs",
-    "check:play:strict": "node tools/check-play-readiness.cjs --strict --remote"
+    "check:play:strict": "node tools/check-play-readiness.cjs --strict --remote",
+    "desktop": "node tools/start-desktop.cjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",

@@ -60,6 +60,39 @@ test('malformed backup and cancelled restore leave data unchanged',async()=>{
  await assert.rejects(backup.restoreBackup(await backup.exportBackup(),false));
  assert.equal((await db.listRecords('matches')).length,1);
 });
+test('backup from another club or without a club identity cannot replace a populated club',async()=>{
+ const {db,backup,load}=await fixture();
+ const recovery=load('src/storage/recovery.js');
+ const original=JSON.parse(await (await backup.exportBackup()).text());
+ const before=await db.listRecords('players');
+ for(const club of [{id:'club_other_01',name:'Test Kulübü'},null]){
+  const file=new Blob([JSON.stringify({...original,club})],{type:'application/json'});
+  const report=await backup.inspectBackup(file);
+  assert.equal(report.valid,false);
+  assert.match(report.warnings.join(' '),/Yalnızca boş bir kulübe/);
+  await assert.rejects(backup.restoreBackup(file,true),/Yalnızca boş bir kulübe/);
+  assert.deepEqual(await db.listRecords('players'),before);
+  assert.equal(await recovery.readRestorePoint('club_test_01'),null);
+ }
+ const password='synthetic-safe-password';
+ backup.setBackupClub({id:'club_other_01',name:'Test Kulübü'});
+ const encrypted=await backup.exportEncryptedBackup(password);
+ backup.setBackupClub({id:'club_test_01',name:'Test Kulübü'});
+ assert.equal((await backup.inspectBackup(encrypted,password)).valid,false);
+ await assert.rejects(backup.restoreBackup(encrypted,true,password),/Yalnızca boş bir kulübe/);
+ assert.deepEqual(await db.listRecords('players'),before);
+});
+test('another club backup can be moved to an empty club without changing the source',async()=>{
+ const {db,backup}=await fixture();
+ const file=await backup.exportBackup();
+ const sourcePlayers=await db.listRecords('players');
+ db.setClubDatabase('club_empty_02');backup.setBackupClub({id:'club_empty_02',name:'Yeni Kulüp'});
+ assert.equal((await backup.inspectBackup(file)).valid,true);
+ await backup.restoreBackup(file,true);
+ assert.deepEqual(await db.listRecords('players'),sourcePlayers);
+ db.setClubDatabase('club_test_01');backup.setBackupClub({id:'club_test_01',name:'Test Kulübü'});
+ assert.deepEqual(await db.listRecords('players'),sourcePlayers);
+});
 test('legacy v1/v2 backups normalize live stores without changing database identity',async()=>{
  const {db,backup}=await fixture();const data=JSON.parse(await (await backup.exportBackup()).text());
  for(const schemaVersion of [1,2]){data.schemaVersion=schemaVersion;delete data.stores.matchSessions;delete data.stores.matchEvents;

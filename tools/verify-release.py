@@ -27,7 +27,7 @@ def verify(filename):
                     and posixpath.normpath(name.rstrip('/')) == name.rstrip('/')
                     and '..' not in name.split('/'), 'Unsafe archive path: ' + name)
             require(not stat.S_ISLNK(entry.external_attr >> 16), 'Symbolic link: ' + name)
-            require(not name.startswith(('src/', 'tests/', 'baseline/', 'node_modules/', '.git/')),
+            require(not name.startswith(('src/', 'tests/', 'baseline/', 'evidence/', 'web/', 'node_modules/', '.git/')),
                     'Development file in PWA: ' + name)
         files = {entry.filename: archive.read(entry) for entry in entries if not entry.is_dir()}
 

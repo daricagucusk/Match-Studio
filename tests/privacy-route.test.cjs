@@ -30,15 +30,15 @@ test('PWA worker does not rewrite the public privacy policy as app shell',()=>{
  assert.equal(route('/index.html'),true);
 });
 test('store-facing app name does not expose internal package names',()=>{
- const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
- const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));
+ const html=fs.readFileSync(path.join(root,'web/index.html'),'utf8');
+ const manifest=JSON.parse(fs.readFileSync(path.join(root,'web/manifest.webmanifest'),'utf8'));
  assert.match(html,/<title>Match Studio \| Futbol Kulübü<\/title>/);
  assert.equal(manifest.name,'Match Studio — Futbol Kulübü');
  assert.equal(manifest.short_name,'Match Studio');
  assert.ok(!manifest.name.includes('Paket F'));
 });
 test('robots rules allow future public legal/assetlinks documents while preserving private app indexing',()=>{
- const rules=fs.readFileSync(path.join(root,'robots.txt'),'utf8');
+ const rules=fs.readFileSync(path.join(root,'web/robots.txt'),'utf8');
  assert.match(rules,/Allow: \/privacy\.html/);
  assert.match(rules,/Allow: \/\.well-known\/assetlinks\.json/);
  assert.match(rules,/Disallow: \//);

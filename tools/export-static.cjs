@@ -1,8 +1,8 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const runtimeFiles=new Set(['index.html','app.bundle.js','broadcast.css','premium-v267.css','live-clock-v268b.css','live-substitutions-v268c.css','live-pitch-v268d.css','live-events-v268e.css','manifest.webmanifest','device-test.html','icons/icon-192.png','icons/icon-512.png','assets/ms-emblem-mark.png','assets/match-studio-brand-preview.png','assets/match-studio-blue-violet-brand.png']);
+const runtimeFiles=new Set(require('./runtime-files.cjs').runtimeFiles);
 function exportStatic(root=path.resolve(__dirname,'..')){
- const read=name=>{const file=path.join(root,name);if(!fs.lstatSync(file).isFile()||fs.realpathSync(file)!==file)throw Error('Unsafe file: '+name);return fs.readFileSync(file);};
+ const read=(name,base=path.join(root,'web'))=>{const file=path.join(base,name);if(!fs.lstatSync(file).isFile()||fs.realpathSync(file)!==file)throw Error('Unsafe file: '+name);return fs.readFileSync(file);};
  const worker=read('sw.js');
  const shell=JSON.parse(worker.toString().match(/^const SHELL=(.*);$/m)?.[1]||'null');
  const integrity=JSON.parse(worker.toString().match(/^const INTEGRITY=(.*);$/m)?.[1]||'null');
@@ -21,17 +21,17 @@ function exportStatic(root=path.resolve(__dirname,'..')){
  bytes.set('robots.txt',read('robots.txt'));
  // Play Store documents may only be staged after legal owner approval and
  // the real Google Play App Signing SHA-256 is known. Never ship placeholder links.
- if(fs.existsSync(path.join(root,'privacy.html'))){
+ if(fs.existsSync(path.join(root,'web','privacy.html'))){
   const privacy=read('privacy.html');
   const problems=require('./play-privacy-validate.cjs').validatePrivacyPage(privacy.toString('utf8'),read('index.html').toString('utf8'));
   if(problems.length)throw Error('Privacy page cannot be published: '+problems.join(' '));
   bytes.set('privacy.html',privacy);
  }
  const assetLinkName='.well-known/assetlinks.json';
- if(fs.existsSync(path.join(root,assetLinkName))){
+ if(fs.existsSync(path.join(root,'web',assetLinkName))){
   const blob=read(assetLinkName);
   const items=JSON.parse(blob.toString('utf8'));
-  const twa=JSON.parse(read('android/twa-manifest.json').toString('utf8'));
+  const twa=JSON.parse(read('android/twa-manifest.json',root).toString('utf8'));
   const valid=Array.isArray(items)&&items.some(item=>
     (item.relation||[]).includes('delegate_permission/common.handle_all_urls')&&
     item.target?.namespace==='android_app'&&

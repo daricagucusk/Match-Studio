@@ -2,10 +2,10 @@ const {test,expect}=require('@playwright/test');
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'../..');
 function release(id){
- const generated=fs.readFileSync(path.join(root,'sw.js'),'utf8');
+ const generated=fs.readFileSync(path.join(root,'web/sw.js'),'utf8');
  const shell=JSON.parse(generated.match(/const SHELL=(.*);/)[1]);
  const files=new Map();
- for(const item of shell){const url=item==='./'?'/':'/'+item.slice(2);let bytes=fs.readFileSync(path.join(root,item==='./'?'index.html':item));if(item==='./app.bundle.js')bytes=Buffer.concat([bytes,Buffer.from(`\nwindow.releaseMarker=${JSON.stringify(id)};`)]);files.set(url,bytes);}
+ for(const item of shell){const url=item==='./'?'/':'/'+item.slice(2);let bytes=fs.readFileSync(path.join(root,'web',item==='./'?'index.html':item));if(item==='./app.bundle.js')bytes=Buffer.concat([bytes,Buffer.from(`\nwindow.releaseMarker=${JSON.stringify(id)};`)]);files.set(url,bytes);}
  const integrity=Object.fromEntries(shell.map(item=>[item,crypto.createHash('sha256').update(files.get(item==='./'?'/':'/'+item.slice(2))).digest('hex')]));
  const worker=`const CACHE=${JSON.stringify('matchstudio-universal-v268f2-test-'+id)};\nconst SHELL=${JSON.stringify(shell)};\nconst INTEGRITY=${JSON.stringify(integrity)};\n`+fs.readFileSync(path.join(root,'src/pwa/service-worker.js'),'utf8');files.set('/sw.js',Buffer.from(worker));return files;
 }

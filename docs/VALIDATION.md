@@ -1,10 +1,14 @@
+> Güncel birleşik F.17 kabul kaydı: [FINAL-F17-20261102.md](FINAL-F17-20261102.md). Aşağıdaki eski sürümlere ait sonuçlar tarihsel kanıttır.
+
+> Bu belgenin test/yayın kayıtları tarihseldir. 2 Kasım 2026 klasör düzenlemesinin güncel yerel doğrulaması: [düzenleme raporu](REORGANIZATION-20261102.md).
+
 ## Birleşik yerel aday — 27 Ekim 2026
 Aday yolu: D:/beyin2/Projeler/MatchStudio/Calisma/Birlesik-Aday.
 Taban: Play2b17cc594686e6650d3f409f6e09af63a70ef4c5; dal kervan/match-studio-tek-surum. Bu aday ana çalışma girişine yönlendirilmedi ve yayınlanmadı.
 Node24 ve Python3.8+ kullanılır. Paket/test araçları Windows'ta python, py -3, python3; diğer sistemlerde python3, python sırasını dener. PYTHON verilirse yalnız belirtilen tam yürütücü kullanılır; shell yoktur.
 Play'in kaynak paketinden özel/imza dosyalarını dışlama filtresi korunuyor; geçici .superpowers alanı da dışlanır. Windows'ta link dışlama testi ayrıcalık gerektirmeyen gerçek dizin junction'ı ile, Linux'ta dosya symlink'i ile çalışır.
 Şifreli yedek varsayılandır; JSONv1/v2/v3, kalıcı silme ve bekleyen silme korumaları korunur. Uygulama src/ modülleri bu uyarlamada değiştirilmedi.
-Yeni kabul kanıtı docs/MERGE-ACCEPTANCE.md: 81 Node, 127 tarayıcı geçti / 8 koşullu atlama; release ve build:vercel çıkış 0; bağımsız kod incelemesinde bulgu yok. Eski76/127CI ve yerelF.14/45test bu adayın kabulü değildir. Play için7açık kapı, gerçek cihaz kabulü ve yeni commit'in uzakCIsonucu ayrıdır.
+Yeni kabul kanıtı docs/history/MERGE-ACCEPTANCE.md: 81 Node, 127 tarayıcı geçti / 8 koşullu atlama; release ve build:vercel çıkış 0; bağımsız kod incelemesinde bulgu yok. Eski76/127CI ve yerelF.14/45test bu adayın kabulü değildir. Play için7açık kapı, gerçek cihaz kabulü ve yeni commit'in uzakCIsonucu ayrıdır.
 
 ---
 
@@ -21,10 +25,10 @@ Tarih: 22 Ekim 2026. Ortam: Linux, Node.js 24.19.0, Playwright Chromium. Testler
 
 | Alan | Doğrulanan davranış |
 | --- | --- |
-| Görsel dil ve metinler | Üç ekran boyutunda 6 senaryo: sekme/filtrelerin ortak seçili rengi, kulüp ve saha giriş yüzeyi, kulüp formu, 44px grup hedefi, afiş önizleme, Türkçe başlık ve şablon adı, yatay taşma; eski aktarım koşulu ve 12 karakter/7 gün yedek uyarıları. Telefon ekran görüntüleri reviews/update-08 içindedir. |
+| Görsel dil ve metinler | Üç ekran boyutunda 6 senaryo: sekme/filtrelerin ortak seçili rengi, kulüp ve saha giriş yüzeyi, kulüp formu, 44px grup hedefi, afiş önizleme, Türkçe başlık ve şablon adı, yatay taşma; eski aktarım koşulu ve 12 karakter/7 gün yedek uyarıları. Telefon ekran görüntüleri evidence/reviews/update-08 içindedir. |
 | GitHub/Vercel yayın çıktısı | Dört ek Node testi: yalnızca çalışma dosyalarının çıkarılması, eski çıktının temizlenmesi, değiştirilmiş dosya özetinin reddi ve önceki çıktının korunması, güvensiz/kaynak yolların reddi ve Vercel yayın ayarları. 74 tarayıcı senaryosu public/ çıktısı üzerinden çalışır. Uzak GitHub Actions ve Vercel yayını bağlantı bekler. |
 | Modal odak yönetimi | Üç ekran boyutunda 12 senaryo: oyuncu penceresinde iki yönde Tab döngüsü, arka planın inert olması, Escape/Kapat ve kayıt sonrası odağın geri dönmesi; CSV devre dışı onay düğmesinin atlanması; saha numara/mevki/oyuncu pencerelerinde ilk odak ve yeniden çizilen saha menü düğmesine dönüş. |
-| Çalışma alanı yoğunluğu | Üç ekran boyutunda 6 senaryo: ortak başlık yüksekliği, saha/arama/yayın hedefi konumları, yatay taşma olmaması, beş adımın en az 44px hedefleri, tarih/saat/stat ayrıntılarına erişim, saha görünümü değiştirme, gerçek PNG indirme ve maç bilgilerini koruyarak geri dönüş. Önce/sonra telefon ölçümleri reviews/update-06 içindedir. |
+| Çalışma alanı yoğunluğu | Üç ekran boyutunda 6 senaryo: ortak başlık yüksekliği, saha/arama/yayın hedefi konumları, yatay taşma olmaması, beş adımın en az 44px hedefleri, tarih/saat/stat ayrıntılarına erişim, saha görünümü değiştirme, gerçek PNG indirme ve maç bilgilerini koruyarak geri dönüş. Önce/sonra telefon ölçümleri evidence/reviews/update-06 içindedir. |
 | Hızlı maç olayı | Üç ekran boyutunda 6 senaryo: kısayol erişimi, kaydırma sonrası erişim ve form odağı; gol/rakip golü/sarı-kırmızı kart; iptal edilen onayın kayıt yazmaması; not korunması ve geçersiz alanların temizlenmesi; yenilemede skor/olay kalıcılığı; oturum durumuna göre etkinlik ve telefon saat düğmeleriyle çakışmama. |
 | İlk grup kurulumu | Yeni kulüp sonrası ilk ekrandan grup oluşturma; boş Oyuncular/Yeni Maç ve Arşiv başlangıcında form erişimi; grup kalıcılığı ve oyuncu/maç seçenekleri; oluşturma sırasında maç taslağının korunması; yinelenen adın reddi. Üç ekran boyutunda toplam 9 yeni senaryo; düğmenin alt menünün üstünde kalması ve yatay taşma kontrol edilir. |
 | Canlı rapor yenileme | Kontrollü tarayıcı saatiyle çalışan/duraklayan/devre arası/tamamlanan maçta toplam ve oyuncu süreleri denetlenir. Oyuncu değişimi, katılım sayısı, form notu/seçimi/odak korunması, geciken sayaçta yazdırma, saat şüphesi uyarıları ve veritabanına sayaç yazısı olmaması üç ekran boyutunda doğrulanır. |
@@ -52,6 +56,6 @@ Tarih: 22 Ekim 2026. Ortam: Linux, Node.js 24.19.0, Playwright Chromium. Testler
 
 ## Gerçek cihazda kalan kabul
 
-Gerçek Samsung Z Fold 7 donanımına erişim olmadığı için Android PWA kurulumu, ekran menteşesi/klavye davranışı, dokunma ergonomisi, paylaşım uygulamaları ve en az 90 dakikalık stres denemesi tamamlanmadı. [Cihaz kontrol listesi](DEVICE_CHECKLIST.md) bu kabul için hazırlanmıştır.
+Gerçek Samsung Z Fold 7 donanımına erişim olmadığı için Android PWA kurulumu, ekran menteşesi/klavye davranışı, dokunma ergonomisi, paylaşım uygulamaları ve en az 90 dakikalık stres denemesi tamamlanmadı. [Cihaz kontrol listesi](guides/DEVICE_CHECKLIST.md) bu kabul için hazırlanmıştır.
 
-Bu rapor performans veya tam güvenlik sertifikası değildir; yukarıdaki senaryoların kapsamını kaydeder. Mevcut canlı adres: https://match-studio-telefon.vercel.app/ (F.3). F.11 yayını Vercel ekip erişim hatası 403 nedeniyle engellendi; F.11 henüz canlı değildir. Son başarılı dağıtım deployments/phone.json, bekleyen güncellemeler deployments/update-01.json, deployments/update-02.json, deployments/update-03.json, deployments/update-04.json, deployments/update-05.json, deployments/update-06.json deployments/update-07.json ve deployments/update-08.json içinde tutulur. GitHub Actions yapılandırması hazırlanmıştır; uzak GitHub üzerinde çalıştırılmadı.
+Bu rapor performans veya tam güvenlik sertifikası değildir; yukarıdaki senaryoların kapsamını kaydeder. Mevcut canlı adres: https://match-studio-telefon.vercel.app/ (F.3). F.11 yayını Vercel ekip erişim hatası 403 nedeniyle engellendi; F.11 henüz canlı değildir. Son başarılı dağıtım evidence/deployments/phone.json, bekleyen güncellemeler evidence/deployments/update-01.json, evidence/deployments/update-02.json, evidence/deployments/update-03.json, evidence/deployments/update-04.json, evidence/deployments/update-05.json, evidence/deployments/update-06.json evidence/deployments/update-07.json ve evidence/deployments/update-08.json içinde tutulur. GitHub Actions yapılandırması hazırlanmıştır; uzak GitHub üzerinde çalıştırılmadı.

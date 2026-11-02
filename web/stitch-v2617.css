@@ -1,0 +1,237 @@
+/* Match Studio F.17 — Aura Tactique, derived from the supplied Stitch boards.
+   Presentation only: club identities, sporting geometry and persisted data stay intact. */
+@font-face{font-family:Outfit;src:url('./fonts/outfit-variable.ttf') format('truetype');font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:'Plus Jakarta Sans';src:url('./fonts/plus-jakarta-sans-variable.ttf') format('truetype');font-style:normal;font-weight:200 800;font-display:swap}
+:root{
+ color-scheme:dark;
+ --bg:#0B0E15;--side:#10131A;--panel:#141722;--panel2:#1D1F27;
+ --green:#E5C478;--green-h:#F2D89B;--white:#F8FAFC;--muted:#A6B0C0;--soft:#9BA6B7;
+ --stroke:#34343D;--focus:#E5C478;--radius:16px;
+ --ms-blue:#E5C478;--ms-blue-hi:#F2D89B;--ms-violet:#D5BE8B;
+ --ms-card:#141722;--ms-surface:#191B23;--ms-divider:#34343D;--ms-ink:#F8FAFC;--ms-secondary:#B8BECA;
+ --ui-surface:#1D1F27;--ui-selected:#3A311F;--ui-border:#61543A;--ui-input:#0B0E15;--ui-text:#F8FAFC;--ui-muted:#B8BECA;
+ --v13-ink:#0B0E15;--v13-surface:#141722;--v13-edge:#34343D;--v13-green:#E5C478;--v13-ivory:#F8FAFC;--v13-muted:#B8BECA;
+ --broadcast-border:#393731;--broadcast-lime:#E5C478;--broadcast-gold:#E5C478;
+ --broadcast-glass:linear-gradient(145deg,#1D1F27,#141722);
+ font-family:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;
+}
+html{background:var(--bg);scrollbar-color:#6E6246 #10131A}
+body{background:var(--bg);color:var(--white);font-family:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;font-size:14px;letter-spacing:-.012em}
+button,input,select,textarea{font-family:inherit}
+h1,h2,h3,.brand-title,.broadcast-metric strong,.roster-metric strong,.pitch-stats strong,.season-kpi-value,.live-clock{
+ font-family:Outfit,'Segoe UI',sans-serif;font-weight:650;letter-spacing:-.035em;
+}
+h1,h2,h3{color:var(--white)}
+.mono,.live-clock,.live-total,.pitch-stats,.roster-metric,.season-kpi,.season-table .num{font-variant-numeric:tabular-nums}
+a{color:#E5C478;text-underline-offset:3px}
+.skip-link{position:fixed;top:12px;left:12px;z-index:10001;padding:12px 16px;border-radius:10px;background:#E5C478;color:#0B0E15;font-weight:800;transform:translateY(calc(-100% - 20px));text-decoration:none}
+.skip-link:focus{transform:none}
+::selection{background:#E5C478;color:#0B0E15}
+::placeholder{color:#97A0B1}
+.muted,.dim,.footnote,.page-head .subtitle,.player-meta,.player-meta span{color:var(--muted)}
+.eyebrow,.workspace-kicker,.pitch-eyebrow,.panel-number,.live-eyebrow,.live-field-attack,.ms-quickstart-kicker{color:#E5C478}
+.line,.nav-divider{background:#34343D}
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{
+ outline:3px solid #E5C478!important;outline-offset:3px!important;
+}
+input,select,textarea,.ms-form input:not([type=color]),.ms-quick select,
+body:has(.workspace-compact) .pitch-quick-select select,.live-surface input,.live-surface select{
+ background:var(--ui-input);color:var(--white);border-color:#61543A;border-radius:12px;
+}
+input:not([type=checkbox]):not([type=range]),select,textarea{font-size:14px;min-height:46px}
+input:hover,select:hover,textarea:hover{border-color:#9F8B5D}
+input:focus,select:focus,textarea:focus{border-color:#E5C478;box-shadow:0 0 0 3px #E5C4781C}
+input[type=checkbox],input[type=range]{accent-color:#E5C478}
+input[type=color]{background:#0B0E15;border-color:#61543A}
+.field>label,.ms-form label,.bd-onboarding-form .ms-form label{color:#E1E2EC}
+.field .hint,.help-row,.live-muted{color:#A6B0C0}
+.sidebar{background:linear-gradient(180deg,#141722,#0D1017 80%);border-right-color:#35332E;box-shadow:10px 0 30px #03050730}
+.sidebar .brand{border-bottom-color:#3D392F}
+.brand-app-mark{border:1px solid #E5C47855;filter:none;object-fit:cover;box-shadow:0 4px 16px #03050766}
+.brand-icons .ms-club-crest{border-color:#141722}
+.brand-title,.sidebar .brand-title{font-weight:750;letter-spacing:-.045em;color:#F8FAFC}
+.sidebar .brand-title span,.brand-super{color:#E5C478}
+.sidebar .brand-sub,.nav-heading{color:#B8B1A1}
+.sidebar-club .ms-club-switcher{background:#191B23;border-color:#4C4433}
+.sidebar-club select{background:#0B0E15;border-color:#61543A;color:#F8FAFC}
+.nav-link{color:#B8BECA;min-height:48px}
+.nav-link .nav-icon{color:#A6B0C0}
+.nav-link:hover{background:#23242C;border-color:#61543A;color:#FFF}
+.nav-link.active{background:linear-gradient(100deg,#342E21,#22211F);border-color:#796642;color:#F6E29F;box-shadow:inset 3px 0 #E5C478}
+.nav-link.active .nav-icon{color:#E5C478}
+.nav-active-indicator{background:#E5C478;box-shadow:none}
+.sidebar-foot{border-top-color:#3D392F}
+.sidebar-foot p,.sidebar-foot .status-row{color:#A6B0C0}
+.sidebar-foot .status-dot{background:#A9C4B3;box-shadow:none}
+.main{background:radial-gradient(ellipse 850px 300px at 75% -140px,#E5C4780B,transparent 76%),#0B0E15}
+.topbar{border-bottom-color:#34343D}
+.crumb{color:#A6B0C0}.crumb strong{color:#F8FAFC}
+.broadcast-live{background:#29251C!important;border-color:#665738!important;color:#F2D89B!important}
+.broadcast-live>span,.onair-dot,.kicker-led{background:#E5C478!important;box-shadow:none!important}
+.local-status{color:#B8BECA!important}
+.connection-indicator{background:#191B23;border-color:#4C4433;color:#C5C7CF}
+.connection-indicator:before{background:#A9C4B3}
+.btn{min-height:44px;border-radius:12px;font-size:13px;font-weight:750;transition:background-color .16s,border-color .16s,color .16s,transform .16s}
+.btn-primary{background:#E5C478;border-color:#F0D697;color:#0B0E15;box-shadow:inset 0 1px #FFF7DB66,0 5px 15px #03050728}
+.btn-primary:hover{background:#F2D89B;border-color:#FFE4A6;color:#0B0E15;box-shadow:0 5px 16px #03050744}
+.btn-ghost{background:#1D1F27;border-color:#706044;color:#F8FAFC}
+.btn-ghost:hover{background:#2A2928;border-color:#B69B63}
+.btn-subtle{background:#141722;border-color:#4D4639;color:#D7D8DF}
+.btn-small{min-height:44px;font-size:12px}
+.btn-danger{background:#43262D;border-color:#80515B;color:#FFD9D7}
+.pill,.stat-chip{background:#2D281E;color:#EBD39B;border-color:#665738}
+.tag:not(.warn):not(.off){background:#28281F;color:#EBD39B;border-color:#665738}
+.panel,.setting-card,.workspace-surface,.weekly-control-panel,.weekly-preview-panel,.aside-note,.broadcast-panel,.editor-panel,.poster-container,.live-surface,.season-panel{
+ background:linear-gradient(150deg,#1B1E28,#141722);border-color:#3C3A36;border-radius:16px;box-shadow:0 8px 24px #03050730;
+}
+.surface{background:#1D1F27;border-color:#48433A}
+.empty{background:#10131A;border-color:#61543A;color:#A6B0C0}
+.empty h3{color:#F8FAFC}.empty svg{color:#E5C478}
+.chip,.group-chip,.template-btn,.segmented button,.v13-segmented button,.pitch-mode button{background:#1D1F27;border-color:#61543A;color:#D8DAE3;min-height:44px}
+.chip:hover,.group-chip:hover{background:#2C2924;border-color:#9D8658}
+.chip.active,.group-chip.active,.template-btn.active,.segmented button.active,.v13-segmented button.active,.pitch-mode button.active,
+.workspace-compact .workflow-tabs button.current,.mobile-editor-tabs button.active{
+ background:var(--ui-selected);border-color:#C6A866;color:#F6E29F;box-shadow:none;
+}
+.workspace-compact .workflow-tabs,.mobile-editor-tabs,.segmented,.v13-segmented,.ms-mobile-club{background:#1D1F27;border-color:#61543A}
+.workflow-tabs button{color:#B8BECA}
+.workflow-tabs button.current{border-color:#E5C478;color:#F6E29F}
+.workflow-tabs button:hover{background:#25241F;color:#F8FAFC}
+.workspace-count,.workspace-version{background:#30291D;color:#EBD39B;border-color:#796642}
+.workspace-date,.match-workspace-head,.workspace-panel-head,.workspace-actionbar,.roster-sticky-actions{border-color:#48433A}
+.workspace-title-row p,.workspace-date strong,.workspace-panel-head p,.roster-metric span{color:#C3C5CF}
+.workspace-date span,.workspace-dot,.workspace-vs{color:#ACA797}
+.workspace-kicker{color:#D9C18B}
+.player-row,.match-row,.operation-row,.roster-control,.roster-pool-row,.select-row{border-color:#34343D}
+.player-row:hover,.match-row:hover,.operation-row:hover,.roster-pool-row:hover,.v13-roster-control:hover{background:#23242C}
+.avatar,.match-mark{background:linear-gradient(145deg,#3A3324,#22232B);color:#F6E29F;border-color:#796642}
+.match-mark small{color:#D5C6A2}
+.player-name,.roster-player-identity strong,.roster-name-block strong{color:#F8FAFC}
+.roster-player-identity small,.roster-name-block small,.roster-row-groups{color:#A6B0C0}
+.roster-metric{background:#1D1F27;border-color:#48433A}
+.roster-metric strong,.broadcast-metric strong,.pitch-stats strong{color:#F6E29F}
+.roster-metric.main-metric{background:#2D281E;border-color:#796642}
+.roster-pool-row.is-chosen{background:#29261E;border-left-color:#E5C478}
+.roster-position{background:#24262F;color:#C5C7CF}
+.ms-club-manager,.ms-import-panel,.info,.roster-help{background:#1D1F27;border-color:#61543A;color:#E1E2EC}
+.info.warning,.warning{background:#382D1A;border-color:#806437;color:#FFE1A6}
+.broadcast-hero{background:radial-gradient(ellipse at 82% 28%,#E5C47813,transparent 60%),linear-gradient(125deg,#1C202B,#10131A);border-color:#62553B;box-shadow:0 16px 44px #03050755}
+.broadcast-hero:after{background:linear-gradient(#E5C478,#A3874B)}
+.broadcast-hero:before{filter:none;opacity:.3}
+.hero-overline,.hero-copy h1 em,.hero-bottom-line i{color:#E5C478}
+.hero-copy h1{font-family:Outfit,'Segoe UI',sans-serif;font-weight:750}
+.hero-copy p,.hero-bottom-line,.hero-bottom-line span:first-child{color:#B8BECA}
+.hero-bottom-line i{background:#E5C478}
+.hero-fixture{background:radial-gradient(ellipse at 50% 56%,#E5C47812,transparent 77%),linear-gradient(155deg,#25262C,#161923);border-color:#756241}
+.hero-fixture:before{background:linear-gradient(90deg,transparent,#E5C47855,transparent)}
+.fixture-topline{color:#E1D3AE;border-bottom-color:#61543A}
+.fixture-away-mark{background:linear-gradient(130deg,#48494F,#272A32)}
+.fixture-open{background:#322A1F!important;border-top-color:#796642!important;color:#F6E29F!important}
+.broadcast-metric{background:linear-gradient(145deg,#24262F,#161923);border-color:#5E523C;color:#F8FAFC}
+.broadcast-metric:hover{background:linear-gradient(150deg,#302B21,#1B1E28);border-color:#B69B63}
+.broadcast-panel-top{border-bottom-color:#3C3A36}
+.metric-icon,.broadcast-metric .metric-icon,.operation-icon{color:#E5C478;background:#30291D;border-color:#61543A}
+.broadcast-empty .empty-orbit{background:radial-gradient(circle,#312C22,#191B23);border-color:#796642}
+.ms-quickstart{--qs-ink:#F8FAFC;--qs-muted:#A6B0C0;background:linear-gradient(135deg,#24252D,#141722);border-color:#61543A;box-shadow:0 8px 24px #03050730}
+.ms-quickstart-title h2{font-family:Outfit,'Segoe UI',sans-serif;color:#F8FAFC}
+.ms-quickstart-count{background:#3A311F;color:#F6E29F}
+.ms-quickstart-step{background:#191B23;border-color:#48433A}
+.ms-quickstart-step:hover{background:#29261E;border-color:#B69B63}
+.ms-quickstart-copy strong{color:#F8FAFC}.ms-quickstart-copy small{color:#A6B0C0}
+.ms-quickstart-arrow{color:#E5C478}
+.ms-quickstart-step.is-done{background:#192A23;border-color:#41614D}
+.ms-quickstart-step.is-done .ms-quickstart-count{background:#314E3C;color:#D3ECD8}
+.preview-display{background:radial-gradient(ellipse,#282A31,#0B0E15 76%);border-color:#61543A}
+.weekly-fixture.chosen{background:#30291D}.weekly-count,.preview-label{color:#EBD39B}
+.pitch-shell{--pt-ink:#F8FAFC;--pt-mist:#B8BECA;--pt-dark:#0B0E15;--pt-accent:#E5C478;color:#F8FAFC}
+.pitch-field{background:repeating-linear-gradient(0deg,#0D281E 0,#0D281E 86px,#113324 86px,#113324 172px);box-shadow:inset 0 0 0 1px #B79D63,0 12px 28px #03050744}
+.pitch-mode,.pitch-sidebar,.pitch-control-panel,.pitch-bench{background:#191B23;border-color:#61543A}
+.pitch-player-more{background:#141722;border-color:#C6A866;color:#F8FAFC;box-shadow:0 3px 9px #03050766}
+.pitch-bench-player{background:#1D1F27;border-color:#61543A;color:#F8FAFC}
+.pitch-bench-player.selected{background:#3A311F;border-color:#E5C478}
+.pitch-field-footer{color:#C3C5CF}
+.pitch-stats>div,.pitch-main,.pitch-side{background:linear-gradient(155deg,#1D1F27,#141722);border-color:#61543A}
+.pitch-stats span,.pitch-save-state,.pitch-subheading h2,.pitch-side-top h2,.pitch-settings label,.pitch-selection>span,.pitch-settings p,.pitch-selection p{color:#B8BECA}
+.pitch-count,.pitch-section-label span,.bench-player-num,.pitch-first-no{background:#3A311F;color:#F6E29F}
+.pitch-quick-select,.pitch-selection{background:#1D1F27;border-color:#61543A;color:#F8FAFC}
+.pitch-quick-select label{color:#C5C7CF}
+.pitch-settings select{background:#0B0E15;border-color:#61543A;color:#F8FAFC}
+.pitch-side-top,.pitch-first-row{border-color:#48433A}
+.pitch-clear{color:#E5C478}
+.pitch-spot-disc{background:#F5E8C5;color:#32291A;border-color:#E5C478}
+.pitch-spot.empty .pitch-spot-disc{background:#1D2823;color:#F5E8C5;border-color:#B6A47A}
+.pitch-spot-name{background:#141722F5;color:#F8FAFC;border-color:#796642}
+.pitch-context-menu{background:#191B23!important;border-color:#A98F59!important;color:#F8FAFC}
+.pitch-context-head{border-bottom-color:#61543A;color:#F8FAFC}
+.pitch-context-menu [role=menuitem]{color:#F8FAFC}
+.pitch-context-menu [role=menuitem]:hover,.pitch-context-menu [role=menuitem]:focus-visible{background:#3A311F}
+.dg-tp-controls,.dg-tp-slot-list,.dg-tp-role-picker{background:#191B23;border-color:#61543A}
+.dg-tp-controls p,.dg-tp-info,.dg-tp-selected small,.dg-tp-slot-list-head{color:#B8BECA}
+.dg-tp-summary .dg-tp-flag,.dg-tp-flag,.dg-tp-selected,.dg-tp-slot-row{background:#1D1F27;border-color:#61543A;color:#F8FAFC}
+.dg-tp-flag b,.dg-tp-slot-row small{color:#F8FAFC}
+.dg-tp-current-formation{background:#3A311F;border-color:#A98F59;color:#F6E29F}
+.dg-tp-ground{background:repeating-linear-gradient(to bottom,#0D281E 0,#0D281E 100px,#113324 100px,#113324 200px);border-color:#A98F59}
+.dg-tp-role{background:#141722F0;border-color:#796642;border-top-color:#E5C478;color:#F8FAFC}
+.dg-tp-role:hover,.dg-tp-role:focus-visible,.dg-tp-role.is-selected{background:#3A311FF5;outline-color:#E5C478}
+.dg-tp-role .dg-tp-name small,.dg-tp-role .dg-tp-roster>span,.dg-tp-role .dg-tp-status{color:#C5C7CF}
+.dg-tp-slot-row:hover,.dg-tp-slot-row:focus-visible{background:#3A311F;border-color:#E5C478}
+.dg-tp-slot-row strong,.dg-tp-role-picker>span{color:#E5C478}
+.dg-tp-role-picker button,.dg-tp-priority-actions button{background:#1D1F27;border-color:#796642;color:#F8FAFC}
+.dg-tp-role-picker button[aria-pressed=true],.dg-tp-role-picker button.selected{background:#3A311F;border-color:#E5C478;color:#F6E29F}
+.live-tactical{--live-stroke:#E5C478;--live-purple:#D3B777}
+.live-surface p,.live-tactical-header p,.live-tactical-bench p{color:#B8BECA}
+.live-status{background:#3A311F;color:#F6E29F}
+.live-clock{color:#F6E29F;text-shadow:none}
+.live-total,.live-caption,.live-top,.live-history li span{color:#C5C7CF}
+.live-history li{border-color:#34343D}
+.live-match-choice{background:#1D1F27;border-color:#61543A;color:#F8FAFC}
+.live-match-choice small,.live-match-choice>span{color:#D9C18B}
+.live-field{background:repeating-linear-gradient(0deg,#0D281E 0%,#0D281E 12%,#113324 12%,#113324 24%);border-color:#A98F59;box-shadow:inset 0 0 0 10px #06190E22,0 12px 28px #03050744}
+.live-field::before{border-color:#D6BE7F99}.live-field-lines{border-color:#D6BE7F99}
+.live-field-player{background:linear-gradient(160deg,#1D1F27,#141722);border-color:#C6A866;color:#F8FAFC;box-shadow:0 5px 16px #03050766}
+.live-field-number{color:#F6E29F!important}.live-field-position{color:#C6B990!important}
+.live-field-player.selected{border-color:#F2D89B;box-shadow:0 0 0 3px #E5C47840,0 7px 22px #03050766}
+.live-tactical-bench,.live-tactical .ms-facility{background:#141722;border-color:#61543A}
+.live-tactical-bench h3 span{color:#E5C478}.live-bench-chip{background:#1D1F27;border-color:#61543A;color:#F8FAFC}
+.live-bench-chip small{color:#B8BECA}.live-bench-chip.selected{background:#3A311F;border-color:#E5C478}
+.live-action-dock{background:#10131AF7;border-color:#A98F59}
+.live-tactical .ms-facility-copy b{color:#F8FAFC}.live-tactical .ms-facility-copy small{color:#B8BECA}
+.toast{background:#25241E;border-color:#B69B63;color:#F8FAFC;box-shadow:0 12px 30px #03050766}
+.toast.error{background:#43262D;border-color:#B8717E;color:#FFD9D7}
+.toast-close{color:#F6E29F;min-width:44px;min-height:44px}
+.modal{background:#191B23;border-color:#796642;color:#F8FAFC}
+.modal-backdrop{background:#030507BD}
+.pwa-update{background:#191B23!important;color:#F8FAFC!important;border-color:#B69B63!important}
+.pwa-install-chip{background:#191B23;border-color:#B69B63;color:#F8FAFC}
+.install-chip{background:#191B23F5;border-color:#B69B63;color:#F8FAFC}
+::-webkit-scrollbar-thumb{background:#6E6246;background-clip:content-box}
+.season-kpi{background:#1D1F27;border-color:#61543A}.season-kpi-value{color:#F6E29F}
+.season-toolbar,.season-actions{border-color:#34343D}.season-note,.season-kpi-label{color:#B8BECA}
+.season-table th,.season-table td{border-color:#34343D}.season-table thead th{color:#D9C18B}
+.bd-onboarding{background:radial-gradient(ellipse at 15% 25%,#E5C4780F,transparent 55%),#0B0E15}
+.bd-onboarding-layout{border-color:#796642;box-shadow:0 24px 72px #03050766}
+.bd-onboarding-editorial{background:radial-gradient(circle at 65% 12%,#E5C47812,transparent 55%),linear-gradient(155deg,#1D202A,#10131A)}
+.bd-onboarding-eyebrow,.bd-onboarding-editorial h1 em,.bd-onboarding-features svg{color:#E5C478}
+.bd-onboarding-editorial>p,.bd-onboarding-features{color:#C3C5CF}
+.bd-onboarding-footer{border-top-color:#61543A;color:#B8B1A1}
+.bd-onboarding-form{background:#191B23}.bd-onboarding-form>p{color:#B8BECA}
+.bd-migration-note{background:#25241E;border-color:#61543A;color:#C5C7CF}
+.brand-feature-lockup{filter:none;max-width:160px;max-height:160px;border-radius:18px;border:1px solid #E5C47833;box-shadow:0 8px 24px #03050744}
+.boot{font-family:Outfit,'Segoe UI',sans-serif;color:#F6E29F;background:#0B0E15}
+.boot span,.boot-foot{color:#A6B0C0!important}.boot-foot a{color:#E5C478!important}
+@media(max-width:767px){
+ .app-shell>.mobile-nav{background:#10131AF5;border-top-color:#796642;box-shadow:0 -8px 24px #03050755;backdrop-filter:blur(12px)}
+ .mobile-link,.mobile-more summary{color:#ABA99F}
+ .mobile-link.active,.mobile-more.active>summary,.mobile-more[open]>summary{color:#F2D89B;background:#2C281F}
+ .mobile-link.active:before,.mobile-more.active>summary:before{background:#E5C478}
+ .mobile-link.active{background:#2C281F;border-radius:10px;box-shadow:inset 0 2px #E5C478}
+ .mobile-more-panel{background:#191B23;border-color:#796642}
+ .mobile-export-bar{background:#10131AF5;border-top-color:#796642}
+ .ms-mobile-club{background:#141722;border-color:#61543A}
+ .brand-feature-lockup{max-width:110px;max-height:110px}
+ .main{background:#0B0E15}
+ .row-actions .btn-small{font-size:11px}
+ .season-toolbar .field{min-width:0}
+ .season-table-wrap{max-width:100%;overscroll-behavior-x:contain}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

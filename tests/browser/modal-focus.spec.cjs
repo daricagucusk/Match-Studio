@@ -25,7 +25,7 @@ test('pitch dialogs return focus to the player menu trigger after it is rebuilt'
  for(const [action,field] of [['pitch-menu-number','#pitch-shirt-number'],['pitch-menu-role','#pitch-role-modal-select'],['pitch-menu-player','#fullName']]){
   await trigger.click();await page.locator(`[role=menu] [data-action=${action}]`).click();await idle(page);await expect(page.getByRole('dialog')).toBeVisible();await expect(page.locator(field)).toBeFocused();
   await page.locator('.modal [data-action=close-modal]').focus();await page.keyboard.press('Shift+Tab');await inside(page);
-  if(info.project.name==='phone'&&action==='pitch-menu-number'){const fs=require('node:fs'),path=require('node:path'),dir=path.resolve(__dirname,'../../reviews/update-07');fs.mkdirSync(dir,{recursive:true});await page.screenshot({path:path.join(dir,'modal-focus-phone.png')});}
+  if(info.project.name==='phone'&&action==='pitch-menu-number'){const fs=require('node:fs'),path=require('node:path'),dir=path.resolve(__dirname,'../../test-results/reviews/update-07');fs.mkdirSync(dir,{recursive:true});await page.screenshot({path:path.join(dir,'modal-focus-phone.png')});}
   await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);await expect(trigger).toBeFocused();await expect(page.locator('.app-shell')).toHaveJSProperty('inert',false);
  }
 });

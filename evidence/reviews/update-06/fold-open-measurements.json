@@ -1,0 +1,47 @@
+{
+  "pitch": {
+    "header": {
+      "top": 105,
+      "height": 129.375,
+      "bottom": 234.375
+    },
+    "field": {
+      "top": 587.9375,
+      "height": 680,
+      "bottom": 1267.9375
+    },
+    "search": null,
+    "target": null,
+    "overflow": false
+  },
+  "roster": {
+    "header": {
+      "top": 105,
+      "height": 129.375,
+      "bottom": 234.375
+    },
+    "field": null,
+    "search": {
+      "top": 477.171875,
+      "height": 48,
+      "bottom": 525.171875
+    },
+    "target": null,
+    "overflow": false
+  },
+  "studio": {
+    "header": {
+      "top": 105,
+      "height": 129.375,
+      "bottom": 234.375
+    },
+    "field": null,
+    "search": null,
+    "target": {
+      "top": 393.171875,
+      "height": 52,
+      "bottom": 445.171875
+    },
+    "overflow": false
+  }
+}

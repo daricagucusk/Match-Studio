@@ -37,7 +37,7 @@ test('report ticks with the clock, preserves form input, and freezes through pau
  await page.locator('[data-action=live-end]').click();await idle(page);await page.clock.fastForward(30000);await times(page,'01:20','00:15','01:05');
  await page.locator('[data-action=live-next]').click();await idle(page);await page.clock.fastForward(5000);await times(page,'01:25','00:15','01:10');await expect(page.locator('#live-clock-time')).toHaveText('00:05');
  await page.locator('[data-action=live-end]').click();await idle(page);await page.locator('[data-action=live-finish]').click();await idle(page);await page.clock.fastForward(30000);await times(page,'01:25','00:15','01:10');
- await expect(page.locator('#live-report-title')).toHaveText('Maç tamamlandı');if(info.project.name==='desktop'){const dir=path.join(root,'reviews/update-03');fs.mkdirSync(dir,{recursive:true});await page.locator('.live-report').screenshot({path:path.join(dir,'completed-report.png')});}
+ await expect(page.locator('#live-report-title')).toHaveText('Maç tamamlandı');if(info.project.name==='desktop'){const dir=path.join(root,'test-results/reviews/update-03');fs.mkdirSync(dir,{recursive:true});await page.locator('.live-report').screenshot({path:path.join(dir,'completed-report.png')});}
 });
 
 test('print refreshes a delayed tick and clock-health warnings without creating events',async({page})=>{

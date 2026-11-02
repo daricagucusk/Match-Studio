@@ -5,6 +5,7 @@ function sourceFiles(root){
  const files=[];
  function visit(dir){for(const entry of fs.readdirSync(path.join(root,dir),{withFileTypes:true})){
   const name=entry.name,relative=path.posix.join(dir,name);
+  if(relative==='web/app.bundle.js'||relative==='web/sw.js')continue;
   if(excluded.has(name)||name.startsWith('.env')||name.startsWith('.static-output-')||/\.(jks|keystore|p12|pfx|pkcs12|pem|key|aab|apk)$/i.test(name)||['key.properties','local.properties'].includes(name)||entry.isSymbolicLink())continue;
   if(entry.isDirectory())visit(relative);else if(entry.isFile())files.push(relative);
  }}visit('');return files.sort();

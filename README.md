@@ -1,35 +1,14 @@
-## Birleşik yerel aday — 27 Ekim 2026
-Aday yolu: D:/beyin2/Projeler/MatchStudio/Calisma/Birlesik-Aday.
-Taban: Play2b17cc594686e6650d3f409f6e09af63a70ef4c5; dal kervan/match-studio-tek-surum. Bu aday ana çalışma girişine yönlendirilmedi ve yayınlanmadı.
-Node24 ve Python3.8+ kullanılır. Paket/test araçları Windows'ta python, py -3, python3; diğer sistemlerde python3, python sırasını dener. PYTHON verilirse yalnız belirtilen tam yürütücü kullanılır; shell yoktur.
-Play'in kaynak paketinden özel/imza dosyalarını dışlama filtresi korunuyor; geçici .superpowers alanı da dışlanır. Windows'ta link dışlama testi ayrıcalık gerektirmeyen gerçek dizin junction'ı ile, Linux'ta dosya symlink'i ile çalışır.
-Şifreli yedek varsayılandır; JSONv1/v2/v3, kalıcı silme ve bekleyen silme korumaları korunur. Uygulama src/ modülleri bu uyarlamada değiştirilmedi.
-Yeni kabul kanıtı docs/MERGE-ACCEPTANCE.md: 81 Node, 127 tarayıcı geçti / 8 koşullu atlama; release ve build:vercel çıkış 0; bağımsız kod incelemesinde bulgu yok. Eski76/127CI ve yerelF.14/45test bu adayın kabulü değildir. Play için7açık kapı, gerçek cihaz kabulü ve yeni commit'in uzakCIsonucu ayrıdır.
+# Match Studio
 
----
+Kulüp, grup, sporcu, kadro ve canlı maç yönetimi için çevrimdışı çalışabilen web uygulaması. Afiş üretimi, şifreli yedekleme ve geri yükleme içerir. Paket sürümü: `2.6.8-f.17`.
 
-## Önceki kaynak belgesi — tarihsel kayıt
-Aşağıdaki eski sürüm/test/yayın iddiaları kaynakta yazıldıkları zamana aittir; güncel aday kabulünü yukarıdaki bölüm ve MERGE-ACCEPTANCE.md belirler.
+Birleşik sürüm; mevcut veri korumalarını, F.16 Sezon Analitiğini ve Stitch altın/obsidyen tasarımını birleştirir. Erişim ve tarayıcıdan güncelleme: [bağlantı rehberi](docs/guides/ERISIM_VE_GUNCELLEME.md).
 
-# Match Studio — Kanonik PWA ve Google Play Üretim Hattı
+Bu klasör tek yerel çalışma kaynağıdır. Yerel test başarısı, canlı sürümün veya Google Play yayınının kabul edildiği anlamına gelmez.
 
-**Aktif ürün:** Match Studio (v2.6.8-f.13 kod hattı)  
-**Kanonik depo:** `daricagucusk/Match-Studio` / `main`  
-**Canlı HTTPS:** https://match-studio-telefon.vercel.app  
-**Son bağımsız doğrulanmış production temel commit:** `4cbf8f899cc1466fe1621d42900fa959357d985f` (26.10.2026).  
-**Bu depo dalı:** Play Store adayı. Play onayı ve AAB yüklemesi henüz yapılmadı.
+## Başlatma
 
-> Geçmiş README'deki F.11 ve "Vercel F.3" ibareleri tarihsel kaldı; güncel production sürümünü yansıtmıyordu. Bu belge o eski ifadelerin yerine geçer. Release kararı için GitHub main SHA, CI ve Vercel deploy SHA her seferinde yeniden doğrulanmalıdır.
-
-## Özellikler
-
-Yerel/çevrimdışı odaklı kulüp, grup, sporcu ve maç yönetimi; kadro hazırlama, sahada yerleşim, canlı maç saati/olayları, istatistikler, yayınlanabilir afiş/PNG, şifreli dışa aktarım/geri yükleme ve kulüp bazlı IndexedDB ayrımı. Kayıtların web origin ve tarayıcı profiline bağlı olması sebebiyle düzenli şifreli dış yedek gerekir.
-
-Kulüp ve sporcu verileri farklı ürünlerle/paylaşımlarla otomatik eşitlenmez. Çocukların isim, fotoğraf ve özel sporcu bilgilerini mağaza görsellerinde göstermeyin.
-
-## Hızlı çalışma
-
-Node.js 22+ ve Python 3 gereklidir.
+Node.js 24 ve Python 3.8+ kullanın. Komutları bu klasörde çalıştırın:
 
 ```sh
 npm ci
@@ -37,38 +16,49 @@ npm run build
 npm start
 ```
 
-`http://127.0.0.1:8911/index.html` üzerinde açılır.
+Uygulama adresi: **http://127.0.0.1:8911/index.html**. `web/index.html` dosyasını çift tıklamak yerine yerel sunucuyu kullanın.
 
-## Üretim ve test
+Kayıtlar site adresine ve tarayıcı profiline bağlıdır. Mevcut kulüp verilerine erişmek için aynı adres, port ve profili kullanın; düzenli şifreli dış yedek alın.
 
-```sh
-npm test
-npx playwright install chromium
-npm run test:browser
-npm run release
-npm run build:vercel
-npm run check:play
-npm run check:play:strict
-```
+## Klasörler
 
-`npm run release`: Node + Chromium testleri, üretim paketi ve bütünlük doğrulaması. `npm run build:vercel`: yalnız doğrulanmış PWA runtime dosyalarını `public/` dizinine hazırlar. `check:play`: hazırlık durumunu bildirir, engeller varken bile çıkış kodu 0 olabilir. `check:play:strict`: gerçek gizlilik politikası, sertifika/assetlinks, Play hesap ve ağ kapıları sağlanmadıkça NO-GO.
+| Konum | Sorumluluk |
+|---|---|
+| [`src/`](src/) | Uygulama JavaScript modülleri; `domain`, `storage`, `app` ve ekranlar |
+| [`web/`](web/) | Düzenlenen HTML, CSS, manifest, görseller ve simgeler |
+| [`tools/`](tools/) | Derleme, güvenli sunucu, paketleme ve Play kontrol araçları |
+| [`tests/`](tests/) | Node testleri ve `browser/` altındaki tarayıcı senaryoları |
+| [`android/`](android/) | Android TWA metadata dosyası; özel imza anahtarları burada tutulmaz |
+| [`docs/`](docs/README.md) | Kurulum, yayın, Play, AI ve tarihsel belgeler |
+| [`context/`](context/README.md) | Proje bağlamı, kararlar ve kullanıcı kaynaklarının haritası |
+| [`evidence/`](evidence/README.md) | Korunan eski paketler, incelemeler ve dağıtım kayıtları |
+| `public/` | Derlemeden üretilen web yayın çıktısı |
+| `dist/` | Üretilen PWA/kaynak ZIP'leri ve mağaza görselleri |
+| `test-results/` | Yeni test ölçümleri, ekran görüntüleri ve hata izleri |
 
-## Android / Google Play
+`web/app.bundle.js` ve `web/sw.js` otomatik üretilir. Uygulama kodunu `src/` içinde, worker kodunu `src/pwa/service-worker.js` içinde değiştirin. Ayrıntılı sorumluluklar ve veri akışı: [klasör mimarisi](docs/STRUCTURE.md).
 
-Android dağıtım stratejisi `android/twa-manifest.json` ve Bubblewrap üzerinden Trusted Web Activity'dir. Mevcut PWA işletim modeli korunur. Google Play için Android 16 **target API 36**, imzalı AAB, gerçek Play App Signing SHA-256 ile `/.well-known/assetlinks.json`, kamuya açık gizlilik politikası ve doğru Data Safety beyanı zorunludur.
+## Doğrulama ve paketleme
 
-**Güvenlik:** `.jks`, `.keystore`, parolalar ve Play Console hesap bilgileri GitHub'a commit edilmez. Geçici/demo sertifikayla Play/TWA doğrulaması tamamlandı denmez.
+| Komut | Sonuç |
+|---|---|
+| `npm test` | Node, depolama ve paket güvenliği testleri |
+| `npm run test:browser` | Masaüstü, telefon ve katlanabilir ekran Chromium senaryoları |
+| `npm run check` | Derleme + Node + tarayıcı kontrolleri |
+| `npm run build:vercel` | Bütünlüğü doğrulanmış dosyaları `public/` içine çıkarır |
+| `npm run package` | `dist/` altında PWA ve kaynak ZIP'leri, özetler ve `release.json` üretir |
+| `npm run release` | Tüm kontrolleri çalıştırır, ardından paketi üretir |
+| `npm run check:play` | Play hazırlığı ve kalan engelleri raporlar |
+| `npm run check:play:strict` | Uzak uçları da doğrular; engel varsa başarısız olur |
 
-Play hazırlığı: `docs/GOOGLE_PLAY_RELEASE_PLAN.md`, `docs/PLAY_STORE_LISTING_TR.md`, `docs/PLAY_STORE_PRIVACY_DRAFT_TR.md`. Yayın takibi: https://github.com/daricagucusk/Match-Studio/issues/24
+Tarayıcı testlerinden önce bir kez `npx playwright install chromium` çalıştırın. `check:play` hazırlık modunda engeller varken de çıkış kodu 0 verebilir; rapordaki engelleri esas alın.
 
-## Kalıcı silme ve kurtarma
+## Çalışma ve yayın kuralları
 
-Birleşik yayın adayında oyuncunun kalıcı silinmesi, eski kulüp kurtarma anlık görüntüsünü iptal etmeyi ve silinmiş oyuncu kimliklerini aynı tarayıcı profilindeki ayrı recovery veritabanında saklamayı içerir. Eski şifreli yedekle silinmiş oyuncu geri yüklenmesi reddedilir. **Bu davranış yayın adayındadır, canlıya geçmiş sayılmamalıdır**; gerçek cihaz testleri ve CI kabulü gerekir. Haricen indirilen yedek dosyalar cihazlardan uzaktan silinemez.
+- Proje talimatları: [CLAUDE.md](CLAUDE.md), Codex giriş noktası: [AGENTS.md](AGENTS.md).
+- Kaynak modüllerin sırası `tools/module-order.json`, ortak yayın dosyaları `tools/runtime-files.cjs` içindedir. Dosyaların disk üzerindeki `web/` konumu yayın URL'lerine eklenmez.
+- Veritabanı, şifreli yedek, kalıcı silme ve kurtarma korumaları korunur. Farklı ürünler arasında otomatik veri eşitleme yoktur.
+- Gerçek sporcu bilgilerini test ve mağaza görsellerine koymayın. Parola, keystore ve imza anahtarlarını depoya eklemeyin.
+- Push, main'e birleştirme, Vercel dağıtımı ve Play yayını ayrıca yetkilendirilir. Gerçek cihaz ve Play Console kabulü yerel otomasyondan ayrıdır.
 
-## Yayın politikası
-
-1. Kanonik `main`, mevcut Codex Cloud görevi ve canlı Vercel sürümünü koru.
-2. Yeni düzeltmeleri izole PR'da geliştir; CI, diff ve gerçek cihaz kabulünden önce main'e birleştirme.
-3. Eski #17 / #19 ve diğer PR'ları güncel `main` üzerinde körlemesine merge etme.
-4. Gerçek Play Console hesabı, target API, AAB ve gerekli kapalı test kanıtı olmadan 'Play Store'a yayınlandı' deme.
-5. Geri dönüş ve test yönergeleri: `docs/RELEASE.md`, `docs/DEVICE_CHECKLIST.md`; yayın engelleri için Issue #24.
+Yayın ve geri dönüş: [RELEASE.md](docs/RELEASE.md). Cihaz kabulü: [kontrol listesi](docs/guides/DEVICE_CHECKLIST.md). Play çalışmaları: [yayın planı](docs/play/GOOGLE_PLAY_RELEASE_PLAN.md). Önceki teslimler: [tarihsel belgeler](docs/README.md#tarihsel-kayıtlar).

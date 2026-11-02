@@ -1,10 +1,12 @@
+> Dosya konumları için güncel [klasör mimarisini](STRUCTURE.md) kullanın. Aşağıdaki sürüm/test/yayın kayıtları kendi tarihlerine aittir; yeni yerel doğrulama [düzenleme raporundadır](REORGANIZATION-20261102.md).
+
 ## Birleşik yerel aday — 27 Ekim 2026
 Aday yolu: D:/beyin2/Projeler/MatchStudio/Calisma/Birlesik-Aday.
 Taban: Play2b17cc594686e6650d3f409f6e09af63a70ef4c5; dal kervan/match-studio-tek-surum. Bu aday ana çalışma girişine yönlendirilmedi ve yayınlanmadı.
 Node24 ve Python3.8+ kullanılır. Paket/test araçları Windows'ta python, py -3, python3; diğer sistemlerde python3, python sırasını dener. PYTHON verilirse yalnız belirtilen tam yürütücü kullanılır; shell yoktur.
 Play'in kaynak paketinden özel/imza dosyalarını dışlama filtresi korunuyor; geçici .superpowers alanı da dışlanır. Windows'ta link dışlama testi ayrıcalık gerektirmeyen gerçek dizin junction'ı ile, Linux'ta dosya symlink'i ile çalışır.
 Şifreli yedek varsayılandır; JSONv1/v2/v3, kalıcı silme ve bekleyen silme korumaları korunur. Uygulama src/ modülleri bu uyarlamada değiştirilmedi.
-Yeni kabul kanıtı docs/MERGE-ACCEPTANCE.md: 81 Node, 127 tarayıcı geçti / 8 koşullu atlama; release ve build:vercel çıkış 0; bağımsız kod incelemesinde bulgu yok. Eski76/127CI ve yerelF.14/45test bu adayın kabulü değildir. Play için7açık kapı, gerçek cihaz kabulü ve yeni commit'in uzakCIsonucu ayrıdır.
+Yeni kabul kanıtı docs/history/MERGE-ACCEPTANCE.md: 81 Node, 127 tarayıcı geçti / 8 koşullu atlama; release ve build:vercel çıkış 0; bağımsız kod incelemesinde bulgu yok. Eski76/127CI ve yerelF.14/45test bu adayın kabulü değildir. Play için7açık kapı, gerçek cihaz kabulü ve yeni commit'in uzakCIsonucu ayrıdır.
 
 ---
 

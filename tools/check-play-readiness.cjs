@@ -23,16 +23,16 @@ function pngSize(bytes){
 const origin='https://match-studio-telefon.vercel.app';
 const hostname=new URL(origin).host;
 async function run(){
- const web=JSON.parse(requireFile('manifest.webmanifest'));
+ const web=JSON.parse(requireFile('web/manifest.webmanifest'));
  const android=JSON.parse(requireFile('android/twa-manifest.json'));
- const decision=JSON.parse(requireFile('docs/release-monetization.json'));
+ const decision=JSON.parse(requireFile('docs/play/release-monetization.json'));
  const pkg=requireFile('package.json');
  const pkgName=JSON.parse(pkg).version;
  const isHex=x=>/^#[0-9a-f]{6}$/i.test(x);
  if(web.short_name!=='Match Studio'||web.display!=='standalone')throw Error('PWA app name/display mismatch');
  if(!web.start_url||!web.scope)throw Error('PWA manifest missing start/scope');
  for(const i of [192,512]){
-   const blob=requireFile('icons/icon-'+i+'.png');
+   const blob=requireFile('web/icons/icon-'+i+'.png');
    const size=pngSize(blob);
    if(size.width!==i||size.height!==i)throw Error('App launcher icon '+i+' does not match required dimensions');
  }
@@ -50,9 +50,9 @@ async function run(){
  if(decision.android.packageIdConfirmedByOwner!==true||decision.android.packageIdProposal!==android.packageId)add('BLOCKED','Package identity','Final package ID requires owner confirmation.');
  if(decision.android.packageIdAvailableInConsole!==true)add('BLOCKED','Play application record','Package availability and application record are not confirmed in Play Console.');
  add('PASS','Permissions','No push delegation or payment permissions configured in wrapper.');
- const possiblePrivacy=path.join(root,'privacy.html');
+ const possiblePrivacy=path.join(root,'web/privacy.html');
  if(fs.existsSync(possiblePrivacy)){
-  const issues=require('./play-privacy-validate.cjs').validatePrivacyPage(requireFile('privacy.html').toString('utf8'),requireFile('index.html').toString('utf8'));
+  const issues=require('./play-privacy-validate.cjs').validatePrivacyPage(requireFile('web/privacy.html').toString('utf8'),requireFile('web/index.html').toString('utf8'));
   if(issues.length)add('BLOCKED','Public privacy policy',issues.join(' '));
   else add('CHECK','Privacy page source','Static safety checks passed; legal accuracy, in-app navigation and public HTTPS URL still require manual confirmation.');
  }else add('BLOCKED','Public privacy policy','privacy.html is not live; privacy draft must be reviewed, approved and published first.');
@@ -81,7 +81,7 @@ async function run(){
    const pwa=await probe('/manifest.webmanifest');
    add(pwa.ok&&pwa.text.includes('"start_url"')?'PASS':'BLOCKED','Public webmanifest',String(pwa.status));
    const privacy=await probe('/privacy.html');
-   const privacyIssues=require('./play-privacy-validate.cjs').validatePrivacyPage(privacy.text,requireFile('index.html').toString('utf8'));
+   const privacyIssues=require('./play-privacy-validate.cjs').validatePrivacyPage(privacy.text,requireFile('web/index.html').toString('utf8'));
    add(privacy.status===200&&/^text\/html/i.test(privacy.type||'')&&!privacyIssues.length?'PASS':'BLOCKED','Public privacy URL',String(privacy.status));
    const links=await probe('/.well-known/assetlinks.json');
    const linkIssues=validateAssetLinks(links,android.packageId,expectedFingerprints);

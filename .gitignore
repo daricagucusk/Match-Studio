@@ -27,3 +27,7 @@ android/.idea/
 
 .unsigned-twa/
 **/unsigned-qa.aab
+
+# Generated runtime files; edit src/ or web/ source files and run npm run build.
+/web/app.bundle.js
+/web/sw.js

@@ -3,11 +3,15 @@ const {idle,nav}=require('./live-fixture.cjs');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../..');
 const sources=Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root,'tools/module-order.json'),'utf8')).map(id=>[id,fs.readFileSync(path.join(root,id),'utf8')]));
+// Compile source factories in Node, then install ordinary functions before page scripts.
+// Lazy imports after an await must also obey the production CSP: no browser eval.
+const fixtureLoader=`(()=>{const factories={${Object.entries(sources).map(([id,source])=>`${JSON.stringify(id)}:(exports,require)=>{\n${source}\n}`).join(',\n')}};const cache={};window.privacyTestLoad=function load(id){if(cache[id])return cache[id];if(!factories[id])throw Error('Unknown test module: '+id);const exports={};cache[id]=exports;factories[id](exports,load);return exports;};})();`;
 const club='privacy_browser_a',other='privacy_browser_b',password='synthetic-privacy-password';
 async function seed(page){
+ await page.addInitScript({content:fixtureLoader});
  await page.goto('/');
- const backup=await page.evaluate(async({sources,club,other,password})=>{
-  const cache={};function load(id){if(cache[id])return cache[id];const e={};cache[id]=e;new Function('exports','require',sources[id])(e,load);return e;}
+ const backup=await page.evaluate(async({club,other,password})=>{
+  const load=window.privacyTestLoad;
   const registry=load('src/storage/club-registry.js'),db=load('src/storage/db.js');
   for(const id of [other,club]){
    await registry.saveClub({id,name:'Sentetik '+id,accent:'#4669D9',createdAt:'2026-10-26T00:00:00Z'});db.setClubDatabase(id);
@@ -21,7 +25,7 @@ async function seed(page){
   registry.setActiveId(club);const backup=load('src/storage/backup.js');backup.setBackupClub({id:club,name:'Sentetik '+club});
   const file=await backup.exportEncryptedBackup(password);
   await load('src/storage/recovery.js').saveRestorePoint(club);db.closeClubDatabase();return file.text();
- },{sources,club,other,password});
+ },{club,other,password});
  await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await idle(page);return backup;
 }
 async function readStores(page){return page.evaluate(async({club,other})=>{

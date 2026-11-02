@@ -17,7 +17,7 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
   await page.locator('[data-action=add-player]').first().click();await idle(page);
   await page.locator('#fullName').fill('Oyuncu '+i);await page.locator('#birthYear').fill('2012');await page.locator('#shirtNumber').fill(String(i));
   await page.locator('#player-form [name=groups]').check();
-  if(i===1)await page.locator('#player-photo').setInputFiles('icons/icon-192.png');
+  if(i===1)await page.locator('#player-photo').setInputFiles('web/icons/icon-192.png');
   await page.locator('[data-action=submit-player]').click();await idle(page);await expect(page.locator('#player-form')).toHaveCount(0);
  }
  await nav(page,'matches');await page.locator('#groupId').selectOption({label:'U14'});await page.locator('#ageCategory').selectOption('U14');
@@ -27,7 +27,8 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
  const checkboxes=page.locator('input[data-player-id]');await expect(checkboxes).toHaveCount(4);
  for(let i=0;i<4;i++){await page.locator('input[data-player-id]').nth(i).check();await idle(page);}
  await nav(page,'pitch');await expect(page.locator('[data-pitch-slot]')).toHaveCount(3);
- if(info.project.name==='desktop'){await page.locator('[data-pitch-player]:visible').first().dragTo(page.locator('[data-pitch-slot]:visible').first());await idle(page);await expect(page.locator('[data-pitch-slot]')).toContainText(['Oyuncu 4','Oyuncu 2','Oyuncu 3']);}
+ // The bench and field are separated by a smooth page scroll; keep the drag target stationary.
+ if(info.project.name==='desktop'){await page.emulateMedia({reducedMotion:'reduce'});await page.locator('[data-pitch-player]:visible').first().dragTo(page.locator('[data-pitch-slot]:visible').first());await idle(page);await expect(page.locator('[data-pitch-slot]')).toContainText(['Oyuncu 4','Oyuncu 2','Oyuncu 3']);}
  await nav(page,'live');await expect(page.locator('#live-rules-form')).toBeVisible();await page.locator('#live-substitution-mode').selectOption('returnAllowed');
  await page.locator('#live-rules-form button[type=submit]').click();await idle(page);await page.locator('[data-action=live-start]').click();await idle(page);
  await expect(page.locator('.live-status')).toHaveText('Oynanıyor');

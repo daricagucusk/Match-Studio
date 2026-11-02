@@ -37,7 +37,7 @@ test('saved match type reaches the studio preview and downloaded PNG',async({pag
   const preview=await page.evaluate(()=>window.posterDrawn.filter(x=>x.canvas==='poster-canvas').map(x=>x.text));expect(preview.some(s=>s.includes(label))).toBe(true);
   await page.evaluate(()=>{window.posterDrawn=[];});const downloading=page.waitForEvent('download');await page.locator('[data-action=export-png]:visible').first().click();const download=await downloading;expect(await download.failure()).toBe(null);
   const exported=await page.evaluate(()=>window.posterDrawn.map(x=>x.text));expect(exported.some(s=>s.includes(label))).toBe(true);if(type==='friendly')expect(exported.some(s=>s.includes('LİG MAÇI'))).toBe(false);
-  if(info.project.name==='desktop'){const dir=path.join(root,'reviews/update-02');fs.mkdirSync(dir,{recursive:true});await download.saveAs(path.join(dir,type+'-public.png'));}
+  if(info.project.name==='desktop'){const dir=path.join(root,'test-results/reviews/update-02');fs.mkdirSync(dir,{recursive:true});await download.saveAs(path.join(dir,type+'-public.png'));}
   await nav('matches');await expect(page.locator('#matchType')).toHaveValue(type);
  }
 });

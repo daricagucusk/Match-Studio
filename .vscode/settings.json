@@ -1,0 +1,34 @@
+{
+  "files.exclude": {
+    "**/node_modules": true,
+    "dist": true,
+    "public": true,
+    "test-results": true,
+    "playwright-report": true,
+    ".static-output-*": true,
+    "**/__pycache__": true,
+    ".agents": true,
+    ".claude": true,
+    ".superpowers": true,
+    "web/app.bundle.js": true,
+    "web/sw.js": true
+  },
+  "explorer.compactFolders": false,
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/public/**": true,
+    "**/web/app.bundle.js": true,
+    "**/web/sw.js": true,
+    "**/test-results/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/public": true,
+    "**/web/app.bundle.js": true,
+    "**/web/sw.js": true,
+    "**/test-results": true
+  },
+  "terminal.integrated.scrollback": 10000
+}

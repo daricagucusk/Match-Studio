@@ -5,7 +5,7 @@ async function top(page){await page.evaluate(()=>window.scrollTo({top:0,behavior
 async function measure(page){return page.evaluate(()=>{const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();return r?{top:r.top,height:r.height,bottom:r.bottom}:null;};return {header:box('.match-workspace-head'),field:box('.pitch-field'),search:box('#roster-search'),target:box('[data-kind=public]'),overflow:document.documentElement.scrollWidth>innerWidth+1};});}
 test('workspace header leaves the phone first screen available for real controls',async({page},info)=>{
  await setup(page);await nav(page,'pitch');await top(page);const before=await measure(page);
- const dir=path.resolve(__dirname,'../../reviews/update-06');fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,info.project.name+'-measurements.json'),JSON.stringify({pitch:before},null,2));
+ const dir=path.resolve(__dirname,'../../test-results/reviews/update-06');fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,info.project.name+'-measurements.json'),JSON.stringify({pitch:before},null,2));
  await page.screenshot({path:path.join(dir,'pitch-'+info.project.name+'.png')});
  expect(before.header.height).toBeLessThanOrEqual(info.project.name==='phone'?150:180);expect(before.overflow).toBe(false);
  expect(before.field.top).toBeLessThan(info.project.name==='phone'?700:info.project.name==='fold-open'?780:850);
