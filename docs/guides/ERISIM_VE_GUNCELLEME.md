@@ -39,3 +39,9 @@ Google Play dağıtımı ayrı bir süreçtir: imzalı AAB, Play uygulama kaydı
 - `main` üzerindeki F.17 kodu için başarılı test çalışması: https://github.com/daricagucusk/Match-Studio/actions/runs/41510271813 . Kalıcı ZIP paketleri: https://github.com/daricagucusk/Match-Studio/releases/tag/v2.6.8-f.17 .
 - Canlı uygulamanın 26 dosya bütünlük kontrolü yeniden geçti; gizlilik ve robots adresleri 200, kontrol edilen 5 özel kaynak yolu 404 döndü.
 - Bu kontrol yeni bir ürün sürümü oluşturmaz. F.17 uygulama kodu korunur; bu belge erişim ve yayın işlemini açıklığa kavuşturur.
+
+### Yerel Git kimliği ve otomatik yayın
+
+3 Kasım denetiminde engellenen commit'lerin GitHub tarafından farklı hesaba bağlandığı görüldü. Bu çalışma klasörünün `user.name` ve `user.email` ayarları, bağlı `daricagucusk` hesabına GitHub tarafından eşleştirilmiş mevcut bir commit'in kimliği temel alınarak düzeltildi. Ayar yalnızca bu depoya uygulanır; diğer projelerin Git kimliği değişmez, eski commit'ler yeniden yazılmaz. Önceki ayarlar yerel geri dönüş kopyasında korunur.
+
+Tarayıcıdan düzenlerken yetkili `daricagucusk` GitHub hesabını kullanın. Başka bilgisayardan çalışırken o klasörün Git yazarı da hesabınızla eşleşmelidir. Her `main` güncellemesinden sonra hem GitHub test sonucunu hem Vercel **Ready** durumunu kontrol edin. [Vercel'in commit yazarı ve hesap eşleşmesi açıklaması](https://vercel.com/docs/deployments/troubleshoot-project-collaboration).
