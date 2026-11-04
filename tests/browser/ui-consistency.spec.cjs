@@ -8,7 +8,7 @@ test('selection colors and form surfaces agree across workspaces',async({page},i
  expect(await color(page.locator('#club-switch:visible,#club-switch-mobile:visible').first())).toBe('rgb(11, 14, 21)');
  expect(await color(page.locator('#pitch-player-shortcut'))).toBe('rgb(11, 14, 21)');
  await nav(page,'roster');expect(await color(page.locator('.group-chip.active').first())).toBe('rgb(58, 49, 31)');const filter=await page.locator('.group-chip.active').first().boundingBox();expect(filter.height).toBeGreaterThanOrEqual(44);
- await nav(page,'studio');expect(await color(page.locator('[data-kind=private]'))).toBe('rgb(58, 49, 31)');if(info.project.name==='phone')expect(await color(page.locator('.mobile-editor-tabs button.active'))).toBe('rgb(58, 49, 31)');
+ await nav(page,'studio');expect(await color(page.locator('[data-kind=private]'))).toBe('rgb(229, 196, 120)');if(info.project.name==='phone')expect(await color(page.locator('.mobile-editor-tabs button.active'))).toBe('rgb(58, 49, 31)');
  await page.locator('[data-kind=public]').click();await idle(page);await expect(page.locator('#preview-status')).toContainText('Paylaşmaya hazır');await expect(page.locator('[data-template=classic-stadium]')).toContainText('Klasik Stadyum');
  if(info.project.name==='phone'){const dir=path.resolve(__dirname,'../../test-results/reviews/update-08');fs.mkdirSync(dir,{recursive:true});await page.screenshot({path:path.join(dir,'studio-consistent-phone.png')});}
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);

@@ -23,6 +23,6 @@ test('Stitch gold identity and offline fonts render across operational screens',
   if(['dashboard','pitch','studio','analytics'].includes(route))await page.screenshot({path:path.join(dir,info.project.name+'-'+route+'.png'),fullPage:true});
  }
  expect(await page.evaluate(()=>getComputedStyle(document.body).backgroundColor)).toBe('rgb(11, 14, 21)');
- expect(await page.locator('.btn-primary:visible').first().evaluate(node=>getComputedStyle(node).backgroundColor)).toBe('rgb(229, 196, 120)');
+ expect(await page.locator('.btn-primary:visible').first().evaluate(node=>getComputedStyle(node).backgroundImage)).toContain('linear-gradient');
  expect(errors).toEqual([]);
 });

@@ -14,7 +14,7 @@ test('new club uses one clear team onboarding action, not duplicate step cards',
  await expect(page.locator('#group-form')).toBeVisible();
  await expect(page.locator('.ms-quickstart')).toHaveCount(0);
  await expect(page.locator('.broadcast-hero.is-empty')).toBeVisible();
- await expect(page.locator('.hero-bottom-line')).toContainText('V2.6.8-F.17');
+ await expect(page.locator('.hero-bottom-line')).toContainText('V2.6.8-F.18');
  await expect(page.locator('.hero-bottom-line')).not.toContainText('F.11');
  if(page.viewportSize().width<=1020){
    await expect(page.locator('.broadcast-hero.is-empty .hero-fixture')).toBeHidden();

@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
-const excluded=new Set(['node_modules','dist','public','.vercel','test-results','playwright-report','.git','__pycache__','.unsigned-twa','.gradle','.idea','.superpowers']);
+const excluded=new Set(['node_modules','dist','public','.vercel','test-results','playwright-report','.git','__pycache__','.unsigned-twa','.gradle','.idea','.superpowers','.codex','.claude']);
 function sourceFiles(root){
  const files=[];
  function visit(dir){for(const entry of fs.readdirSync(path.join(root,dir),{withFileTypes:true})){

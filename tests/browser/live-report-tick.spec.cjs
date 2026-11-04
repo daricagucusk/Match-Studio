@@ -17,7 +17,7 @@ async function setup(page){
  },sources);
  await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await nav(page,'live');await page.locator('[data-action=live-open]').click();await idle(page);await expect(page.locator('[data-action=live-start]')).toBeVisible();await page.clock.pauseAt(new Date((await page.evaluate(()=>Date.now()))+1000));
 }
-const row=(page,n)=>page.locator('.live-e-table tbody tr').filter({has:page.getByRole('rowheader',{name:'Oyuncu '+n,exact:false})});
+const row=(page,n)=>page.locator('.live-e-table tbody tr').filter({has:page.locator('th').filter({hasText:'Oyuncu '+n})});
 async function times(page,total,first,fourth){
  await expect(page.locator('#live-clock-total')).toHaveText(total);
  await expect(page.locator('.live-report p').first()).toContainText(total+' oynanan süre');
@@ -37,7 +37,7 @@ test('report ticks with the clock, preserves form input, and freezes through pau
  await page.locator('[data-action=live-end]').click();await idle(page);await page.clock.fastForward(30000);await times(page,'01:20','00:15','01:05');
  await page.locator('[data-action=live-next]').click();await idle(page);await page.clock.fastForward(5000);await times(page,'01:25','00:15','01:10');await expect(page.locator('#live-clock-time')).toHaveText('00:05');
  await page.locator('[data-action=live-end]').click();await idle(page);await page.locator('[data-action=live-finish]').click();await idle(page);await page.clock.fastForward(30000);await times(page,'01:25','00:15','01:10');
- await expect(page.locator('#live-report-title')).toHaveText('Maç tamamlandı');if(info.project.name==='desktop'){const dir=path.join(root,'test-results/reviews/update-03');fs.mkdirSync(dir,{recursive:true});await page.locator('.live-report').screenshot({path:path.join(dir,'completed-report.png')});}
+ await expect(page.locator('#live-report-title')).toHaveText('Maç tamamlandı');if(info.project.name==='desktop'){const dir=path.join(root,'test-results/reviews/update-03');fs.mkdirSync(dir,{recursive:true});await page.locator('[data-action=live-coach-report]').click();await page.locator('.live-report').screenshot({path:path.join(dir,'completed-report.png')});}
 });
 
 test('print refreshes a delayed tick and clock-health warnings without creating events',async({page})=>{
@@ -46,7 +46,7 @@ test('print refreshes a delayed tick and clock-health warnings without creating 
  const started=await page.evaluate(()=>Date.now());await page.clock.setSystemTime(started+7000);
  await page.evaluate(()=>window.dispatchEvent(new Event('beforeprint')));await times(page,'00:07','00:07','00:00');
  await page.clock.setSystemTime(started+11000);await page.evaluate(()=>{window.print=()=>{window.printedTotal=document.querySelector('.live-report p').textContent;};});
- await page.locator('[data-action=live-report-print]').click();await expect.poll(()=>page.evaluate(()=>window.printedTotal)).toContain('00:11 oynanan süre');await idle(page);await times(page,'00:11','00:11','00:00');
+ await page.locator('[data-action=live-coach-report]').click();await page.locator('[data-action=live-report-print]').click();await expect.poll(()=>page.evaluate(()=>window.printedTotal)).toContain('00:11 oynanan süre');await idle(page);await times(page,'00:11','00:11','00:00');
  await page.clock.setSystemTime(started+7200000);await page.evaluate(()=>window.dispatchEvent(new Event('beforeprint')));
  await expect(page.locator('#live-clock-health')).toContainText('şüpheli');await expect(page.locator('[data-live-report-warning=clock]')).toBeVisible();await expect(page.locator('[data-live-report-warning=minutes]')).toBeVisible();
  const persisted=await page.evaluate(()=>new Promise((resolve,reject)=>{const q=indexedDB.open('matchstudio-club-report_test_club');q.onerror=()=>reject(q.error);q.onsuccess=()=>{const db=q.result,tx=db.transaction(['matchEvents','matchSessions']),events=tx.objectStore('matchEvents').getAll(),sessions=tx.objectStore('matchSessions').getAll();tx.oncomplete=()=>{db.close();resolve({eventCount:events.result.length,revision:sessions.result[0].revision});};tx.onerror=()=>reject(tx.error);};}));

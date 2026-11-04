@@ -1,0 +1,254 @@
+/* MatchStudio Premium Coach / UX v2 — 2026-11-04
+   Layout inspiration: user supplied live console HTML. Brand styling: selected MatchStudio Stitch gold/obsidian system.
+   No external images or fonts; all data remains in the existing application. */
+:root{--ms2-bg:#0B0E15;--ms2-card:#141722;--ms2-raised:#1C202B;--ms2-stroke:#494338;--ms2-gold:#E5C478;--ms2-gold-bright:#F6DF9F;--ms2-text:#F7F7F5;--ms2-muted:#B5B7C1;--ms2-field:#113A29}
+body{background:var(--ms2-bg)}
+.app-shell .page{min-width:0}
+.btn:focus-visible,.nav-link:focus-visible,.live-match-console button:focus-visible,.roster-order-label select:focus-visible{outline:3px solid var(--ms2-gold);outline-offset:3px}
+.btn-primary,.live-action-dock .btn-primary{background:linear-gradient(135deg,#F5DC99,#D1AA55)!important;color:#201808!important;border-color:#D3B166!important;font-weight:800;box-shadow:0 8px 22px #0003}
+.btn-primary:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}
+.btn-ghost:hover:not(:disabled),.nav-link:hover{border-color:#D8BC83!important}
+.broadcast-dashboard .broadcast-hero{background:radial-gradient(ellipse at 82% 30%,#E5C47814,transparent 55%),linear-gradient(122deg,#202329,#101319)!important;border-color:#62543C}
+.broadcast-dashboard .broadcast-hero h1 em{color:#E5C478!important;font-style:normal}
+.broadcast-dashboard .hero-buttons .btn-primary{background:linear-gradient(125deg,#EFD59A,#D3AC5B)!important}
+.broadcast-dashboard .hero-fixture{border:1px solid #766243;background:linear-gradient(175deg,#1C202A,#10131B)}
+.broadcast-dashboard .fixture-vs{color:#E5C478}
+.broadcast-dashboard .broadcast-metric{border-color:#5C4F3B;background:linear-gradient(160deg,#22252B,#15181E)}
+.broadcast-dashboard .broadcast-metric strong,.broadcast-dashboard .broadcast-panel h2{color:#F7F7F5}
+.broadcast-dashboard .broadcast-panel{border-color:#4D4539;background:#151922}
+.broadcast-dashboard .broadcast-section-title span,.broadcast-dashboard .panel-number,.broadcast-dashboard .metric-kicker{color:#E5C478}
+.broadcast-dashboard .broadcast-match-list .match-row:hover,.broadcast-dashboard .operation-row:hover{background:#24242B}
+.studio-workspace-grid .workspace-surface,.studio-workspace-grid .poster-container{background:#151922!important;border-color:#64533C!important}
+.studio-workspace-grid .workspace-panel-head h2,.studio-workspace-grid .preview-topline h2{color:#F7F7F5;font-weight:800}
+.studio-workspace-grid .studio-control-section{border-top-color:#48433A}
+.studio-workspace-grid .v13-segmented{background:#0E1119;border:1px solid #554A38}
+.studio-workspace-grid .v13-segmented button.active{background:#E5C478!important;color:#211A0E!important}
+.studio-workspace-grid .visual-template-btn{background:#191C24;border-color:#54483A}
+.studio-workspace-grid .visual-template-btn.active{border-color:#E5C478!important;box-shadow:0 0 0 2px #E5C47845}
+.studio-workspace-grid .preview-display{background:radial-gradient(ellipse,#242B2C,#0B0E15 75%)}
+.studio-workspace-grid .preview-resolution,.studio-workspace-grid .preview-quality.is-verified{color:#E3D39D;border-color:#65563F;background:#302A1F}
+.studio-workspace-grid .preview-actionbar{border-top-color:#62543D}
+.studio-workspace-grid .poster-pane{position:sticky;top:12px;align-self:start}
+.roster-order-label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;margin:4px 0 10px;border:1px solid #514638;background:#171B23;border-radius:10px;font-size:12px;color:#E7DCC7;font-weight:700}
+.roster-order-label select{width:auto;min-width:184px;max-width:65%;min-height:40px;background:#10131B;border:1px solid #6A5635;color:#F7F6F1;border-radius:8px;padding:6px 9px}
+.roster-only-available{background:#181B22!important;border-color:#6E5A3A!important;color:#F7F6F1!important}
+.roster-only-available input{accent-color:var(--ms2-gold)!important}
+.roster-pool-row.is-chosen{border-left-color:#E5C478!important;background:#302A20!important}
+.roster-pool-row:focus-within{outline:2px solid #E5C478;outline-offset:-2px}
+.live-match-console{position:relative;min-width:0;color:var(--ms2-text);isolation:isolate}
+.live-match-console .live-coach-header{display:flex;align-items:center;gap:10px;justify-content:space-between;min-width:0}
+.live-match-console .live-coach-header .live-head{flex:1;min-width:0;gap:12px;margin:0}
+.live-match-console .live-head .live-eyebrow{display:none}
+.live-match-console .live-head h1{font-size:clamp(18px,1.8vw,24px);margin:0}
+.live-match-console .live-head p{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+.live-coach-utilities{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.live-coach-utilities .btn{min-height:40px;padding:6px 11px;font-size:12px;background:#171B24;border-color:#5B4C36}
+.live-match-console .live-console-top{min-width:0}
+.live-match-console .live-console-top>.live-surface{background:linear-gradient(125deg,#1D222C,#131723);border:1px solid #655337;box-shadow:inset 0 1px #ffffff12,0 10px 26px #0003}
+.live-match-console .live-console-score{font-size:clamp(26px,3.1vw,38px)!important;color:#E5C478!important;font-variant-numeric:tabular-nums}
+.live-match-console .live-clock{color:#F6DF9F!important;font-size:clamp(44px,5.7vw,78px)!important;letter-spacing:-.065em}
+.live-match-console .live-controls .btn{min-height:45px!important;padding:7px 14px!important}
+.live-match-console .live-coach-prompt{min-height:28px;display:flex;align-items:center;background:#242016;color:#F2DEA9;border-left:3px solid #E5C478;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:650}
+.live-match-console .live-coach-prompt:not(:empty){margin:0}
+.live-match-console .live-console-stage{display:grid;grid-template-columns:minmax(0,1.13fr) minmax(0,.87fr);min-height:0;align-items:stretch;gap:10px}
+.live-match-console .live-console-pitch-column,.live-match-console .live-console-events-column{min-width:0;min-height:0}
+.live-match-console .live-console-stage .live-surface{margin:0 0 7px;background:#171B25;border:1px solid #504738;border-radius:13px;box-shadow:0 8px 24px #0002}
+.live-match-console .live-console-pitch-column .live-tactical-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,.52fr);gap:10px}
+.live-match-console .live-field{aspect-ratio:.78;max-width:335px!important;max-height:min(52dvh,500px);height:auto!important;margin:0 auto;border-color:#D5B96F;background:repeating-linear-gradient(0deg,#0D3020 0%,#0D3020 12%,#13452B 12%,#13452B 24%);}
+.live-match-console .live-field-player{touch-action:manipulation;min-width:41px;min-height:41px;padding:2px;max-width:65px;border-color:#8EA9AA}
+.live-match-console .live-field-player:focus-visible,.live-match-console[data-quick-mode] .live-field-player[aria-pressed=true]{border-color:#E5C478;box-shadow:0 0 0 3px #E5C47877}
+.live-match-console .live-field-minute{font-size:9px;line-height:1.1;color:#E5C478;font-variant-numeric:tabular-nums}
+.live-match-console .live-tactical-bench{min-height:0;padding:8px;background:#151922}
+.live-match-console .live-tactical-benchlist{max-height:min(44dvh,450px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.live-match-console .live-bench-chip{min-height:39px;font-size:11px;padding:6px 7px}
+.live-match-console .live-action-dock{background:#151922F7;border-color:#76603A}
+.live-match-console .live-console-events-column .live-e-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.live-match-console .live-console-events-column .live-e-form .field{min-width:0}
+.live-match-console .live-console-events-column .live-e-form select,.live-match-console .live-console-events-column .live-e-form input{min-height:39px;padding:6px 9px;font-size:12px}
+.live-match-console .live-console-events-column .live-e-form button{grid-column:1/-1;min-height:45px}
+.live-match-console .live-e-note{grid-column:1/-1}
+.live-match-console .live-e-history,.live-match-console .live-squad-details{border:1px solid #60513F;border-radius:10px}
+.live-match-console .live-e-history>summary,.live-match-console .live-squad-details>summary{padding:8px 10px;color:#E5C478;cursor:pointer;font-size:12px}
+.live-match-console .live-sub-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+.live-match-console .live-sub-form select{min-height:40px;font-size:12px}
+.live-match-console .live-sub-form>button{grid-column:1/-1;min-height:44px}
+.live-match-console .live-event-shortcuts{position:relative;z-index:7;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;padding:8px;background:#171A22;border:1px solid #7B633C;border-radius:14px;box-shadow:0 -8px 24px #0003;margin:0}
+.live-match-console .live-event-shortcuts .btn{min-height:53px!important;font-size:clamp(12px,1.1vw,15px);font-weight:800;background:#22232B;border:1px solid #5E513B;border-radius:10px}
+.live-match-console .live-event-shortcuts .btn:nth-child(1){border-color:#D8B66D}
+.live-match-console .live-event-shortcuts .btn:nth-child(3){border-color:#D1B24B}
+.live-match-console .live-event-shortcuts .btn:nth-child(4){border-color:#C86E6E}
+.live-match-console .live-event-shortcuts .btn:nth-child(5){border-color:#7A9BC5}
+.live-match-console .live-event-shortcuts button[aria-pressed=true]{background:#4E4129;color:#FBE5AD;box-shadow:inset 0 0 0 1px #E5C478}
+.live-match-console .live-event-shortcuts .btn:disabled{opacity:.5}
+.live-match-console .live-console-secondary:not([open]){display:none!important}
+.live-match-console .live-console-secondary[open]{position:fixed;inset:clamp(55px,8vh,95px) clamp(10px,4vw,65px) clamp(10px,5vh,55px) auto;width:min(670px,calc(100vw - 24px));z-index:60;overflow:auto;background:#141820;border:1px solid #B99B60;box-shadow:0 25px 90px #000B;border-radius:16px;max-height:80dvh;padding:12px}
+.live-match-console .live-console-secondary[open]>summary{position:sticky;top:0;z-index:2;padding:12px 14px;margin:-5px -5px 8px;background:#29261D;color:#FBE1A5;border-radius:9px;cursor:pointer;list-style:disclosure-open}
+.live-match-console .live-console-secondary-body{display:grid;gap:10px}
+.live-match-console .live-console-secondary .live-surface{background:#191C25;border-color:#554A38}
+@media (min-width:1121px) and (min-height:700px){
+ body:has(.live-match-console) .main{height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+ body:has(.live-match-console) .topbar{display:none}
+ body:has(.live-match-console) .main>.page{flex:1;min-height:0;overflow:hidden;padding-top:10px;padding-bottom:10px;max-width:none!important}
+ .live-match-console{height:100%;display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto;gap:7px}
+ .live-match-console .live-console-stage{height:auto!important;min-height:0;overflow:hidden!important}
+ .live-match-console .live-console-pitch-column,.live-match-console .live-console-events-column{min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+ .live-match-console .live-console-pitch-column .live-tactical{min-height:100%}
+ .live-match-console .live-console-pitch-column .live-field{max-height:min(47dvh,495px)}
+ .live-match-console .live-console-events-column .live-surface{padding:9px}
+ .live-match-console .live-console-events-column .live-substitution>p:not(.live-warning){display:none}
+}
+@media (min-width:768px) and (max-width:1120px){
+ .live-match-console .live-console-stage{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}
+ .live-match-console .live-console-pitch-column .live-tactical-layout{grid-template-columns:minmax(0,1fr)}
+ .live-match-console .live-field{max-width:300px!important;max-height:390px}
+ .live-match-console .live-tactical-benchlist{max-height:120px;display:flex;overflow:auto;gap:5px}
+ .live-match-console .live-bench-chip{flex:none;max-width:160px}
+ .live-match-console .live-console-events-column{max-height:calc(100dvh - 270px);overflow-y:auto}
+ .live-match-console .live-coach-header .live-head p{display:none}
+}
+@media(max-width:767px){
+ body:has(.live-match-console) .main{height:calc(100dvh - 68px - env(safe-area-inset-bottom));overflow:hidden;display:flex;flex-direction:column;padding:8px 10px 0!important}
+ body:has(.live-match-console) .main>.topbar,body:has(.live-match-console) .ms-mobile-club{display:none}
+ body:has(.live-match-console) .main>.page{flex:1;min-height:0;overflow:hidden;padding:0!important}
+ .live-match-console{height:100%;display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto;gap:5px}
+ .live-match-console .live-coach-header .live-head h1{font-size:18px}
+ .live-match-console .live-coach-header .live-head p{display:none}
+ .live-match-console .live-coach-header .live-head .btn{display:none}
+ .live-coach-utilities .btn{font-size:10px;padding:5px 7px;min-height:36px}
+ .live-match-console .live-console-top>.live-surface{display:grid;grid-template-columns:1fr auto;grid-template-areas:"status clock" "controls controls" "caption total" "warning warning";gap:5px 8px;padding:7px 10px}
+ .live-match-console .live-console-top .live-clock{font-size:clamp(36px,10vw,56px)!important}
+ .live-match-console .live-controls{justify-content:stretch}
+ .live-match-console .live-controls .btn{flex:1;min-height:42px!important}
+ .live-match-console .live-coach-prompt{font-size:11px;min-height:25px;padding:4px 8px}
+ .live-match-console .live-console-stage{min-height:0;grid-template-columns:1fr;overflow:auto;overscroll-behavior:contain}
+ .live-match-console .live-console-stage .live-surface{padding:8px;margin:0 0 6px}
+ .live-match-console .live-console-pitch-column .live-tactical-layout{grid-template-columns:1fr}
+ .live-match-console .live-field{max-width:min(80vw,300px)!important;max-height:335px}
+ .live-match-console .live-tactical-benchlist{display:flex;max-height:85px;overflow:auto}
+ .live-match-console .live-bench-chip{flex:none;min-width:130px;max-width:160px}
+ .live-match-console .live-console-events-column .live-e-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .live-match-console .live-event-shortcuts{position:sticky;bottom:0;z-index:25;gap:3px;padding:5px}
+ .live-match-console .live-event-shortcuts .btn{min-height:48px!important;padding:5px 2px;font-size:10px}
+ .live-match-console .live-console-secondary[open]{position:fixed;inset:5% 5px calc(72px + env(safe-area-inset-bottom));width:auto;max-height:none}
+ .live-match-console .live-tactical-header p{font-size:10px}
+ .roster-order-label{flex-direction:column;align-items:stretch}
+ .roster-order-label select{max-width:none;width:100%}
+ .studio-workspace-grid .poster-pane{position:relative}
+}
+@media print{.live-coach-utilities,.live-coach-prompt,.live-event-shortcuts{display:none!important}.live-console-secondary{display:block!important;position:static!important;max-height:none!important;border:0!important;box-shadow:none!important}}
+
+/* The shared .page uses centered intrinsic width; a live coach console must fill the full work area. */
+body:has(.live-match-console) .main>.page{width:100%!important;min-width:0!important;max-width:none!important;margin-left:0!important;margin-right:0!important;align-self:stretch!important}
+
+/* Narrow screens: the pitch and forms must be sequential, not overlapping grid tracks. */
+@media(max-width:767px){
+ .live-match-console .live-console-stage{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:8px!important;overflow-y:auto!important;overflow-x:hidden!important;min-height:0!important}
+ .live-match-console .live-console-pitch-column,.live-match-console .live-console-events-column{position:relative!important;display:block!important;height:auto!important;flex:0 0 auto!important;min-height:0!important;overflow:visible!important;width:100%!important}
+ .live-match-console .live-event-shortcuts{z-index:26}
+}
+
+/* Additional match events use the existing append-only match event schema. */
+.live-match-console .live-event-shortcuts{grid-template-columns:repeat(8,minmax(0,1fr))}
+.live-match-console .live-event-shortcuts .btn:nth-child(6){border-color:#B76B58}
+.live-match-console .live-event-shortcuts .btn:nth-child(7){border-color:#6A9CA4}
+.live-match-console .live-event-shortcuts .btn:nth-child(8){border-color:#8D83B6}
+@media(max-width:767px){.live-match-console .live-event-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(44px,auto))}.live-match-console .live-event-shortcuts .btn{min-height:44px!important;padding:4px 2px!important;font-size:10px!important}}
+
+/* Keep the two-row touch action dock fully above the phone's fixed navigation. */
+@media(max-width:767px){body:has(.live-match-console) .main{height:calc(100dvh - 100px - env(safe-area-inset-bottom))!important}}
+
+/* Explicitly override the app shell minimum height for the live coach viewport. */
+@media(max-width:767px){
+ body:has(.live-match-console) .main{min-height:0!important;max-height:calc(100dvh - 70px - env(safe-area-inset-bottom))!important;height:calc(100dvh - 70px - env(safe-area-inset-bottom))!important;overflow:hidden!important}
+ body:has(.live-match-console) .main>.page{min-height:0!important;height:100%!important;flex:1 1 auto!important;overflow:hidden!important}
+}
+@media(min-width:768px) and (max-width:1120px){
+ body:has(.live-match-console) .app-shell{min-height:0!important;height:100dvh!important;overflow:hidden!important}
+ body:has(.live-match-console) .main{height:calc(100dvh - 16px)!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+ body:has(.live-match-console) .main>.topbar{display:none!important}
+ body:has(.live-match-console) .main>.page{flex:1 1 auto!important;min-height:0!important;height:100%!important;overflow:hidden!important}
+ body:has(.live-match-console) .live-match-console{height:100%!important;min-height:0!important;display:grid!important;grid-template-rows:auto auto auto minmax(0,1fr) auto!important}
+ body:has(.live-match-console) .live-console-stage{height:100%!important;min-height:0!important;overflow:hidden!important}
+ body:has(.live-match-console) .live-console-pitch-column,body:has(.live-match-console) .live-console-events-column{min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain}
+}
+
+/* Physical Galaxy Z Fold7 cover-screen acceptance: avoid stale document scroll hiding coach header. */
+@media(max-width:767px){
+ html:has(.live-match-console),body:has(.live-match-console){height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;}
+ body:has(.live-match-console) #app,body:has(.live-match-console) .app-shell{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;}
+}
+
+/* Android real-device field acceptance: accessible non-native confirmation while preserving append-only event history. */
+.ms-coach-confirm[open]{box-sizing:border-box;position:fixed;inset:0;margin:auto;width:min(92vw,430px);max-height:min(80dvh,540px);overflow:auto;z-index:2147480000;border:1px solid #E5C478;border-radius:18px;padding:20px;background:#191C24;color:#F7F6F1;box-shadow:0 22px 78px #000a;font-family:inherit;}
+.ms-coach-confirm::backdrop{background:rgba(2,4,9,.82);backdrop-filter:blur(3px);}
+.ms-coach-confirm h2{margin:0 0 12px;font-size:clamp(20px,5vw,24px);font-weight:800;color:#E5C478;}
+.ms-coach-confirm p{margin:0 0 20px;font-size:15px;line-height:1.5;overflow-wrap:anywhere;color:#F7F6F1;}
+.ms-coach-confirm-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;}
+.ms-coach-confirm-actions button{min-width:0;min-height:52px;touch-action:manipulation;border-radius:10px;font-size:15px;}
+.ms-coach-confirm-actions button:focus-visible{outline:3px solid #E5C478;outline-offset:3px;}
+
+/* Z Fold7 real-device fix: quick undo's correction form must be reachable without scrolling behind the fixed action dock. */
+@media(max-width:767px){
+  .live-match-console:has(#live-event-correction-form:not([hidden])) #live-event-correction-form{
+    position:fixed!important;left:12px!important;right:12px!important;top:calc(8dvh + env(safe-area-inset-top))!important;bottom:calc(78px + env(safe-area-inset-bottom))!important;
+    width:auto!important;height:auto!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-content:start!important;gap:10px!important;
+    padding:16px!important;margin:0!important;border:1px solid #E5C478!important;border-radius:16px!important;
+    background:#171B24!important;box-shadow:0 0 0 100vmax rgba(4,6,12,.79),0 18px 55px rgba(0,0,0,.65)!important;z-index:70!important;
+  }
+  .live-match-console #live-event-correction-form:not([hidden]) .field,
+  .live-match-console #live-event-correction-form:not([hidden]) button{min-width:0!important;width:100%!important;grid-column:1/-1!important}
+  .live-match-console #live-event-correction-form:not([hidden]) button{min-height:48px!important}
+}
+
+/* One-hand, real Android Chrome note entry: fixed safe-area sheet prevents sticky header/action bar hit interception. */
+.live-match-console:not([data-quick-mode="NOTE"]) .live-note-cancel{display:none!important}
+@media(max-width:767px){
+ .live-match-console[data-quick-mode="NOTE"] #live-event-form{
+  position:fixed!important;top:calc(13dvh + env(safe-area-inset-top))!important;bottom:calc(83px + env(safe-area-inset-bottom))!important;
+  left:12px!important;right:12px!important;width:auto!important;height:auto!important;max-height:none!important;overflow-y:auto!important;
+  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;gap:12px!important;
+  padding:20px 15px!important;margin:0!important;background:#181C26!important;border:1px solid #E5C478!important;border-radius:16px!important;
+  box-shadow:0 0 0 100vmax rgba(2,4,9,.79),0 18px 55px rgba(0,0,0,.65)!important;z-index:80!important;
+ }
+ .live-match-console[data-quick-mode="NOTE"] #live-event-form:before{content:"Maç Notu";font-size:19px;font-weight:800;color:#E5C478}
+ .live-match-console[data-quick-mode="NOTE"] #live-event-form .field:not(.live-e-note){display:none!important}
+ .live-match-console[data-quick-mode="NOTE"] #live-event-form .live-e-note,
+ .live-match-console[data-quick-mode="NOTE"] #live-event-form button{width:100%!important;min-width:0!important;min-height:45px!important;flex:0 0 auto!important;grid-column:1/-1!important}
+ .live-match-console[data-quick-mode="NOTE"] #live-event-form .live-note-cancel{display:block!important}
+}
+
+/* Galaxy Z Fold7 inner display (640 CSS px on the real device): compact two-column coach mode.
+   The physical inner panel is 1968×2184; Android Chrome reports 640×~537 CSS viewport.
+   This bridges the breakpoint gap between phone <=767 and tablet >=768. */
+.live-fold-home-link{display:none!important}
+@media (min-width:600px) and (max-width:767px){
+ body:has(.live-match-console) .app-shell>.mobile-nav{display:none!important}
+ body:has(.live-match-console) .main{height:100dvh!important;max-height:100dvh!important;padding:4px 7px!important;min-height:0!important}
+ body:has(.live-match-console) .main>.page{height:100%!important;padding:0!important;overflow:hidden!important}
+ body:has(.live-match-console) .live-match-console{height:100%!important;min-height:0!important;display:grid!important;grid-template-rows:auto auto auto minmax(0,1fr) auto!important;gap:5px!important}
+ .live-match-console .live-coach-header{min-height:29px!important}
+ .live-match-console .live-coach-header .live-head h1{font-size:17px!important}
+ .live-match-console .live-fold-home-link{display:inline-flex!important}
+ .live-match-console .live-coach-utilities .btn{padding:4px 7px!important;font-size:11px!important;min-height:33px!important}
+ .live-match-console .live-console-top>.live-surface{display:grid!important;grid-template-columns:minmax(110px,1fr) minmax(100px,1fr) minmax(120px,.9fr)!important;grid-template-rows:auto auto!important;grid-template-areas:"status clock controls" "caption total controls" "warning warning warning"!important;gap:2px 6px!important;padding:5px 7px!important;max-height:105px!important;min-height:0!important;overflow:hidden!important}
+ .live-match-console .live-console-top .live-top{grid-area:status!important;gap:2px!important;font-size:10px!important}
+ .live-match-console .live-console-top .live-status{font-size:10px!important;padding:3px 6px!important}
+ .live-match-console .live-console-top .live-console-score{font-size:21px!important}
+ .live-match-console .live-console-top .live-clock{grid-area:clock!important;font-size:clamp(31px,6vw,43px)!important;line-height:1.04!important;margin:0!important}
+ .live-match-console .live-console-top .live-controls{grid-area:controls!important;display:flex!important;justify-content:center!important}
+ .live-match-console .live-console-top .live-controls .btn{min-height:43px!important;padding:5px 7px!important;font-size:11px!important}
+ .live-match-console .live-console-top .live-caption{grid-area:caption!important;font-size:10px!important}
+ .live-match-console .live-console-top .live-total{grid-area:total!important;font-size:10px!important}
+ .live-match-console .live-coach-prompt{min-height:24px!important;padding:4px 8px!important;font-size:11px!important;line-height:1.15!important}
+ .live-match-console .live-console-stage{display:grid!important;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)!important;grid-template-rows:minmax(0,1fr)!important;align-items:stretch!important;gap:8px!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+ .live-match-console .live-console-stage>.live-console-pitch-column,.live-match-console .live-console-stage>.live-console-events-column{width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;display:block!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;flex:1 1 auto!important;scrollbar-width:thin}
+ .live-match-console .live-console-pitch-column .live-tactical-layout{grid-template-columns:minmax(0,1fr)!important;gap:6px!important}
+ .live-match-console .live-field{max-width:260px!important;max-height:300px!important}
+ .live-match-console .live-tactical-benchlist{max-height:95px!important;display:flex!important;overflow-x:auto!important;gap:4px!important}
+ .live-match-console .live-console-events-column .live-e-form{grid-template-columns:1fr!important}
+ .live-match-console .live-console-events-column .live-surface{padding:8px!important}
+ .live-match-console .live-event-shortcuts{grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-template-rows:1fr!important;gap:3px!important;padding:5px!important;min-height:51px!important}
+ .live-match-console .live-event-shortcuts .btn{min-height:44px!important;font-size:10px!important;line-height:1.1!important;padding:4px 1px!important;white-space:normal!important}
+ .live-match-console[data-quick-mode="NOTE"] #live-event-form{left:14%!important;right:14%!important;top:10dvh!important;bottom:8dvh!important}
+}

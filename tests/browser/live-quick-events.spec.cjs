@@ -6,8 +6,8 @@ test('quick event controls stay reachable and only save after confirmation',asyn
  await setup(page);
  const goal=page.locator('[data-action=live-quick-event][data-event-type=GOAL]');await expect(goal).toBeVisible();await expect(goal).toBeDisabled();
  await page.locator('[data-action=live-start]').click();await idle(page);await expect(goal).toBeEnabled();await expect.poll(()=>page.evaluate(()=>scrollY)).toBe(0);
- const box=await goal.boundingBox();expect(box.y).toBeGreaterThanOrEqual(0);expect(box.y+box.height).toBeLessThan(page.viewportSize().height-65);expect(box.height).toBeGreaterThanOrEqual(44);
- expect(await page.evaluate(()=>document.querySelector('.live-event-zone').compareDocumentPosition(document.querySelector('.live-tactical'))&Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
+ const box=await goal.boundingBox();expect(box.y).toBeGreaterThanOrEqual(0);expect(box.y+box.height).toBeLessThan(page.viewportSize().height-(page.viewportSize().width<767?65:10));expect(box.height).toBeGreaterThanOrEqual(44);
+ expect(await page.evaluate(()=>document.querySelector('.live-tactical').compareDocumentPosition(document.querySelector('.live-event-zone'))&Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
  if(info.project.name==='phone'){const toolbar=await page.locator('.live-event-shortcuts').boundingBox();for(const action of ['live-pause','live-end']){const control=await page.locator(`[data-action=${action}]`).boundingBox();expect(control.y+control.height).toBeLessThanOrEqual(toolbar.y);}const dir=path.resolve(__dirname,'../../test-results/reviews/update-05');fs.mkdirSync(dir,{recursive:true});await page.screenshot({path:path.join(dir,'quick-events-phone.png')});}
  await page.locator('#live-event-note').fill('Sahadan not');await goal.click();await expect(page.locator('#live-event-type')).toHaveValue('GOAL');await expect(page.locator('#live-event-player')).toBeFocused();await expect(page.locator('#live-event-note')).toHaveValue('Sahadan not');expect((await count(page)).length).toBe(1);
  await page.locator('#live-event-player').selectOption('p1');page.once('dialog',d=>d.dismiss());await page.locator('#live-event-form button[type=submit]').click();await idle(page);expect((await count(page)).length).toBe(1);await expect(page.locator('#live-event-note')).toHaveValue('Sahadan not');
@@ -25,8 +25,8 @@ test('shortcuts remain reachable after scrolling and respect match status',async
  await setup(page);page.on('dialog',d=>d.accept());const goal=page.locator('[data-event-type=GOAL]');
  await page.locator('[data-action=live-start]').click();await idle(page);
  await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'instant'}));
- const box=await goal.boundingBox();expect(box.y).toBeGreaterThanOrEqual(0);expect(box.y+box.height).toBeLessThan(page.viewportSize().height-65);
- await goal.click();await expect(page.locator('#live-event-player')).toBeFocused();const form=await page.locator('#live-event-form').boundingBox();expect(form.y).toBeGreaterThanOrEqual(0);expect(form.y).toBeLessThan(160);expect((await count(page)).length).toBe(1);
+ const box=await goal.boundingBox();expect(box.y).toBeGreaterThanOrEqual(0);expect(box.y+box.height).toBeLessThan(page.viewportSize().height-(page.viewportSize().width<767?65:10));
+ await goal.click();await expect(page.locator('#live-event-player')).toBeFocused();if(page.viewportSize().width<767){await expect(page.locator('.live-field')).toBeInViewport({ratio:0.1});}else{await expect(page.locator('#live-event-form')).toBeInViewport();}expect((await count(page)).length).toBe(1);
  await page.locator('[data-action=live-pause]').click();await idle(page);await expect(goal).toBeEnabled();
  await page.locator('[data-action=live-end]').click();await idle(page);await expect(goal).toBeEnabled();await page.locator('[data-action=live-next]').click();await idle(page);await page.locator('[data-action=live-end]').click();await idle(page);await expect(goal).toBeEnabled();
  await page.locator('[data-action=live-finish]').click();await idle(page);await expect(goal).toBeDisabled();await expect(page.locator('[data-action=live-quick-event]:enabled')).toHaveCount(0);
@@ -40,7 +40,7 @@ test('P1: matchday quick substitution control reaches the editable form without 
  await expect(quick).toBeVisible();
  const before=(await count(page)).length;
  await quick.click();
- await expect(page).toHaveURL(/#live-substitution-form$/);
+ await expect(page.locator("#live-coach-prompt")).toContainText("Değişim"); await expect(page.locator("#live-sub-out")).toBeFocused();
  await expect(page.locator('#live-substitution-form')).toBeVisible();
  await expect(page.locator('#live-sub-out')).toBeEnabled();
  expect((await count(page)).length).toBe(before);

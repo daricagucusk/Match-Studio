@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.matchdaystudio.app",
+      "sha256_cert_fingerprints": [
+        "49:8F:91:FC:D8:4F:80:11:88:F0:1D:E9:24:2B:B5:6D:7C:33:D6:E7:31:F5:C7:CE:02:B6:2C:B7:82:90:C0:4F"
+      ]
+    }
+  }
+]
