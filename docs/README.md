@@ -4,6 +4,10 @@ Güncel giriş [proje README](../README.md), klasör sorumlulukları [mimari](ST
 
 ## Başlangıç ve mimari
 
+- [Birleşik aday doğrulama ve sınırlar](BIRLESIK-ADAY-20261105.md)
+- [Birleştirme ve temizlik envanteri](MATCH-STUDIO-BIRLESTIRME-ENVANTERI-20261105.md)
+- [JARVIS yerel iş akışı](JARVIS_WORKFLOW.md) ve [ajan devir şablonu](AI_HANDOFF.md)
+- [F.18 saha konsolu değişiklikleri](F18-PREMIUM-COACH-CHANGELOG.md) ve [F.18 Fold7 cihaz raporu](F18-ZFOLD7-REAL-DEVICE-ACCEPTANCE.md)
 - [Birleşik F.17 kabul kaydı](FINAL-F17-20261102.md)
 
 - [RELEASE.md](RELEASE.md)

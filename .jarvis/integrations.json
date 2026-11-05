@@ -1,0 +1,23 @@
+{
+  "note": "Per-project connectors are opt-in. No credentials, account IDs or API tokens belong here.",
+  "agent_routes": {
+    "planning": "ollama/qwen3.5:9b",
+    "analysis": "opencode plan",
+    "review": "codex read-only"
+  },
+  "blocked_automatic_actions": [
+    "git push",
+    "git reset --hard",
+    "rm -rf",
+    "deploy",
+    "publish",
+    "ads_spend",
+    "account_changes"
+  ],
+  "automation": {
+    "allow_write_without_approval": false,
+    "allow_network_post_without_approval": false,
+    "max_parallel_agents": 1
+  },
+  "external_connectors": []
+}
