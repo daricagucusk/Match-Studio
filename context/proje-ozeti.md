@@ -4,7 +4,7 @@ Bu dosya projenin ne olduğunu, neden var olduğunu, kapsamını ve mevcut durum
 
 ## Projenin adı
 
-Match Studio — paket sürümü `2.6.8-f.17`.
+Match Studio — yerel aday paket sürümü `2.6.8-f.19-rc.1`.
 
 ## Kısa tanım
 
@@ -24,7 +24,7 @@ Başka Match Studio kopyaları, uzaktaki main, canlı Vercel ve Play Console bu 
 
 ## Mevcut durum
 
-`Calisma/Birlesik-Aday` seçilmiş yerel çalışma kaynağıdır. 2 Kasım 2026'da web girdileri, üretilen çıktılar, belgeler ve geçmiş kanıtlar ayrılmıştır. Güncel yerel doğrulama ve sınırlar: `docs/REORGANIZATION-20261102.md`. Eski kabul raporları tarihsel kanıttır.
+`Calisma/Birlesik-Tek-Surum` 5 Kasım 2026'da F.18 temeli üzerine F.19 geliştirmeleri ve yedek önizlemesi eklenerek oluşturulan yerel çalışma adayıdır. Testler ve açık sınırlar `docs/BIRLESIK-ADAY-20261105.md` içindedir. Bu adayın yerel durumu GitHub main veya canlı yayınla aynı sayılmaz. Eski kabul raporları tarihsel kanıttır.
 
 ## Önemli konumlar
 
