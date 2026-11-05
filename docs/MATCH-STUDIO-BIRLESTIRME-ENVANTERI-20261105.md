@@ -51,6 +51,8 @@ P0 çalışma ağacının 42 kaydedilmemiş dosyası ve arşivlenen çıktısı 
 
 Sonraki içerik incelemesinde #28'in dolu kulübü farklı yedeğe karşı koruyan `assertBackupTarget` kodu ve testlerinin, #29'un `reducedMotion` test düzeltmesinin GitHub main kaynaklarında mevcut olduğu doğrulandı. Her iki PR'ın uzak başı tekrar denetlendikten sonra #28 ve #29 kapatıldı; dalları silinmedi.
 
+#19'un kulüp değişimi, yavaş okuma, iptal ve geri yükleme sonrası fikstür önizlemesini geçersiz kılma amacı `origin/main` içinde farklı bir uygulama ile karşılanıyor; mevcut birim ve tarayıcı testlerinde aynı kulüp adlarıyla A→B→A, yavaş okuma ve geri yükleme senaryoları bulunuyor. Bu içerik incelemesinden sonra #19 kapatıldı; özgün dal silinmedi. Uygulamalar byte düzeyinde aynı değildir.
+
 ## Bağımsız Git geçişi
 
 5 Kasım'da eski ortak depodan tüm Git referanslarını içeren `Gecmis-Kaynaklar/MatchStudio-tum-git-gecmisi-20261105.bundle` oluşturuldu ve `git bundle verify` başarılı oldu. SHA-256: `3e766d4f28d8d79ef8992e90581548b5ba1371926d350a5efe39c68ad1dadfd5`. Bağımsız depoda eski 47 `refs/` kaydı `refs/archive/` altında birebir doğrulandı; `git fsck --full` hata olmadan tamamlandı. Yerel bundle ve arşiv referansları özel çalışma geçmişi içerebilir; yayımlanmaz.
@@ -72,3 +74,5 @@ Bağımsız adayda 115 birim testi, derleme ve mevki/yedek odaklı 12 tarayıcı
 F.16 PWA ZIP içindeki 28/28 dosya ve F.16 Source ZIP içindeki 233/233 dosya, aynı isimli açılmış klasörlerde SHA-256 ile birebir eşleşti; klasör dosya sayıları da aynı. `stitch görseller.zip` içindeki 54/54 dosya açılmış görsellerle eşleşti. Bu kontrol ZIP dışındaki başlatıcıların veya başka konumlardaki dosyaların kullanımını kanıtlamaz.
 
 5 Kasım: F.16 PWA ve Source ZIP içerikleri dosya sayısı, güvenli yol ve SHA-256 ile yeniden kontrol edildi. İki ZIP `Gecmis-Kaynaklar/Korunan-F16-20261105/` altına taşındı ve taşıma öncesi/sonrası SHA-256 eşitliği doğrulandı. Ardından yalnızca bu ZIP'lerle birebir eşleşen iki açılmış F.16 klasörü kaldırıldı; yaklaşık 27.471.234 bayt açılmış kopya temizlendi. Stitch görselleri ve diğer kopyalar değiştirilmedi.
+
+F.17 PWA ve Source ZIP'leri de 5 Kasım'da `Gecmis-Kaynaklar/Korunan-F17-20261105/` altına taşındı; taşıma öncesi ve sonrası SHA-256 eşleşti. PWA `64ff510102789b8ba20020cc463bfbc539a287c85d6d610c52d90fc645f9a478`, kaynak `225e17425ebb6f6a29caf0bad1888e79ed3aa6d66b5dfda19109452ac4224d51`. Taşıma disk alanı açmaz; eski paketleri çalışma girişinden ayırır.

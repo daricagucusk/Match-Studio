@@ -16,7 +16,7 @@ test('Z Fold7 640 CSS px inner viewport uses two-column single-screen coach cons
  await page.locator('[data-action=live-quick-note][data-note-kind=technical]').click();
  expect(await page.locator('#live-event-form').evaluate(e=>getComputedStyle(e).position)).toBe('fixed');
  await page.locator('[data-action=live-cancel-quick-note]').click();
- expect(await page.locator('.live-match-console').getAttribute('data-quick-mode')).toBeNull();
+ await expect(page.locator('.live-match-console')).not.toHaveAttribute('data-quick-mode',/./);
  await expect(page.locator('.live-e-history summary')).toContainText('(0)');
 });
 
