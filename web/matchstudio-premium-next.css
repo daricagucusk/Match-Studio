@@ -252,3 +252,74 @@ body:has(.live-match-console) .main>.page{width:100%!important;min-width:0!impor
  .live-match-console .live-event-shortcuts .btn{min-height:44px!important;font-size:10px!important;line-height:1.1!important;padding:4px 1px!important;white-space:normal!important}
  .live-match-console[data-quick-mode="NOTE"] #live-event-form{left:14%!important;right:14%!important;top:10dvh!important;bottom:8dvh!important}
 }
+
+/* F.19 — Coach-position intelligence: independent FM-like slot cards. */
+.dg-tp-f19 .dg-tp-role{min-width:0;overflow:visible;isolation:isolate}
+.dg-tp-f19 .dg-tp-role-tactic{display:block;max-width:100%;color:#f5d999;font-size:10px;font-weight:750;line-height:1.15;text-align:center;overflow-wrap:anywhere}
+.dg-tp-f19 .dg-tp-roster{display:grid;gap:3px}
+.dg-tp-f19 .dg-tp-roster span{display:block;font-size:10px;line-height:1.2;overflow-wrap:anywhere}
+.dg-tp-f19 .dg-tp-roster span b{color:#e5c478}
+.dg-tp-f19 .dg-tp-slot-detail{align-items:start;min-width:0;gap:10px;text-align:left}
+.dg-tp-f19 .dg-tp-slot-detail.selected{border-color:#e5c478;box-shadow:inset 0 0 0 1px #e5c47877}
+.dg-tp-f19 .dg-tp-slot-detail em{white-space:nowrap;font-size:10px;font-style:normal;color:#e5c478}
+.dg-tp-f19 .dg-tp-slot-candidates{min-width:0;display:grid;gap:4px}
+.dg-tp-f19 .dg-tp-slot-candidates small{display:block;white-space:normal;line-height:1.4}
+.dg-tp-f19 .dg-tp-extra-candidates{display:flex;flex-wrap:wrap;gap:5px;align-items:baseline}
+.dg-tp-f19 .dg-tp-alt-name{padding:3px 7px;background:#242631;border:1px solid #494338;border-radius:6px;font-size:11px;color:#f7f7f5}
+.dg-tp-f19 [data-team-slot]:focus-visible{outline:3px solid #e5c478;outline-offset:2px}
+.dg-tp-tactical-field{padding:10px;border:1px solid #5a503d;background:#171b25;border-radius:10px}
+.dg-tp-tactical-field select{width:100%;min-height:44px}
+.dg-tp-tactical-field small{display:block;color:#b5b7c1;margin-top:6px;font-size:11px}
+.dg-tp-full-depth{margin-top:12px;border:1px solid #504735;border-radius:10px;padding:10px;background:#191d26}
+.dg-tp-full-depth>strong{display:block;color:#e5c478;font-size:12px;margin-bottom:8px}
+.dg-tp-full-depth ol{margin:0;padding:0;list-style:none;display:grid;gap:4px;max-height:230px;overflow-y:auto}
+.dg-tp-full-depth li{display:flex;gap:8px;align-items:center;padding:4px 7px;background:#232733;border-radius:6px;font-size:12px}
+.dg-tp-choice-rank{flex:none;min-width:75px;font-variant-numeric:tabular-nums;color:#e5c478}
+@media(max-width:767px){
+ .dg-tp-f19 .dg-tp-slot-detail{min-height:50px}
+ .dg-tp-f19 .dg-tp-role-tactic{font-size:9px}
+}
+/* F.19 — real-life readable coach pitch; reserve the right column for events.
+   Previously width was clamped to 335px (around 216px in the attached screenshot). */
+@media(min-width:1200px) and (min-height:700px){
+ .live-match-console .live-console-stage{grid-template-columns:minmax(0,1.3fr) minmax(350px,.7fr)}
+ .live-match-console .live-console-pitch-column .live-tactical-layout{
+    grid-template-columns:minmax(0,1fr) minmax(150px,.33fr);gap:10px;align-items:start
+ }
+ .live-match-console .live-console-pitch-column .live-field{
+    width:min(100%,38dvh,490px)!important;max-width:none!important;
+    max-height:none!important;height:auto!important;aspect-ratio:.78;margin-inline:auto
+ }
+ .live-match-console .live-field-player{min-width:49px;min-height:45px;max-width:70px}
+ .live-match-console .live-field-player .live-field-name{font-size:9.5px;line-height:1.1;max-width:69px}
+ .live-match-console .live-field-player .live-field-number{font-size:14px}
+ .live-match-console .live-field-minute{font-size:10px}
+ .live-match-console .live-console-pitch-column .live-tactical-benchlist{max-height:min(58dvh,540px)}
+}
+/* Galaxy Z Fold7 open/compact landscape keeps a usable main pitch. */
+@media(min-width:768px) and (max-width:1199px){
+ .live-match-console .live-console-pitch-column .live-field{
+   width:min(100%,38dvh,390px)!important;max-width:none!important;
+   max-height:none!important;height:auto!important
+ }
+ .live-match-console .live-console-stage{grid-template-columns:minmax(0,1.14fr) minmax(0,.86fr)}
+}
+
+
+/* matchday-fast-events-v1 — readable on a Fold cover display */
+.live-match-console .live-player-badges{position:absolute;top:-9px;left:50%;transform:translateX(-50%);display:flex;gap:2px;justify-content:center;pointer-events:none;white-space:nowrap;z-index:3}
+.live-match-console .live-player-badge{display:inline-flex;align-items:center;justify-content:center;border:1px solid #a4c3bd;border-radius:5px;padding:1px 3px;font-size:9px;line-height:1.15;min-height:14px;font-weight:850;color:#fff;background:#134c55;white-space:nowrap}
+.live-match-console .live-player-badge.badge-yellow{background:#f2c74c;border-color:#f8de85;color:#111a25}
+.live-match-console .live-player-badge.badge-red{background:#b92834;border-color:#ff8490;color:white}
+.live-match-console .live-field-player.live-sent-off{border-color:#f26b74;box-shadow:0 0 0 2px #c9364544}
+.live-match-console .live-field-player{overflow:visible}
+.live-match-console .live-bench-badges{display:inline-flex;flex-wrap:wrap;gap:3px;margin-left:5px;vertical-align:middle}
+.live-match-console .live-player-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;background:#102c32;color:#f2f9ff;padding:8px;margin:8px 0;border:1px solid #618c95;border-radius:12px}
+.live-match-console .live-player-actions[hidden]{display:none}
+.live-match-console .live-player-actions strong{max-width:100%;font-size:12px}
+.live-match-console .live-player-actions button{background:#183844;color:#fff;border:1px solid #5a8597;border-radius:8px;min-width:48px;min-height:46px;padding:5px 10px;font-weight:800;touch-action:manipulation}
+.live-match-console .live-player-actions button:focus-visible{outline:3px solid #ffe0a0;outline-offset:2px}
+.live-match-console .live-quick-feedback{display:flex;gap:8px;align-items:center}
+.live-match-console #live-assist-none{flex-shrink:0;min-height:44px}
+.live-match-console #live-assist-none[hidden]{display:none}
+@media(max-width:699px){.live-match-console .live-player-badge{font-size:8px;padding:1px 2px}.live-match-console .live-player-badges{max-width:88px;flex-wrap:wrap;row-gap:1px}.live-match-console .live-quick-feedback{flex-wrap:wrap}.live-match-console .live-player-actions{position:relative;z-index:8}.live-match-console .live-player-actions button{flex:1 1 50px;padding:5px 4px}}

@@ -26,8 +26,8 @@ test('coach console keeps clock, score, actions, pitch and substitutions on one 
  await expect(page.locator('.live-console-secondary')).toHaveAttribute('open','');
  await page.locator('.live-console-secondary > summary').click();
  await expect(page.locator('.live-console-secondary')).not.toHaveAttribute('open','');
- await page.locator('[data-event-type=GOAL]').click();
- await expect(page.locator('#live-event-player')).toBeFocused();
+ await page.locator('[data-action=live-quick-event][data-event-type=GOAL]').click();
+ await expect(page.locator('#live-coach-prompt')).toContainText('Golcüye dokun');
 });
 
 test('roster selection preserves scroll offset and can filter out chosen players',async({page})=>{

@@ -44,14 +44,18 @@ function validateBackup(data){
 }
 async function inspectBackup(file,password){
  try{
+  const ctx=clubContext();if(selectedClub?.id!==ctx.id)throw Error('Aktif kulüp kimliği uyuşmuyor.');
   const decoded=await decodeBackupBlob(file,password);
+  assertContext(ctx);
   if(decoded.needsPassword)return {valid:false,needsPassword:true,encrypted:true,counts:{},warnings:[]};
   const data=decoded.payload,warnings=validateBackup(data);
-  if(!warnings.length&&selectedClub?.id)await assertBackupTarget(data,selectedClub.id);
+  if(!warnings.length)await assertBackupTarget(data,ctx.id);
   // Report legacy orphaned references separately; do not silently change them.
   const integrityWarnings=warnings.length?[]:checkSnapshotIntegrity(normalizeBackupStores(data));
-  if(!warnings.length&&selectedClub?.id)await assertNoErasedPlayers(selectedClub.id,normalizeBackupStores(data));
-  return {valid:!warnings.length,encrypted:decoded.encrypted,counts:Object.fromEntries(STORES.map(s=>[s,data?.stores?.[s]?.length||0])),warnings,integrityWarnings,club:data?.club?.name||null,clubId:data?.club?.id||null,schemaVersion:data?.schemaVersion};
+  if(!warnings.length)await assertNoErasedPlayers(ctx.id,normalizeBackupStores(data));
+  const existing=warnings.length?null:await captureCurrentStores();assertContext(ctx);
+  const existingCounts=existing?Object.fromEntries(STORES.map(s=>[s,existing[s].length])):null;
+  return {valid:!warnings.length,encrypted:decoded.encrypted,counts:Object.fromEntries(STORES.map(s=>[s,data?.stores?.[s]?.length||0])),existingCounts,warnings,integrityWarnings,club:data?.club?.name||null,clubId:data?.club?.id||null,schemaVersion:data?.schemaVersion};
  }catch(e){return {valid:false,counts:{},warnings:[e.message]};}
 }
 async function exportEncryptedBackup(password){return encryptBackupBlob(await exportBackup(),password);}

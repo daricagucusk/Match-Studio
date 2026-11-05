@@ -28,7 +28,7 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
  for(let i=0;i<4;i++){await page.locator('input[data-player-id]').nth(i).check();await idle(page);}
  await nav(page,'pitch');await expect(page.locator('[data-pitch-slot]')).toHaveCount(3);
  // The bench and field are separated by a smooth page scroll; keep the drag target stationary.
- if(info.project.name==='desktop'){await page.emulateMedia({reducedMotion:'reduce'});await page.locator('[data-pitch-player]:visible').first().dragTo(page.locator('[data-pitch-slot]:visible').first());await idle(page);await expect(page.locator('[data-pitch-slot]')).toContainText(['Oyuncu 4','Oyuncu 2','Oyuncu 3']);}
+ if(info.project.name==='desktop'){await page.emulateMedia({reducedMotion:'reduce'});await page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});await page.locator('.pitch-field').evaluate(el=>el.getBoundingClientRect().toJSON());await page.locator('[data-pitch-player]:visible').first().dragTo(page.locator('[data-pitch-slot]:visible').first());await idle(page);await expect(page.locator('[data-pitch-slot]')).toContainText(['Oyuncu 4','Oyuncu 2','Oyuncu 3']);}
  await nav(page,'live');await expect(page.locator('#live-rules-form')).toBeVisible();await page.locator('#live-substitution-mode').selectOption('returnAllowed');
  await page.locator('#live-rules-form button[type=submit]').click();await idle(page);await page.locator('[data-action=live-start]').click();await idle(page);
  await expect(page.locator('.live-status')).toHaveText('Oynanıyor');

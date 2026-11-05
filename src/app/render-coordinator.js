@@ -10,6 +10,21 @@ function createRenderCoordinator(root){
   // Keep the coach's place when selecting players on a long roster.
   const oldRoster=canPatch?content.querySelector('.roster-list'):null;
   const rosterPosition=oldRoster?{top:oldRoster.scrollTop,left:oldRoster.scrollLeft,pageY:window.scrollY,playerId:document.activeElement?.dataset?.playerId}:null;
+  // Same-route views are reconstructed after player clicks. Preserve inner scroll
+  // containers and the exact focused athlete; never move the pitch on selection.
+  const retainScrollSelectors=['.pitch-side','.pitch-bench-list','.pitch-layout','.pitch-main','.v22-team-members','.dg-tp-slot-list','.dg-tp-slot-list-grid','.live-tactical-benchlist','.live-console-pitch-column','.live-console-events-column'];
+  const oldScroll=canPatch?retainScrollSelectors.map(selector=>{
+   const element=content.querySelector(selector);
+   return element?{selector,top:element.scrollTop,left:element.scrollLeft}:null;
+  }).filter(Boolean):[];
+  const oldPageY=canPatch?window.scrollY:null;
+  const oldFocus=canPatch&&content.contains(document.activeElement)?(()=>{
+   const element=document.activeElement;
+   for(const dataName of ['pitchPlayer','pitchSlot','pitchRolePlayer','teamSlotPlayer','teamRolePlayer','teamSlot']){
+    if(element.dataset?.[dataName]!==undefined)return {dataName,value:element.dataset[dataName]};
+   }
+   return element.id?{id:element.id}:null;
+  })():null;
   // A clock action first renders a loading state; retain opened reports across that intermediate render.
   if(previousKey!==key)expandedLive=[];
   const existingLive=canPatch?content.querySelector('.live-match-console'):null;
@@ -32,6 +47,19 @@ function createRenderCoordinator(root){
    }
    if(Math.abs(window.scrollY-rosterPosition.pageY)>1)window.scrollTo({top:rosterPosition.pageY,behavior:'instant'});
   }
+  for(const position of oldScroll){
+   const element=root.querySelector(position.selector);
+   if(element){element.scrollTop=position.top;element.scrollLeft=position.left;}
+  }
+  if(oldFocus){
+   let element=oldFocus.id?document.getElementById(oldFocus.id):null;
+   if(oldFocus.dataName){
+    element=[...root.querySelectorAll('[data-'+oldFocus.dataName.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+']')]
+      .find(candidate=>candidate.dataset[oldFocus.dataName]===oldFocus.value);
+   }
+   if(element?.isConnected&&!element.disabled)element.focus({preventScroll:true});
+  }
+  if(oldPageY!==null&&Math.abs(window.scrollY-oldPageY)>1)window.scrollTo({top:oldPageY,behavior:'instant'});
   previousKey=key;
   return canPatch?'page':'shell';
  }

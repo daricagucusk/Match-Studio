@@ -1,5 +1,5 @@
 
-const {TEAM_ROLES,sanitizeTeamDepth}=require("src/domain/team-depth.js");
+const {TEAM_ROLES,TEAM_ROLE_PROFILES,sanitizeTeamDepth,getSlotKey,getSlotIdentity,getTeamSlotCandidates}=require("src/domain/team-depth.js");
 const {getPitchPresets}=require("src/domain/lineup.js");
 
 
@@ -73,11 +73,12 @@ function getFormationPitchSlots(formation='4-3-3'){
 // Fill all primary positions first, then use remaining athletes for backups.
 // The augmenting path maximises filled positions instead of greedily consuming
 // a versatile player while another role becomes empty.
-function matchRoleSlots(slots,roles,idMap,excluded=new Set()){
+function matchRoleSlots(slots,roles,idMap,excluded=new Set(),slotCandidates={}){
  const assigned=new Map(),claimedByPlayer=new Map();
  function find(slotIndex,visited){
-  const role=slots[slotIndex].role;
-  for(const id of roles[role]||[]){
+  const slot=slots[slotIndex],role=slot.role,key=getSlotKey(role,slot.roleIndex);
+  const candidates=Object.prototype.hasOwnProperty.call(slotCandidates,key)?slotCandidates[key]:roles[role];
+  for(const id of candidates||[]){
    if(excluded.has(id)||!idMap.has(id)||visited.has(id))continue;
    visited.add(id);
    const old=claimedByPlayer.get(id);
@@ -100,25 +101,42 @@ function getTeamPitchAnalysis(depth,players=[],prefs={}){
  const idMap=new Map(eligible.map(p=>[p.id,p]));
  const formationTargets=getPositionTargets(safePrefs.formation);
  const tacticalSlots=getFormationPitchSlots(safePrefs.formation);
- const first=matchRoleSlots(tacticalSlots,normalized.roles,idMap);
+ const first=matchRoleSlots(tacticalSlots,normalized.roles,idMap,new Set(),normalized.slotCandidates);
  const reserved=new Set(first.values());
- const second=safePrefs.depthFactor===2?matchRoleSlots(tacticalSlots,normalized.roles,idMap,reserved):new Map();
- const selectedIds=new Set(),nominations=new Map();
- for(const r of TEAM_ROLES)for(const id of normalized.roles[r.code]||[]){
-  if(!idMap.has(id))continue;
-  selectedIds.add(id);nominations.set(id,(nominations.get(id)||0)+1);
+ // Show two explicit coaching preferences even when the coverage goal is 1x.
+ const second=matchRoleSlots(tacticalSlots,normalized.roles,idMap,reserved,normalized.slotCandidates);
+ const selectedIds=new Set(),nominations=new Map(),nominatedRoles=new Map();
+ const nominate=(id,code)=>{
+  if(!idMap.has(id))return;
+  selectedIds.add(id);
+  const roles=nominatedRoles.get(id)||new Set();
+  roles.add(code);nominatedRoles.set(id,roles);
+ };
+ for(const r of TEAM_ROLES)for(const id of normalized.roles[r.code]||[])nominate(id,r.code);
+ for(const [slotKey,ids] of Object.entries(normalized.slotCandidates)){
+  const code=slotKey.split(':')[0];
+  for(const id of ids)nominate(id,code);
  }
+ for(const [id,roles] of nominatedRoles)nominations.set(id,roles.size);
  const positions={};let missingSlots=0,assignedPrimary=0,assignedBackups=0;
  const assignments=tacticalSlots.map((slot,index)=>{
   const p=first.has(index)?idMap.get(first.get(index)):null;
   const backup=second.has(index)?idMap.get(second.get(index)):null;
   if(p)assignedPrimary++;else missingSlots++;
-  if(safePrefs.depthFactor===2){if(backup)assignedBackups++;else missingSlots++;}
-  return {...slot,slotIndex:index,primary:p,backup};
+  if(backup)assignedBackups++;
+  if(safePrefs.depthFactor===2&&!backup)missingSlots++;
+  const identity=getSlotIdentity(slot);
+  const pool=getTeamSlotCandidates(normalized,identity.key).map(id=>idMap.get(id)).filter(Boolean);
+  const alternatives=pool.filter(candidate=>candidate.id!==p?.id&&candidate.id!==backup?.id);
+  const availableRoles=TEAM_ROLE_PROFILES[slot.role];
+  const tacticalRole=normalized.tacticalRoles[identity.key]||availableRoles[0].id;
+  const tacticalRoleName=availableRoles.find(r=>r.id===tacticalRole)?.name||availableRoles[0].name;
+  return {...slot,...identity,slotIndex:index,primary:p,backup,alternatives,candidateCount:pool.length,tacticalRole,tacticalRoleName};
  });
  for(const r of TEAM_ROLES){
-  const candidates=(normalized.roles[r.code]||[]).map(id=>idMap.get(id)).filter(Boolean);
   const roleSlots=assignments.filter(s=>s.role===r.code);
+  const ids=[...new Set([...(normalized.roles[r.code]||[]),...roleSlots.flatMap(s=>getTeamSlotCandidates(normalized,s.key))])];
+  const candidates=ids.map(id=>idMap.get(id)).filter(Boolean);
   const members=[...roleSlots.map(s=>s.primary),...roleSlots.map(s=>s.backup)].filter(Boolean);
   const slots=formationTargets[r.code]||0,target=slots*safePrefs.depthFactor,count=members.length;
   const status=target===0?(candidates.length?'alternative':'optional'):count<target?'missing':candidates.length>target?'crowded':'balanced';

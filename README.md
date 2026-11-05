@@ -1,6 +1,6 @@
 # Match Studio
 
-Kulüp, grup, sporcu, kadro ve canlı maç yönetimi için çevrimdışı çalışabilen web uygulaması. Afiş üretimi, şifreli yedekleme ve geri yükleme içerir. Paket sürümü: `2.6.8-f.17`.
+Kulüp, grup, sporcu, kadro ve canlı maç yönetimi için çevrimdışı çalışabilen web uygulaması. Afiş üretimi, şifreli yedekleme ve geri yükleme içerir. Paket sürümü: `2.6.8-f.19-rc.1` (F.19 aday sürüm; F.18 `6470d9e` temel alınmıştır).
 
 Birleşik sürüm; mevcut veri korumalarını, F.16 Sezon Analitiğini ve Stitch altın/obsidyen tasarımını birleştirir. Erişim ve tarayıcıdan güncelleme: [bağlantı rehberi](docs/guides/ERISIM_VE_GUNCELLEME.md).
 

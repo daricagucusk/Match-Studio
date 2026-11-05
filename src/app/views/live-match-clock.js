@@ -1,22 +1,43 @@
 // Live match clock screen — no persistence or implicit timer side effects during rendering.
 const {projectClock,formatClock,STATUS}=require('src/domain/match-clock.js');
 const {calculatePlayerMinutes}=require('src/domain/match-substitutions.js');
+const {projectMatchReport}=require('src/domain/match-events-report.js');
+const {projectLiveActionIndicators}=require('src/domain/live-action-indicators.js');
 const {createMatchEventsView,LABEL}=require('src/app/views/live-events-report.js');
-function renderLiveTactical({tactical,match,onField,bench,labelFor,minutes,canSub,roster,esc}){
+function renderLiveTactical({tactical,match,onField,bench,labelFor,minutes,canSub,roster,indicators,esc}){
  const {slots,assignments,formation,needsReview,warning,isCrosswise,facilityHtml}=tactical;
  const names=Object.fromEntries((roster?.entries||[]).map(e=>[e.playerId,String(e.shirtNumberSnapshot||'')]));
  const field=slots.map((slot,index)=>{
   const id=assignments[String(index)],name=id?labelFor(id):'Boş konum',position=esc(slot.label||'OY');
   const shirt=id?(names[id]||String(index+1)):'+';
-  return `<button type="button" class="live-field-player ${id?'occupied':'vacant'}" style="--x:${Number(slot.x)}%;--y:${Number(slot.y)}%" ${id&&canSub?`data-live-pitch-out="${esc(id)}" aria-pressed="false"`:'disabled'} aria-label="${name} · ${position}${id?' · sahadan çıkar':''}"><span class="live-field-number">${esc(shirt)}</span><span class="live-field-name">${name}</span><span class="live-field-position">${position}</span><span class="live-field-minute" data-live-whole-minutes="${esc(id)}">${Math.floor((minutes.byPlayer[id]?.playedMs||0)/60000)} dk</span></button>`;
+  const stat=id?(indicators[id]||{}):{};
+  const badges=id?[
+   stat.goals?'<span data-kind="goal" class="live-player-badge">⚽ '+stat.goals+'</span>':'',
+   stat.assists?'<span data-kind="assist" class="live-player-badge">A '+stat.assists+'</span>':'',
+   stat.yellow?'<span data-kind="yellow" class="live-player-badge badge-yellow">🟨 '+stat.yellow+'</span>':'',
+   stat.red?'<span data-kind="red" class="live-player-badge badge-red">🟥 '+stat.red+'</span>':'',
+   stat.inCount?'<span data-kind="sub-in" class="live-player-badge">⇧</span>':''
+  ].filter(Boolean).join(''):'';
+  return `<button type="button" class="live-field-player ${id?'occupied':'vacant'}${stat.red?' live-sent-off':''}" style="--x:${Number(slot.x)}%;--y:${Number(slot.y)}%" ${id&&canSub?`data-live-pitch-out="${esc(id)}" aria-pressed="false"`:'disabled'} aria-label="${name} · ${position}${id?' · işlem seç':''}${stat.goals?' · '+stat.goals+' gol':''}${stat.assists?' · '+stat.assists+' asist':''}${stat.yellow?' · '+stat.yellow+' sarı kart':''}${stat.red?' · '+stat.red+' kırmızı kart':''}"><span class="live-field-number">${esc(shirt)}</span><span class="live-field-name">${name}</span><span class="live-field-position">${position}</span><span class="live-player-badges" aria-hidden="true">${badges}</span><span class="live-field-minute" data-live-whole-minutes="${esc(id)}">${Math.floor((minutes.byPlayer[id]?.playedMs||0)/60000)} dk</span></button>`;
  }).join('');
- const benchChips=bench.map(id=>`<button type="button" class="live-bench-chip" data-live-pitch-in="${esc(id)}" aria-pressed="false" ${canSub?'':'disabled'}><span>${labelFor(id)}</span><small data-live-whole-minutes="${esc(id)}">${Math.floor((minutes.byPlayer[id]?.playedMs||0)/60000)} dk</small></button>`).join('');
+ const benchChips=bench.map(id=>{
+  const stat=indicators[id]||{};
+  const badges=[
+   stat.goals?'<span data-kind="goal" class="live-player-badge">⚽ '+stat.goals+'</span>':'',
+   stat.assists?'<span data-kind="assist" class="live-player-badge">A '+stat.assists+'</span>':'',
+   stat.yellow?'<span data-kind="yellow" class="live-player-badge badge-yellow">🟨 '+stat.yellow+'</span>':'',
+   stat.red?'<span data-kind="red" class="live-player-badge badge-red">🟥 '+stat.red+'</span>':'',
+   stat.outCount?'<span data-kind="sub-out" class="live-player-badge">⇩</span>':''
+  ].filter(Boolean).join('');
+  return `<button type="button" class="live-bench-chip" data-live-pitch-in="${esc(id)}" aria-pressed="false" ${canSub?'':'disabled'}><span>${labelFor(id)}<span class="live-bench-badges" aria-hidden="true">${badges}</span></span><small data-live-whole-minutes="${esc(id)}">${Math.floor((minutes.byPlayer[id]?.playedMs||0)/60000)} dk</small></button>`;
+ }).join('');
  return `<section class="live-surface live-tactical" aria-labelledby="live-tactical-title">
  <div class="live-tactical-header"><div><div class="live-eyebrow">CANLI DİZİLİŞ</div><h2 id="live-tactical-title">Canlı Taktik Saha</h2><p>${esc(formation)} · ${onField.length} sahada / ${bench.length} yedek</p></div><span class="live-tactical-sync">● Kayıtlar bu cihazda</span></div>
  ${isCrosswise?facilityHtml(match):''}
  ${needsReview?`<p class="live-warning" role="status">${esc(warning)}</p>`:''}
- <div class="live-tactical-layout"><div class="live-field-wrap"><div class="live-field-attack">↑ HÜCUM YÖNÜ</div><div class="live-field" role="group" aria-label="Canlı sahadaki oyuncular, değişiklik için dokunarak seçin"><div class="live-field-lines live-field-mid"></div><div class="live-field-lines live-field-circle"></div><div class="live-field-lines live-field-goal-top"></div><div class="live-field-lines live-field-goal-bottom"></div>${field}</div></div>
+ <div class="live-tactical-layout"><div class="live-field-wrap"><div class="live-field-attack">↑ HÜCUM YÖNÜ</div><div class="live-field" role="group" aria-label="Canlı sahadaki oyuncular, hızlı maç işlemi için dokunun"><div class="live-field-lines live-field-mid"></div><div class="live-field-lines live-field-circle"></div><div class="live-field-lines live-field-goal-top"></div><div class="live-field-lines live-field-goal-bottom"></div>${field}</div></div>
  <div class="live-tactical-bench"><h3>Yedek kulübesi <span>${bench.length}</span></h3><p>Çıkacak oyuncuyu sahadan, girecek oyuncuyu aşağıdan seçin.</p><div class="live-tactical-benchlist">${benchChips||'<p class="live-muted">Yedek bulunmuyor.</p>'}</div></div></div>
+ <div id="live-player-actions" class="live-player-actions" role="group" aria-label="Seçilen oyuncuya hızlı işlem" hidden><strong id="live-selected-player">Oyuncu seçildi</strong><button type="button" data-action="live-player-quick" data-event-type="GOAL">⚽ Gol</button><button type="button" data-action="live-player-quick" data-event-type="YELLOW_CARD">🟨 Sarı</button><button type="button" data-action="live-player-quick" data-event-type="RED_CARD">🟥 Kırmızı</button><button type="button" data-action="live-player-quick" data-event-type="SUBSTITUTION">⇄ Değişim</button><button type="button" data-action="live-player-close" aria-label="Hızlı menüyü kapat">×</button></div>
  <div class="live-action-dock"><span id="live-pitch-selection" role="status" aria-live="polite">Sahadan oyuncu seçin → Yedekten oyuncu seçin</span><button type="submit" form="live-substitution-form" id="live-pitch-confirm" class="btn btn-primary" disabled>Değişikliği onayla</button></div>
  <p class="live-muted live-pitch-footnote">Saha değişiklikleri önceki taktik planını değiştirmez. Her değişiklik, oturum ve olay geçmişine tek işlemde kaydedilir.</p></section>`;
 }
@@ -50,18 +71,20 @@ function createLiveMatchViews({state,esc,btn,I,allMatches,getGroup,activeLineup,
   const benchRows=bench.map(id=>`<div class="live-player-row"><span><strong>${labelFor(id)}</strong><small>Yedek</small></span><strong data-live-minutes="${esc(id)}">${formatClock(minutes.byPlayer[id]?.playedMs||0)}</strong></div>`).join('');
   const lineup=typeof activeLineup==='function'?activeLineup():null;
   const tactical=projectLivePitch?projectLivePitch({session,events:state.liveEvents||[],match,lineup}):null;
-  const tacticalHtml=tactical?renderLiveTactical({tactical,match,onField,bench,labelFor,minutes,canSub,roster,esc}):'';
+  const badgeReport=projectMatchReport(session,state.liveEvents||[],state.data.players||[],roster,nowMs);
+  const indicators=projectLiveActionIndicators(session,state.liveEvents||[],badgeReport);
+  const tacticalHtml=tactical?renderLiveTactical({tactical,match,onField,bench,labelFor,minutes,canSub,roster,indicators,esc}):'';
   const eventSections=createMatchEventsView({session,events:state.liveEvents||[],match,players:state.data.players||[],roster,esc,nowMs});
   const subUI=`<section class="live-surface live-substitution" aria-labelledby="live-sub-title"><div class="live-sub-head"><h2 id="live-sub-title">Oyuncu değişiklikleri</h2><span>${esc(onField.length)} sahada · ${esc(bench.length)} yedek</span></div><p>İşlemler maç geçmişine kaydedilir. Oynanan süre, devre arası ve duraklamalar hariç hesaplanır.</p>
   ${minutes.reviewRequired?'<p class="live-warning" role="status">Saat düzeltmesi veya eksik olay geçmişi var. Oyuncu sürelerini kontrol edin.</p>':''}
   <form id="live-substitution-form" class="live-sub-form"><div class="field"><label for="live-sub-out">Sahadan çıkan</label><select name="outPlayerId" id="live-sub-out" required ${canSub?'':'disabled'}><option value="">Oyuncu seçin</option>${options(onField)}</select></div><div class="field"><label for="live-sub-in">Oyuna giren</label><select name="inPlayerId" id="live-sub-in" required ${canSub?'':'disabled'}><option value="">Yedek seçin</option>${options(bench)}</select></div>${returnMode==='competitionConfigured'?'<label class="live-return-check"><input type="checkbox" name="competitionReturnApproved"> Tekrar giriş varsa müsabaka kuralını kontrol ettim</label>':''}<button type="submit" class="btn btn-primary" ${canSub&&onField.length&&bench.length?'':'disabled'}>Oyuncu değişikliğini kaydet</button></form>
   <details class="live-squad-details"><summary>Oyuncu süreleri ve tam kadro (${participants.length})</summary><div class="live-squads"><div><h3>İlk kadro / Sahadakiler</h3>${onRows||'<p>Henüz oyuncu yok.</p>'}</div><div><h3>Yedekler</h3>${benchRows||'<p>Yedek kalmadı.</p>'}</div></div></details><p class="live-muted">Kaydedilen değişiklik: ${Number(session.substitutionCount)||0} · Oyuncu süresi şu anda canlı olay geçmişinden hesaplanır.</p></section>`;
   return `<div class="live-match-console" aria-label="Canlı maç saha konsolu">
-  <div class="live-coach-header">${heading}<div class="live-coach-utilities" role="group" aria-label="Maç araçları"><button type="button" class="btn btn-ghost live-fold-home-link" data-nav="dashboard">Ana ekran</button><button type="button" class="btn btn-ghost" data-action="live-coach-undo">Son olayı geri al</button><button type="button" class="btn btn-ghost" data-action="live-coach-report" aria-controls="live-console-secondary">Rapor · Saat</button></div></div>
+  <div class="live-coach-header">${heading}<div class="live-coach-utilities" role="group" aria-label="Maç araçları"><button type="button" class="btn btn-ghost live-fold-home-link" data-nav="dashboard">Ana ekran</button><button type="button" class="btn btn-ghost" data-action="live-coach-undo">Son sportif olayı geri al</button><button type="button" class="btn btn-ghost" data-action="live-coach-report" aria-controls="live-console-secondary">Rapor · Saat</button></div></div>
   <section class="live-console-top" aria-label="Canlı saha kontrolleri">
 <section class="live-surface" aria-label="Canlı maç durumu"><div class="live-top"><span class="live-status">${esc(STATUS[snap.status])}</span><span>${snap.periodNumber}. devre / ${snap.totalPeriods} devre</span><strong class="live-console-score" aria-label="Maç skoru">${eventSections.score}</strong></div><div class="live-clock" id="live-clock-time" role="timer" aria-label="Geçen devre süresi">${formatClock(snap.elapsedPeriodMs)}</div><div class="live-caption">DEVRE SÜRESİ · ${formatClock(snap.scheduledPeriodMs)} hedef</div><div class="live-total">Toplam oynanan süre <strong id="live-clock-total">${formatClock(snap.elapsedMatchMs)}</strong></div><p class="live-warning" id="live-clock-health" role="status">${esc(snap.warning||'')}</p><div class="live-controls">${actions}</div></section>
   </section>
-  <div class="live-coach-prompt" id="live-coach-prompt" role="status" aria-live="polite">Gol, kart veya değişim düğmesine basıp sahadaki oyuncuyu seçin.</div>
+  <div class="live-quick-feedback"><div class="live-coach-prompt" id="live-coach-prompt" role="status" aria-live="polite">Gol, kart veya değişim düğmesine basıp sahadaki oyuncuyu seçin.</div><button type="button" class="btn btn-ghost" id="live-assist-none" data-action="live-assist-none" hidden>Asist yok · Tamam</button></div>
   <div class="live-console-stage">
     <div class="live-console-pitch-column">${tacticalHtml}</div>
     <div class="live-console-events-column">${eventSections.eventsHtml}${subUI}</div>

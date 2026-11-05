@@ -107,6 +107,16 @@ test('restore rejected if club changes during file decoding',async()=>{
  assert.equal((await db.listRecords('players')).length,0);
  db.setClubDatabase('club_test_01');assert.equal((await db.listRecords('players')).length,3);
 });
+test('backup preview compares counts without writing and rejects a club change while reading',async()=>{
+ const {db,backup}=await fixture();const file=await backup.exportBackup();
+ await db.putRecord('players',{id:'extra',fullName:'Test Oyuncusu',groupIds:['g1']});
+ const report=await backup.inspectBackup(file);
+ assert.equal(report.valid,true);assert.equal(report.counts.players,3);assert.equal(report.existingCounts.players,4);
+ assert.equal((await db.listRecords('players')).length,4);
+ let release;const delayed={size:file.size,text:()=>new Promise(r=>release=async()=>r(await file.text()))};
+ const task=backup.inspectBackup(delayed);db.setClubDatabase('club_new_01');await release();
+ const changed=await task;assert.equal(changed.valid,false);assert.match(changed.warnings.join(' '),/kulüp değişti/);
+});
 module.exports={fixture};
 test('recovery storage failure prevents destructive restore',async()=>{
  const {db,backup,context}=await fixture();const file=await backup.exportBackup();await db.putRecord('players',{id:'extra',fullName:'Korunacak Oyuncu',groupIds:['g1']});

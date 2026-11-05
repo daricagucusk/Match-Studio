@@ -14,6 +14,7 @@
     "src/domain/club-brand.js",
     "src/domain/file-names.js",
     "src/domain/lineup.js",
+    "src/domain/live-action-indicators.js",
     "src/domain/live-pitch.js",
     "src/domain/match-clock.js",
     "src/domain/match-events-report.js",

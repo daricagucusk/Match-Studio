@@ -87,7 +87,7 @@ test('P0: encrypted club backup restores roster, match and image in a completely
  expect(downloaded.suggestedFilename()).toMatch(/KORUMALI.*\.json$/);
 
  // Independent browser context: no storage, IndexedDB or localStorage shared.
- const fresh=await browser.newContext({baseURL:'http://127.0.0.1:8911'});
+ const fresh=await browser.newContext({baseURL:page.url()});
  try{
   const second=await fresh.newPage();
   second.on('dialog',d=>d.accept(d.type()==='prompt'?password:undefined));
