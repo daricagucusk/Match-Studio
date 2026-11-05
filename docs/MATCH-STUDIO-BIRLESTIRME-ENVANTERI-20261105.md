@@ -53,6 +53,10 @@ Sonraki içerik incelemesinde #28'in dolu kulübü farklı yedeğe karşı koruy
 
 #19'un kulüp değişimi, yavaş okuma, iptal ve geri yükleme sonrası fikstür önizlemesini geçersiz kılma amacı `origin/main` içinde farklı bir uygulama ile karşılanıyor; mevcut birim ve tarayıcı testlerinde aynı kulüp adlarıyla A→B→A, yavaş okuma ve geri yükleme senaryoları bulunuyor. Bu içerik incelemesinden sonra #19 kapatıldı; özgün dal silinmedi. Uygulamalar byte düzeyinde aynı değildir.
 
+F.12 #2 ve F.13 #3 kapsamında yedek oyuncunun kartla katılmış sayılmaması ve düzeltilmiş golde geçersiz öz-asistin geri gelmemesi kod ve testleri incelendi. `src/domain/match-events-report.js` ve `tests/live.test.cjs` F.13 dalı ile `origin/main` arasında aynıdır; F.12 davranışları da aynı mevcut testlerde bulunur. İki taslak kapatıldı, dalları silinmedi.
+
+F.14 #5 tamamıyla eşdeğer değildir: taslak yedek ve oyuncu listesini aynı dosya düğmesinden tanımayı ve varsayılan şifresiz indirmeyi önerir. Güncel aday şifreli yedeği varsayılan tutar; oyuncu CSV aktarımını Oyuncular ekranında ayrı sunar. Şifresiz varsayılana dönmek veri güvenliğini zayıflatacağından taslak doğrudan uygulanmadı. Aynı yükleme noktasından dosya türü tanıma/sadeleştirme, şifreleme ve geri yükleme korumalarını koruyan ayrı ürün işi olarak değerlendirilmelidir. #5 açık tutulmuştur.
+
 ## Bağımsız Git geçişi
 
 5 Kasım'da eski ortak depodan tüm Git referanslarını içeren `Gecmis-Kaynaklar/MatchStudio-tum-git-gecmisi-20261105.bundle` oluşturuldu ve `git bundle verify` başarılı oldu. SHA-256: `3e766d4f28d8d79ef8992e90581548b5ba1371926d350a5efe39c68ad1dadfd5`. Bağımsız depoda eski 47 `refs/` kaydı `refs/archive/` altında birebir doğrulandı; `git fsck --full` hata olmadan tamamlandı. Yerel bundle ve arşiv referansları özel çalışma geçmişi içerebilir; yayımlanmaz.
@@ -78,3 +82,5 @@ F.16 PWA ZIP içindeki 28/28 dosya ve F.16 Source ZIP içindeki 233/233 dosya, a
 F.17 PWA ve Source ZIP'leri de 5 Kasım'da `Gecmis-Kaynaklar/Korunan-F17-20261105/` altına taşındı; taşıma öncesi ve sonrası SHA-256 eşleşti. PWA `64ff510102789b8ba20020cc463bfbc539a287c85d6d610c52d90fc645f9a478`, kaynak `225e17425ebb6f6a29caf0bad1888e79ed3aa6d66b5dfda19109452ac4224d51`. Taşıma disk alanı açmaz; eski paketleri çalışma girişinden ayırır.
 
 `Kaynaklar/Toplu-Arsiv` içinde 14 numaralı ZIP kopyası, her kopya ve aynı klasörde korunan numarasız ana dosya için SHA-256 silme öncesi iki kez doğrulanarak kaldırıldı: 268B TamPaket (1–4), F13 PWA ve Source (1), F1R1 TamPaket (1), PC Windows Hazır (1), PC ve Telefon Tam Paket (1–6). Ana dosyalar ve farklı adlı diğer arşivler korundu. Açılan alan 143.573.071 bayttır. Yalnızca belirtilen dosyalar kaldırıldı.
+
+Eski `Birlesik-Aday/dist` içindeki iki F.17 ZIP, `Match Studio EN SON SÜRÜM` klasöründeki aynı adlı dosyalarla SHA-256 olarak eşleştiği tekrar kontrol edilerek kaldırıldı; bu işlem 33.550.619 bayt açtı. F.18 ZIP'leri ve `dist/release.json` korunmuştur. Korunan F.17 dosyaları daha önce arşive taşınan farklı boyutlu F.17 ZIP'lerinden ayrıdır.
