@@ -51,6 +51,12 @@ P0 çalışma ağacının 42 kaydedilmemiş dosyası ve arşivlenen çıktısı 
 
 Sonraki içerik incelemesinde #28'in dolu kulübü farklı yedeğe karşı koruyan `assertBackupTarget` kodu ve testlerinin, #29'un `reducedMotion` test düzeltmesinin GitHub main kaynaklarında mevcut olduğu doğrulandı. Her iki PR'ın uzak başı tekrar denetlendikten sonra #28 ve #29 kapatıldı; dalları silinmedi.
 
+## Bağımsız Git geçişi
+
+5 Kasım'da eski ortak depodan tüm Git referanslarını içeren `Gecmis-Kaynaklar/MatchStudio-tum-git-gecmisi-20261105.bundle` oluşturuldu ve `git bundle verify` başarılı oldu. SHA-256: `3e766d4f28d8d79ef8992e90581548b5ba1371926d350a5efe39c68ad1dadfd5`. Bağımsız depoda eski 47 `refs/` kaydı `refs/archive/` altında birebir doğrulandı; `git fsck --full` hata olmadan tamamlandı. Yerel bundle ve arşiv referansları özel çalışma geçmişi içerebilir; yayımlanmaz.
+
+Bağımsız adayda 115 birim testi, derleme ve mevki/yedek odaklı 12 tarayıcı testi geçti. Bağlı eski adayın 42 `dist` ve test kanıtı ZIP ve SHA-256 kontrolüyle `Gecmis-Kaynaklar/Birlesik-tek-surum-test-kanitlari-20261105.zip` içine alındı; arşiv SHA-256 `20b5f6320854a736a3ac900dee4ee65197c2313e22a7120d6ef137ff11e03a5e`. Ardından eski bağlı çalışma ağacı kaldırıldı ve bağımsız depo aynı `Calisma/Birlesik-Tek-Surum` adına taşındı. Yeni deponun Git ortak dizini kendi `.git` klasörüdür; `origin` GitHub deposuna işaret eder. Eski `Birlesik-Aday` kişisel ayarlar ve kaydedilmemiş dosyalar için ayrıca korunmaktadır.
+
 ## Koruma ve sonraki inceleme
 
 - Gerçek kulüp yedeği, imza materyali, Play kanıtları, kaynak görseller, fiziksel cihaz kanıtları ve ayrı çalışma ağaçlarındaki kaydedilmemiş işler silme adayı varsayılmaz.
