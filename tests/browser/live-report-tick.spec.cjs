@@ -27,7 +27,7 @@ async function times(page,total,first,fourth){
 test('report ticks with the clock, preserves form input, and freezes through pauses and finish',async({page},info)=>{
  page.on('dialog',d=>d.accept());await setup(page);await page.locator('[data-action=live-start]').click();await idle(page);await page.clock.fastForward(5000);
  await times(page,'00:05','00:05','00:00');
- await page.locator('#live-event-note').fill('Kaydedilmemiş saha notu');await page.locator('#live-event-player').selectOption('p2');await page.locator('#live-event-note').focus();
+ await page.locator('[data-action=live-coach-report]').click();await expect(page.locator('#live-console-secondary')).toHaveAttribute('open','');await page.locator('#live-event-note').fill('Kaydedilmemiş saha notu');await page.locator('#live-event-player').selectOption('p2');await page.locator('#live-event-note').focus();
  await page.clock.fastForward(5000);await times(page,'00:10','00:10','00:00');await expect(page.locator('#live-event-note')).toBeFocused();await expect(page.locator('#live-event-note')).toHaveValue('Kaydedilmemiş saha notu');await expect(page.locator('#live-event-player')).toHaveValue('p2');
  await page.locator('[data-action=live-pause]').click();await idle(page);await page.clock.fastForward(60000);await times(page,'00:10','00:10','00:00');
  await page.locator('[data-action=live-resume]').click();await idle(page);await page.clock.fastForward(5000);await times(page,'00:15','00:15','00:00');
@@ -37,7 +37,7 @@ test('report ticks with the clock, preserves form input, and freezes through pau
  await page.locator('[data-action=live-end]').click();await idle(page);await page.clock.fastForward(30000);await times(page,'01:20','00:15','01:05');
  await page.locator('[data-action=live-next]').click();await idle(page);await page.clock.fastForward(5000);await times(page,'01:25','00:15','01:10');await expect(page.locator('#live-clock-time')).toHaveText('00:05');
  await page.locator('[data-action=live-end]').click();await idle(page);await page.locator('[data-action=live-finish]').click();await idle(page);await page.clock.fastForward(30000);await times(page,'01:25','00:15','01:10');
- await expect(page.locator('#live-report-title')).toHaveText('Maç tamamlandı');if(info.project.name==='desktop'){const dir=path.join(root,'test-results/reviews/update-03');fs.mkdirSync(dir,{recursive:true});await page.locator('[data-action=live-coach-report]').click();await page.locator('.live-report').screenshot({path:path.join(dir,'completed-report.png')});}
+ await expect(page.locator('#live-report-title')).toHaveText('Maç tamamlandı');if(info.project.name==='desktop'){const dir=path.join(root,'test-results/reviews/update-03');fs.mkdirSync(dir,{recursive:true});if((await page.locator('#live-console-secondary').getAttribute('open'))===null)await page.locator('[data-action=live-coach-report]').click();await page.locator('.live-report').screenshot({path:path.join(dir,'completed-report.png')});}
 });
 
 test('print refreshes a delayed tick and clock-health warnings without creating events',async({page})=>{

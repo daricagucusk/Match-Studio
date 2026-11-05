@@ -67,6 +67,6 @@ test('live match pitch is large enough to read without losing match actions',asy
  }
  await expect(page.locator('#live-clock-time')).toBeVisible();
  await expect(page.locator('.live-event-shortcuts')).toBeVisible();
- await expect(page.locator('#live-substitution-form')).toBeVisible();
+ await page.locator('[data-action=live-coach-report]').click();await expect(page.locator('#live-substitution-form')).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
 });

@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "ms-vscode.powershell",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+    "github.vscode-pull-request-github",
+    "ms-playwright.playwright",
+    "eamodio.gitlens"
+  ],
+  "unwantedRecommendations": []
+}

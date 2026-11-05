@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test');
 const {setup,idle}=require('./live-fixture.cjs');
 
-test('Z Fold7 640 CSS px inner viewport uses two-column single-screen coach console',async({page},info)=>{
+test('Z Fold7 640 CSS px inner viewport prioritizes pitch with two action rows',async({page},info)=>{
  test.skip(info.project.name!=='fold-open','physical inner viewport regression runs on fold-open project');
  await page.setViewportSize({width:640,height:537});
  await setup(page);await page.locator('[data-action=live-start]').click();await idle(page);
@@ -10,8 +10,8 @@ test('Z Fold7 640 CSS px inner viewport uses two-column single-screen coach cons
   return {viewport:innerWidth,stage:box('.live-console-stage'),pitch:box('.live-console-pitch-column'),events:box('.live-console-events-column'),dock:box('.live-event-shortcuts'),buttons:[...document.querySelectorAll('.live-event-shortcuts button')].map(e=>Math.round(e.getBoundingClientRect().y)),overflow:document.documentElement.scrollWidth>innerWidth+1,nav:getComputedStyle(document.querySelector('.app-shell>.mobile-nav')).display,home:getComputedStyle(document.querySelector('.live-fold-home-link')).display};
  });
  expect(r.viewport).toBe(640);expect(r.stage.h).toBeGreaterThanOrEqual(190);
- expect(r.events.x).toBeGreaterThan(r.pitch.x+50);expect(r.buttons).toHaveLength(8);
- expect(new Set(r.buttons).size).toBe(1);expect(r.overflow).toBe(false);
+ expect(r.pitch.w).toBeGreaterThan(500);expect(r.buttons).toHaveLength(10);
+ expect(new Set(r.buttons).size).toBe(2);expect(r.overflow).toBe(false);
  expect(r.nav).toBe('none');expect(r.home).not.toBe('none');
  await page.locator('[data-action=live-quick-note][data-note-kind=technical]').click();
  expect(await page.locator('#live-event-form').evaluate(e=>getComputedStyle(e).position)).toBe('fixed');

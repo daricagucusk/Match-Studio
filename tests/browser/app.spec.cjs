@@ -34,6 +34,7 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
  await expect(page.locator('.live-status')).toHaveText('Oynanıyor');
  const matchId=await page.evaluate(async()=>{const databases=await indexedDB.databases();const name=databases.find(x=>x.name.startsWith('matchstudio-club-')).name;return new Promise(resolve=>{const q=indexedDB.open(name);q.onsuccess=()=>{const db=q.result,r=db.transaction('matches').objectStore('matches').getAll();r.onsuccess=()=>{resolve(r.result[0].id);db.close();};};});});
  const second=await context.newPage();await second.goto('/');await expect(second.locator('.app-shell')).toBeVisible();await nav(second,'live');await second.locator(`[data-action=live-open][data-id="${matchId}"]`).click();await idle(second);
+ await page.locator('[data-action=live-coach-report]').click();await expect(page.locator('#live-console-secondary')).toHaveAttribute('open','');
  await page.locator('#live-sub-out').selectOption({index:1});await page.locator('#live-sub-in').selectOption({index:1});await page.locator('#live-substitution-form button[type=submit]').click();await idle(page);
  await expect(page.locator('.live-history')).toContainText('Oyuncu değişimi');await expect(second.locator('.live-history')).toContainText('Oyuncu değişimi');await second.close();
  await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await nav(page,'live');await page.locator(`[data-action=live-open][data-id="${matchId}"]`).click();await idle(page);

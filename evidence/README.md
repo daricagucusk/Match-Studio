@@ -4,7 +4,7 @@ Bu klasör geçmiş inceleme ve teslim kayıtlarını içerir. Dosyalar güncel 
 
 | Konum | Önceki konum | İçerik |
 |---|---|---|
-| `baseline/` | Proje kökündeki `baseline/` | Önceki PWA paketleri ve kaynak kökeni; release testlerinin bağımsız girdileri |
+| `baseline/` | Proje kökündeki `baseline/` | Tarihsel PWA paketleri ve kaynak kökeni. 6 Kasım 2026'dan itibaren release testleri bağımlılığı olmayan üretilmiş sentetik fixture kullanır; bu dosyalar yalnızca geçmiş kanıt olarak korunur |
 | `reviews/` | Proje kökündeki `reviews/` | Tarihli ekran görüntüleri, ölçümler ve inceleme notları |
 | `deployments/` | Proje kökündeki `deployments/` | Önceki dağıtım kayıtları |
 

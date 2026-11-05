@@ -32,9 +32,9 @@
 - Produces `projectLiveActionIndicators(session,events,report)`: `Record<playerId,{goals,assists,yellow,red,inCount,outCount}>`.
 - View consumes projection only; data storage unchanged.
 
-- [ ] **Step 1:** Test standard goal/assist/cards/subs and corrected goal no longer counted, then run node --test (RED).
-- [ ] **Step 2:** Add pure projection, connect to live pitch and bench badges; run unit test (GREEN).
-- [ ] **Step 3:** Run npm test and inspect CSS layout.
+- [x] **Step 1:** Test standard goal/assist/cards/subs and corrected goal no longer counted, then run node --test (RED).
+- [x] **Step 2:** Add pure projection, connect to live pitch and bench badges; run unit test (GREEN).
+- [x] **Step 3:** Run npm test and inspect CSS layout.
 
 ### Task 2: Anında sportif olay, asist ve geri al
 **Files:** Modify `src/main.js`, `src/app/views/live-match-clock.js`; create `tests/browser/live-tap-actions.spec.cjs`; adapt legacy quick test.
@@ -44,20 +44,20 @@
 - `quickCommitSporting(type,payload)` keeps one in-flight action and club/match scope.
 - `EVENT_CORRECTION` void references last active sportive event.
 
-- [ ] **Step 1:** Playwright test yellow/red, goal then assist, quick undo, double click, reload (RED).
-- [ ] **Step 2:** Implement player menu and quick mode commit using existing append-only transaction; explicit manual edit continues.
-- [ ] **Step 3:** Run targeted Playwright and existing quick tests (GREEN).
+- [x] **Step 1:** Playwright test yellow/red, goal then assist, quick undo, double click, reload (RED).
+- [x] **Step 2:** Implement player menu and quick mode commit using existing append-only transaction; explicit manual edit continues.
+- [x] **Step 3:** Run targeted Playwright and existing quick tests (GREEN).
 
 ### Task 3: Hızlı değişiklik ve cihaz testleri
 **Files:** Modify `src/main.js`, `tests/browser/live-tap-actions.spec.cjs`, CSS.
 
 **Interfaces:** Existing `commitSubstitution` enforces `returnAllowed/noReturn/competitionConfigured` policy.
 
-- [ ] **Step 1:** Playwright test two-pick substitution and prohibited return (RED).
-- [ ] **Step 2:** Implement auto-submit for eligible changes; require manual policy approval for return.
-- [ ] **Step 3:** Run targeted desktop/phone/fold, npm test, build, relevant F.19 tests.
+- [x] **Step 1:** Playwright test two-pick substitution and prohibited return (RED).
+- [x] **Step 2:** Implement auto-submit for eligible changes; require manual policy approval for return.
+- [x] **Step 3:** Run targeted desktop/phone/fold, npm test, build, relevant F.19 tests.
 
 ### Task 4: Delivery and regression
-- [ ] **Step 1:** Confirm all changed files, HTML/CSS are built; no secret/config modifications.
-- [ ] **Step 2:** Run broad browser regression and note any unresolved flaky/physical-device risks.
-- [ ] **Step 3:** Keep unpublished F.19 worktree and write QA results; no Git push or Vercel deployment.
+- [x] **Step 1:** Confirm all changed files, HTML/CSS are built; no secret/config modifications.
+- [x] **Step 2:** Run broad browser regression and note any unresolved flaky/physical-device risks.
+- [x] **Step 3:** Keep unpublished F.19 worktree and write QA results; no Git push or Vercel deployment.

@@ -15,7 +15,7 @@ test('selection colors and form surfaces agree across workspaces',async({page},i
 });
 test('product labels are Turkish and backup restrictions remain understandable',async({page},info)=>{
  await setup(page);await nav(page,'dashboard');await expect(page.locator('.broadcast-live')).toHaveText('MAÇ MERKEZİ');await expect(page.locator('.fixture-topline')).toContainText('SIRADAKİ MAÇ');
- await nav(page,'live');await expect(page.locator('#live-event-title')).toBeVisible();await expect(page.locator('.live-event-zone')).not.toContainText('PAKET E');
+ await nav(page,'live');await page.locator('[data-action=live-coach-report]').click();await expect(page.locator('#live-event-title')).toBeVisible();await expect(page.locator('.live-event-zone')).not.toContainText('PAKET E');
  await nav(page,'archive');expect(await color(page.locator('#club-settings-form input[name=clubName]'))).toBe('rgb(11, 14, 21)');await expect(page.locator('.ms-import-panel')).not.toContainText('origin');await expect(page.locator('.ms-import-panel')).not.toContainText('dg-match-studio');await expect(page.locator('.ms-import-panel')).toContainText('aynı site adresi');
  await expect(page.locator('.settings-list')).toContainText('en az 12 karakter');await expect(page.locator('.settings-list')).toContainText('7 gün');await expect(page.locator('.settings-list')).not.toContainText('AES-GCM');
  if(info.project.name==='phone'){const dir=path.resolve(__dirname,'../../test-results/reviews/update-08');fs.mkdirSync(dir,{recursive:true});await page.screenshot({path:path.join(dir,'settings-copy-phone.png')});}

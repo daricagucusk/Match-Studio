@@ -19,28 +19,28 @@ Preserve existing club data, current navigation, Google Play assetlinks, storage
 
 ### Task 1: Domain and tests
 Files: src/domain/team-depth.js, src/domain/team-pitch-analysis.js, tests/team-role-slots.test.cjs
-- [ ] Add failing tests for per-slot ordering, tactical-role validation, 3+ alternatives, legacy fallback.
-- [ ] Run the tests and observe RED.
-- [ ] Implement optional compatible slot data.
-- [ ] Run GREEN plus existing unit suite.
+- [x] Add failing tests for per-slot ordering, tactical-role validation, 3+ alternatives, legacy fallback.
+- [x] Run the tests and observe RED.
+- [x] Implement optional compatible slot data.
+- [x] Run GREEN plus existing unit suite.
 
 ### Task 2: UI role cards and actions
 Files: src/team/team-pitch.js, src/app/views/team-analysis.js, src/main.js, tests/browser/team-role-slots.spec.cjs
-- [ ] Add browser assertions for distinct CB/CM slot cards, selection/ranking.
-- [ ] Add role names/selection controls and unlimited alternatives panel.
-- [ ] Wire persistence and state without changing players' official main positions.
-- [ ] Verify with browser test and reset.
+- [x] Add browser assertions for distinct CB/CM slot cards, selection/ranking.
+- [x] Add role names/selection controls and unlimited alternatives panel.
+- [x] Wire persistence and state without changing players' official main positions.
+- [x] Verify with browser test and reset.
 
 ### Task 3: Live pitch and scrolling
 Files: web/matchstudio-premium-next.css, src/app/render-coordinator.js, tests/browser/f19-field-stability.spec.cjs
-- [ ] Add measured pitch width and scroll-anchor failing tests.
-- [ ] Increase field size, preserve one-screen controls.
-- [ ] Keep scrollTop and DOM focus for pitch and depth lists; ensure stable player coordinates.
-- [ ] Verify desktop, Fold-open and narrow mobile views.
+- [x] Add measured pitch width and scroll-anchor failing tests.
+- [x] Increase field size, preserve one-screen controls.
+- [x] Keep scrollTop and DOM focus for pitch and depth lists; ensure stable player coordinates.
+- [x] Verify desktop, Fold-open and narrow mobile views.
 
 ### Task 4: Documentation and release QA
 Files: docs/F19-AGENT-HANDOFF.md, docs/design/F19/DESIGN.md, README.md
-- [ ] Write field contracts and decision record for other tools.
-- [ ] Run unit, Playwright and static build; compare output to exact base.
-- [ ] Inspect Git diff and ensure no private files.
-- [ ] Deploy only after passing end-to-end QA.
+- [x] Write field contracts and decision record for other tools.
+- [x] Run unit, Playwright and static build; compare output to exact base.
+- [x] Inspect Git diff and ensure no private files.
+- [ ] Deploy only after passing end-to-end QA. (Kiler açık: yayına geçiş ayrı yetkidir; yerel kabul tamamlandı — 6 Kasım 2026 Hes. kaydı `docs/BIRLESIK-ADAY-20261105.md`.)
