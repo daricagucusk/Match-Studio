@@ -49,6 +49,8 @@ P0 çalışma ağacının 42 kaydedilmemiş dosyası ve arşivlenen çıktısı 
 
 #23 başı `bd008267` için `git cherry origin/main` aynı yamanın ana dalda bulunduğunu (`-`) gösterdi; GitHub'daki güncel baş doğrulandıktan sonra #23 de kapatıldı. #28 ve #29 için eşdeğer commit otomatik saptanmadı (`+`); inceleme için açık bırakıldı.
 
+Sonraki içerik incelemesinde #28'in dolu kulübü farklı yedeğe karşı koruyan `assertBackupTarget` kodu ve testlerinin, #29'un `reducedMotion` test düzeltmesinin GitHub main kaynaklarında mevcut olduğu doğrulandı. Her iki PR'ın uzak başı tekrar denetlendikten sonra #28 ve #29 kapatıldı; dalları silinmedi.
+
 ## Koruma ve sonraki inceleme
 
 - Gerçek kulüp yedeği, imza materyali, Play kanıtları, kaynak görseller, fiziksel cihaz kanıtları ve ayrı çalışma ağaçlarındaki kaydedilmemiş işler silme adayı varsayılmaz.
