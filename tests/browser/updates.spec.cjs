@@ -25,12 +25,15 @@ test('partial deployment is rejected; complete update waits for acceptance and p
   files=release('new');broken=false;
   await page.evaluate(async()=>{const reg=await navigator.serviceWorker.getRegistration();await reg.update();});
   await expect(page.locator('#pwa-update')).toBeVisible();expect(await second.evaluate(()=>window.releaseMarker)).toBe('old');
+  await page.getByRole('button',{name:'Daha sonra'}).click();await expect(page.locator('#pwa-update')).toHaveCount(0);
+  expect(await page.evaluate(async()=>Boolean((await navigator.serviceWorker.getRegistration()).waiting))).toBe(true);
+  await page.reload();await expect(page.locator('#pwa-update')).toBeVisible();
   await second.reload();expect(await second.evaluate(()=>window.releaseMarker)).toBe('old');
   page.on('dialog',d=>d.accept());
   await second.evaluate(()=>{window.holdingUpdateLock=false;navigator.locks.request('matchstudio-ui-update',{mode:'shared'},()=>{window.holdingUpdateLock=true;return new Promise(resolve=>window.releaseUpdateLock=resolve);});});
   await expect.poll(()=>second.evaluate(()=>window.holdingUpdateLock)).toBe(true);
-  await page.locator('#pwa-update button').click();await expect(page.locator('.toast')).toContainText('Başka sekmede işlem sürüyor');expect(await page.evaluate(()=>window.releaseMarker)).toBe('old');
-  await second.evaluate(()=>window.releaseUpdateLock());await page.locator('#pwa-update button').click();
+  await page.getByRole('button',{name:'Güncelle ve yeniden başlat'}).click();await expect(page.locator('.toast')).toContainText('Başka sekmede işlem sürüyor');expect(await page.evaluate(()=>window.releaseMarker)).toBe('old');
+  await second.evaluate(()=>window.releaseUpdateLock());await page.getByRole('button',{name:'Güncelle ve yeniden başlat'}).click();
   await expect.poll(()=>page.evaluate(()=>window.releaseMarker).catch(()=>null)).toBe('new');await expect.poll(()=>second.evaluate(()=>window.releaseMarker).catch(()=>null)).toBe('new');
   await expect(page.locator('.app-shell')).toBeVisible();await expect(second.locator('.app-shell')).toBeVisible();await expect(page.locator('#club-switch')).toContainText('Güncelleme Spor');
   await second.close();

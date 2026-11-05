@@ -1,9 +1,9 @@
 // Keep update acceptance separate from app rendering and from active data writes.
 function setupPwaUpdates({isBusy=()=>false,onStatus=()=>{},notify=()=>{}}={}){
  if(!('serviceWorker' in navigator)||!window.isSecureContext||location.protocol==='file:')return;
- let accepted=false,hadController=Boolean(navigator.serviceWorker.controller);
+ let accepted=false,hadController=Boolean(navigator.serviceWorker.controller),dismissedWorker=null;
  const show=reg=>{
-  if(!reg.waiting||!navigator.serviceWorker.controller)return;
+  if(!reg.waiting||!navigator.serviceWorker.controller||reg.waiting===dismissedWorker)return;
   let banner=document.getElementById('pwa-update');
   if(!banner){
    banner=document.createElement('div');banner.id='pwa-update';banner.className='pwa-update';banner.setAttribute('role','status');
@@ -20,7 +20,9 @@ function setupPwaUpdates({isBusy=()=>false,onStatus=()=>{},notify=()=>{}}={}){
      await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));
     });
    });
-   banner.append(text,button);document.body.append(banner);
+   const later=document.createElement('button');later.type='button';later.className='btn btn-ghost';later.textContent='Daha sonra';
+   later.addEventListener('click',()=>{dismissedWorker=reg.waiting;banner.remove();});
+   banner.append(text,button,later);document.body.append(banner);
   }
  };
  navigator.serviceWorker.addEventListener('controllerchange',()=>{
