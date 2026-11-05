@@ -3,9 +3,10 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {spawnPython}=require('../tools/python.cjs');
 const root=path.resolve(__dirname,'..'),verifier=path.join(root,'tools/verify-release.py');
-const baseline=path.join(root,'evidence/baseline/MatchStudio_V268F2_PWA.zip');
-// A valid previously delivered PWA is an independent verifier fixture.
-test('release verifier accepts the previously delivered PWA package',()=>{
+const fixtureDir=fs.mkdtempSync(path.join(os.tmpdir(),'matchstudio-release-fixture-'));
+const baseline=path.join(fixtureDir,'fixture.zip');
+const fixture=spawnPython([path.join(root,'tools/create-test-fixture.py'),baseline],{encoding:'utf8'}); if(fixture.status!==0)throw new Error(fixture.stderr||fixture.stdout); require('node:test').after(()=>fs.rmSync(fixtureDir,{recursive:true,force:true}));
+test('release verifier accepts a valid synthetic PWA package',()=>{
  const result=spawnPython([verifier,baseline],{encoding:'utf8'});assert.equal(result.status,0,result.stderr||result.stdout);
 });
 for(const mode of ['corrupt','missing','extra','traversal','duplicate','worker-manifest','evidence','web'])test('release verifier rejects '+mode+' archive',()=>{
