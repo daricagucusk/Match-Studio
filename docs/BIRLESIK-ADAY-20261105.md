@@ -11,7 +11,8 @@ Bu çalışma ağacı, F.18 web sürümü `6470d9e` temelinden ve ayrı F.19 gel
 
 ## Açık noktalar
 
-- Atlanan 12 sonuç altı senaryonun diğer ekran profillerindeki koşullu tekrarlarıdır: taslak kopyalama, mağaza grafik ve ekran görüntüleri, güncelleme protokolü ve Fold iç/dış ekran ölçümleri ilgili seçilmiş profilde çalışır. Gerçek cihaz kabulü ayrıca gereklidir; 5 Kasım kontrolünde ADB cihaz listelememiştir.
+- Atlanan 12 sonuç altı senaryonun diğer ekran profillerindeki koşullu tekrarlarıdır: taslak kopyalama, mağaza grafik ve ekran görüntüleri, güncelleme protokolü ve Fold iç/dış ekran ölçümleri ilgili seçilmiş profilde çalışır.
+- 5 Kasım'da bağlanan Galaxy Z Fold7 kapalı dış ekranında Android Chrome ile ayrı `127.0.0.1:8975` kökenindeki F.19 başlangıç ekranı görüntülendi. Bu kontrol yalnızca açılış ve görünür ilk ekran içindir; dokunmatik maç akışları, Fold iç ekranı, çevrimdışı kayıt ve uzun maç kabulü yapılmamıştır. APK/AAB veya Play kabulü değildir.
 - Gerçek kulüp kayıtlarını, geri dönüş kopyalarını, eski çalışma ağaçlarını ve Play imza materyallerini koruyun.
 - GitHub main, Vercel ve Play sürümleri bu yerel adayla kendiliğinden güncellenmez.
 - Önceki dallar ve arşivler yalnızca içeriğin korunduğu doğrulanarak düzenlenmelidir.
