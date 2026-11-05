@@ -11,7 +11,7 @@ Bu çalışma ağacı, F.18 web sürümü `6470d9e` temelinden ve ayrı F.19 gel
 
 ## Açık noktalar
 
-- Atlanan 12 senaryonun kapsamı ve gerçek cihaz kabulü ayrıca değerlendirilmelidir.
+- Atlanan 12 sonuç altı senaryonun diğer ekran profillerindeki koşullu tekrarlarıdır: taslak kopyalama, mağaza grafik ve ekran görüntüleri, güncelleme protokolü ve Fold iç/dış ekran ölçümleri ilgili seçilmiş profilde çalışır. Gerçek cihaz kabulü ayrıca gereklidir; 5 Kasım kontrolünde ADB cihaz listelememiştir.
 - Gerçek kulüp kayıtlarını, geri dönüş kopyalarını, eski çalışma ağaçlarını ve Play imza materyallerini koruyun.
 - GitHub main, Vercel ve Play sürümleri bu yerel adayla kendiliğinden güncellenmez.
 - Önceki dallar ve arşivler yalnızca içeriğin korunduğu doğrulanarak düzenlenmelidir.
