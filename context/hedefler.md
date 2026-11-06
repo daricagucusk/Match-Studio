@@ -4,6 +4,7 @@ Bu belge Match Studio'nun aktif hedefleri, öncelikleri ve başarı ölçütleri
 
 ## Aktif hedefler
 
+- Takım derinliği: bütün saha görevlerini ana sayfayı aşağı kaydırmadan gösteren, aynı ekranda kolay oyuncu girişi ve tercih sıralaması sağlayan tasarım. Araştırma ve ajan üretimi kullanıcı tarafından istendi; uygulama sözleşmesi `../docs/TEAM-DEPTH-DESIGN.md`. Telefonun sonlu görünür alanında ek tercihlere erişim açık olmalı; veri kırpma veya okunamaz küçültme kabul sayılmaz. Ekran ve kalıcılık doğrulaması 6 Kasım 2026'da yerel Chromium'da PASS; fiziksel cihaz ve yayın kabulü ayrı hedeftir.
 - Tek yerel kaynak: `Calisma/Birlesik-Tek-Surum`. F.19 canlı maç konsolu, takım derinliği ve taktik rollerindeki değişiklikleri tek kaynakta geliştirmek.
 - Kulüp/sporcu verilerini, çevrimdışı kullanımı, şifreli geri yükleme ve maç geçmişini korumak.
 - Masaüstü, telefon ve Fold açık/kapalı profillerinde canlı maç ekranını, gol/asist/kart/değişim akışlarını ve iptal/geri alma işlemlerini doğrulamak.

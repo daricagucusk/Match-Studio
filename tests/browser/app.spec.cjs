@@ -20,7 +20,7 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
   if(i===1)await page.locator('#player-photo').setInputFiles('web/icons/icon-192.png');
   await page.locator('[data-action=submit-player]').click();await idle(page);await expect(page.locator('#player-form')).toHaveCount(0);
  }
- await nav(page,'matches');await page.locator('#groupId').selectOption({label:'U14'});await page.locator('#ageCategory').selectOption('U14');
+ await nav(page,'matches');await page.locator('#groupId').selectOption({label:'U14'});
  await page.locator('#opponent').fill('Komşu Spor');await page.locator('#venue').fill('Merkez Stadı');await page.locator('#matchDate').fill('2026-10-24');await page.locator('#kickoffTime').fill('14:00');
  await page.locator('#gameSize').selectOption('3');await idle(page);await page.locator('#benchLimit').fill('2');
  await page.locator('[data-action=save-match]').click();await idle(page);

@@ -30,7 +30,7 @@ test('saved match type reaches the studio preview and downloaded PNG',async({pag
  const nav=async route=>{const item=page.locator(`[data-nav="${route}"]:visible`).first();if(await item.count())await item.click();else{await page.locator('.mobile-more summary').click();await page.locator(`.mobile-more [data-nav="${route}"]`).click();}await idle();};
  await page.goto('/');await page.locator('#club-create-form [name=clubName]').fill('Afiş Test Spor');await page.locator('#club-create-form button').click();await expect(page.locator('.app-shell')).toBeVisible();await idle();
  await nav('archive');await page.locator('#group-form [name=name]').fill('U14');await page.locator('#group-form button').click();await idle();await nav('matches');
- await page.locator('#groupId').selectOption({label:'U14'});await page.locator('#ageCategory').selectOption('U14');await page.locator('#opponent').fill('Sahil Spor');await page.locator('#venue').fill('Kent Stadı');await page.locator('#matchDate').fill('2026-10-24');await page.locator('#kickoffTime').fill('14:00');
+ await page.locator('#groupId').selectOption({label:'U14'});await page.locator('#opponent').fill('Sahil Spor');await page.locator('#venue').fill('Kent Stadı');await page.locator('#matchDate').fill('2026-10-24');await page.locator('#kickoffTime').fill('14:00');
  for(const [type,label] of [['friendly','HAZIRLIK MAÇI'],['league','LİG MAÇI']]){
   await page.locator('#matchType').selectOption(type);await page.locator('[data-action=save-match]').click();await idle();await nav('studio');
   await page.locator('[data-kind=public]').click();await idle();await expect(page.locator('#preview-status')).toContainText('Paylaşmaya hazır');

@@ -51,7 +51,6 @@ test('capture authentic Play listing screens with no real player or club data',a
   await snap(page,'02-oyuncular');
   await nav(page,'matches');
   await page.locator('#groupId').selectOption({label:'U14'});
-  await page.locator('#ageCategory').selectOption('U14');
   await page.locator('#opponent').fill('Örnek Rakip');
   await page.locator('#venue').fill('Akademi Eğitim Sahası');
   await page.locator('#matchDate').fill('2026-11-08');

@@ -28,10 +28,9 @@ const {auditActiveClub}=require('src/storage/audit.js');
 const {makeLineup,normalizeLineup,placePlayer,removeFromPitch,changePitchPreset,setPlayerPitchRole,getPitchPresets,getPitchShirtNumber,setPitchShirtNumber}=require("src/domain/lineup.js");
 const {pitchScreen}=require("src/pitch/pitch-screen.js");
 const {pitchPng}=require("src/pitch/pitch-export.js");
-const {getRosterPolicy,filterMultiGroupPool,availableRosterSpots,proposeRosterAddition,proposeBulkRosterAddition,getMatchRosterSections,autofillStartingLineup,capacityWarning}=require("src/domain/roster-policy.js");
-const {TEAM_ROLES,TEAM_ROLE_PROFILES,createTeamDepth,sanitizeTeamDepth,setTeamPlayerRole,moveTeamRoleCandidate,getTeamDepthStats,getTeamSlotCandidates,setTeamSlotPlayer,moveTeamSlotCandidate,setTeamTacticalRole}=require("src/domain/team-depth.js");
+const {parseAgeCategory,getRosterPolicy,filterMultiGroupPool,availableRosterSpots,proposeRosterAddition,proposeBulkRosterAddition,getMatchRosterSections,autofillStartingLineup,capacityWarning}=require("src/domain/roster-policy.js");
+const {TEAM_ROLE_PROFILES,createTeamDepth,sanitizeTeamDepth,setTeamPlayerRole,moveTeamRoleCandidate,getTeamSlotCandidates,setTeamSlotPlayer,moveTeamSlotCandidate,setTeamTacticalRole}=require("src/domain/team-depth.js");
 const {TEAM_PITCH_FORMATIONS,normalizeTeamPitchPrefs,getTeamPitchAnalysis,getFormationPitchSlots}=require("src/domain/team-pitch-analysis.js");
-const {renderTeamPitch}=require("src/team/team-pitch.js");
 const {mondayOf,pickBoardMatches,prepareBoard,renderWeeklyBoard,exportWeeklyBoard}=require("src/posters/weekly-board.js");
 const {safeFilenamePart}=require("src/domain/file-names.js");
 const {FORMATS,LAYOUTS,normalizeGameFormat,normalizePitchLayout,recommendedFormatForAge,getFormatDisplay}=require("src/domain/match-format.js");
@@ -130,7 +129,7 @@ function I(k){return `<span class="inline-icon" aria-hidden="true"><svg viewBox=
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const groupNames=[]; // New clubs start without seeded roster data.
 const nav=[['dashboard','home','Genel Bakış'],['players','users','Oyuncular'],['matches','calendar','Yeni Maç'],['roster','roster','Kadro Seçimi'],['team','users','Genel Takım Kadrosu'],['pitch','pitch','Saha / Diziliş'],['studio','studio','Afiş Stüdyosu'],['weekly','calendar','Haftalık Maç Panosu'],['archive','archive','Arşiv / Ayarlar']];
-const state={season:{groupId:'',from:'',to:'',sort:'goals',clubId:null,bundle:null,data:null,loading:false,error:null},club:null,clubs:[],legacy:null,integrityAudit:null,route:'dashboard',data:{players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]},currentId:null,filterGroup:'all',query:'',modal:null,liveDetailsOpen:false,tab:'design',previewResult:null,csvPending:null,sessionMatch:null,liveSession:null,liveEvents:[],liveLoading:false,notice:null,rosterPoolScope:'all',rosterQuery:'',rosterOnlyAvailable:false,rosterOrder:'natural',pitchMode:'match',pitchSelectedId:null,pitchContext:null,rosterPoolGroups:[],rosterFilterMatchId:null,teamGroupId:null,teamRoleSelected:'GK',teamSlotSelected:null,teamQuery:'',teamPitchPrefs:{formation:'4-3-3',depthFactor:2},board:{week:mondayOf(new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'}))||new Date().toISOString().slice(0,10),mode:'week',size:'portrait-post',selected:null},fixtureImport:null};
+const state={season:{groupId:'',from:'',to:'',sort:'goals',clubId:null,bundle:null,data:null,loading:false,error:null},club:null,clubs:[],legacy:null,integrityAudit:null,route:'dashboard',data:{players:[],groups:[],matches:[],rosters:[],posterDrafts:[],settings:[],assets:[]},currentId:null,filterGroup:'all',query:'',modal:null,liveDetailsOpen:false,tab:'design',previewResult:null,csvPending:null,sessionMatch:null,liveSession:null,liveEvents:[],liveLoading:false,notice:null,rosterPoolScope:'all',rosterQuery:'',rosterOnlyAvailable:false,rosterOrder:'natural',pitchMode:'match',pitchSelectedId:null,pitchContext:null,rosterPoolGroups:[],rosterFilterMatchId:null,teamGroupId:null,teamRoleSelected:'GK',teamSlotSelected:null,teamQuery:'',teamDepthPage:0,teamEditorOpen:false,teamCandidatePage:0,teamFocusReturn:null,teamPitchPrefs:{formation:'4-3-3',depthFactor:2},board:{week:mondayOf(new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'}))||new Date().toISOString().slice(0,10),mode:'week',size:'portrait-post',selected:null},fixtureImport:null};
 const fixtureImports=createFixtureImportSession();
 function invalidateFixtureImport(){fixtureImports.invalidate();state.fixtureImport=null;}
 let draftStorage=null;try{draftStorage=sessionStorage;}catch(error){}
@@ -186,6 +185,41 @@ async function persistTeamPitchPrefs(prefs){
  await refresh();render();
 }
 async function persistTeamDepth(depth){await putRecord('settings',{id:`teamDepth:${depth.groupId}`,value:depth});await refresh();render();}
+const depthSelectorValue=value=>globalThis.CSS?.escape?CSS.escape(String(value)):String(value).replace(/["\\]/g,'\\$&');
+function teamDepthFocusMark(){
+ const element=document.activeElement;
+ if(!element||!element.closest('#team-depth-editor'))return null;
+ if(element.id)return {id:element.id,caret:typeof element.selectionStart==='number'?element.selectionStart:null};
+ if(element.dataset?.teamSlotPlayer!==undefined)return {selector:'[data-team-slot-player="'+depthSelectorValue(element.dataset.teamSlotPlayer)+'"][data-team-slot-key="'+depthSelectorValue(element.dataset.teamSlotKey||'')+'"]'};
+ if(element.dataset?.teamPriority!==undefined)return {selector:'[data-team-priority="'+depthSelectorValue(element.dataset.teamPriority)+'"][data-player-id="'+depthSelectorValue(element.dataset.playerId||'')+'"]'};
+ if(element.dataset?.teamCandidatePage!==undefined)return {selector:'[data-team-candidate-page="'+depthSelectorValue(element.dataset.teamCandidatePage)+'"]'};
+ if(element.dataset?.teamEditorClose!==undefined)return {selector:'[data-team-editor-close]'};
+ return null;
+}
+function closeTeamDepthEditor(){
+ if(!state.teamEditorOpen)return;
+ state.teamFocusReturn=state.teamSlotSelected;
+ state.teamEditorOpen=false;
+ render();
+}
+function mountTeamDepthEditor(mark){
+ const dialog=root.querySelector('#team-depth-editor');
+ if(!dialog)return;
+ if(!dialog.open){
+  if(typeof dialog.showModal==='function')dialog.showModal();else dialog.setAttribute('open','');
+  dialog.addEventListener('cancel',event=>{event.preventDefault();closeTeamDepthEditor();});
+  dialog.addEventListener('click',event=>{if(event.target===dialog){event.preventDefault();closeTeamDepthEditor();}});
+ }
+ let target=null;
+ if(mark?.selector)target=dialog.querySelector(mark.selector);
+ else if(mark?.id)target=dialog.querySelector('#'+mark.id);
+ if(!target)target=dialog.querySelector('#team-search');
+ if(!target)target=dialog.querySelector('button,select,input');
+ target?.focus({preventScroll:true});
+ if(target?.id==='team-search'&&mark?.caret!==null&&mark?.caret!==undefined){
+  try{target.setSelectionRange(mark.caret,mark.caret);}catch{}
+ }
+}
 function openPitchContext(slot,x,y){
  const plan=activeLineup(),playerId=plan.assignments[String(slot)];
  if(!playerId||!activeRoster().entries.some(e=>e.playerId===playerId))return;
@@ -299,7 +333,7 @@ async function loadSeasonAnalytics(){
   if(state.route==='analytics')render();
  }
 }
-function selectRoute(route){rememberMatchDraft();posterPreviewVersion++;weeklyPreviewVersion++;if(['roster','studio','pitch'].includes(route)&&!state.currentId){toast('Önce bir maç kaydı oluştur.');route='matches';}if(route==='roster'&&state.rosterFilterMatchId!==state.currentId){const m=activeMatch();state.rosterPoolGroups=m?.groupId?[m.groupId]:[];state.rosterFilterMatchId=state.currentId;state.rosterQuery='';}if(route==='pitch'&&state.route!=='pitch'){state.pitchMode='match';state.pitchSelectedId=null;}state.pitchContext=null;state.route=route;state.modal=null;if(route!=='live')wakeLock.set(false);render();if(route==='live')loadLiveClock();if(route==='analytics')loadSeasonAnalytics();window.scrollTo(0,0);}
+function selectRoute(route){rememberMatchDraft();posterPreviewVersion++;weeklyPreviewVersion++;if(['roster','studio','pitch'].includes(route)&&!state.currentId){toast('Önce bir maç kaydı oluştur.');route='matches';}if(route==='roster'&&state.rosterFilterMatchId!==state.currentId){const m=activeMatch();state.rosterPoolGroups=m?.groupId?[m.groupId]:[];state.rosterFilterMatchId=state.currentId;state.rosterQuery='';}if(route==='pitch'&&state.route!=='pitch'){state.pitchMode='match';state.pitchSelectedId=null;}state.teamEditorOpen=false;state.teamFocusReturn=null;state.pitchContext=null;state.route=route;state.modal=null;if(route!=='live')wakeLock.set(false);render();if(route==='live')loadLiveClock();if(route==='analytics')loadSeasonAnalytics();window.scrollTo(0,0);}
 function btn(label,action,cls='btn-primary',extra=''){return `<button class="btn ${cls}" data-action="${action}" ${extra}>${label}</button>`}
 const logo=()=>`<div class="brand-icons"><img class="brand-app-mark" src="./assets/ms-emblem-mark.png" alt="" aria-hidden="true"><div class="ms-club-crest" data-club-logo aria-hidden="true">${esc((state.club?.name||"MS").slice(0,2).toLocaleUpperCase("tr-TR"))}</div></div>`;
 const subtitle={dashboard:'Kontrol merkezi',players:'Oyuncu merkezi',matches:'Maç planlama',roster:'Kadro oluşturucu',team:'Genel takım kadrosu',pitch:'Taktik saha',studio:'Görsel tasarım',weekly:'Haftalık maç görselleri',analytics:'Sezon analitiği',archive:'Geçmiş ve ayarlar',live:'Canlı Maç Saati'};
@@ -319,7 +353,7 @@ function squadReleaseWarnings(kind){if(kind!=='private')return [];const policy=a
 
 // Explicit dependency injection: views read an immutable snapshot of the current app context per render.
 const {groupSetup, dashboard, matchRow, players, input, ta, groupOpt, matchFormatFields, matchForm, workspaceHead, rosterPicker}=createMatchOperationViews({formatTurkishDate, getRosterInsights, getRosterPolicy, filterMultiGroupPool, getMatchRosterSections, FORMATS, LAYOUTS, recommendedFormatForAge, getFormatDisplay, state, getGroup, activeMatch, activeRoster, activeLineup, activePolicy, allMatches, btn, pageHeader, I, esc, nav});
-const {teamRosterPage}=createTeamAnalysisViews({TEAM_ROLES, TEAM_ROLE_PROFILES, getTeamDepthStats, getTeamSlotCandidates, TEAM_PITCH_FORMATIONS, getTeamPitchAnalysis, getFormationPitchSlots, renderTeamPitch, state, activeDepth, pageHeader, esc});
+const {teamRosterPage}=createTeamAnalysisViews({TEAM_ROLE_PROFILES,getTeamSlotCandidates,TEAM_PITCH_FORMATIONS,getTeamPitchAnalysis,getFormationPitchSlots,state,activeDepth,esc});
 const {posterStudio, weeklyPage}=createMediaStudioViews({getPosterReleaseIssues, templates, pickBoardMatches, prepareBoard, state, getGroup, activeMatch, activeRoster, btn, pageHeader, I, esc, draftFor, posterKind, workspaceHead});
 const {renderLiveClock}=createLiveMatchViews({state,esc,btn,I,allMatches,getGroup,activeLineup,projectLivePitch});
 const {archive, modalHtml}=createClubRecordViews({formatTurkishDate, getPitchShirtNumber, state, getGroup, activeRoster, activeLineup, allMatches, btn, logo, pageHeader, I, esc, clubManager, groupSetup, groupOpt, input, ta});
@@ -329,18 +363,28 @@ function render(){
  if(state.route==='matches'&&state.club&&!state.currentId){const draft=matchDrafts.read(matchDraftScope());if(draft?.seed)state.sessionMatch=draft.seed;}
  const prev=document.activeElement,prevId=prev?.id;
  const prevRole=prev?.dataset?.teamRole,prevSlot=prev?.dataset?.teamSlot;
- const prevPitchMode=prev?.dataset?.pitchMode;
+ const prevPitchMode=prev?.dataset?.pitchMode,prevDepthPage=prev?.dataset?.teamDepthPage;
+ const depthFocus=teamDepthFocusMark();
  if(!state.club){viewCoordinator.reset();root.innerHTML=clubWelcome();modalFocus.sync();return;}document.documentElement.style.setProperty("--v22-leaf",safeColor(state.club.accent));document.documentElement.style.setProperty("--ms-accent",safeColor(state.club.accent));setBackupClub(state.club);let page;switch(state.route){case 'players':page=players();break;case 'matches':page=matchForm();break;case 'roster':page=rosterPicker();break;case 'team':page=teamRosterPage();break;case 'pitch':page=pitchView();break;case 'live':page=renderLiveClock();break;case 'studio':page=posterStudio();break;case 'weekly':page=weeklyPage();break;case 'analytics':if(state.season.clubId!==state.club.id&&!state.season.loading)setTimeout(()=>loadSeasonAnalytics(),0);page=seasonPage();break;case 'archive':page=archive();break;default:page=dashboard()};const renderKey=JSON.stringify([state.club.id,state.club.name,state.club.accent,state.clubs.map(c=>[c.id,c.name,c.accent]),state.route]);
  const notice=location.protocol==='file:'?'<div class="offline-alert">Güvenilir kayıt için bu uygulamayı HTTPS veya yerel sunucuyla başlatın.</div>':'';
  viewCoordinator.update({key:renderKey,page:notice+page,shell:()=>shell(page),modal:state.modal?modalHtml():''});if(state.route==='matches')restoreMatchDraft();if(state.route==='studio')drawLivePreview();if(state.route==='weekly')drawWeeklyPreview();if(state.route==='archive'){updateLogoPreview();updateSWStatus()}if(state.route==='players')decorateAvatars();decorateClubLogo();updateConnectionStatus();updateSWStatus();const mob=root.querySelector('.mobile-nav'),active=mob?.querySelector('.mobile-link.active');if(mob&&active)mob.scrollLeft=Math.max(0,active.offsetLeft-mob.clientWidth/2+active.offsetWidth/2);
  // Replacing the app shell must not strand keyboard focus after a select or pitch-role click.
  if(!state.modal){let keep=null;
-  if(['team-pitch-formation','team-pitch-depth','team-tactical-role','pitch-formation','season-group','season-sort','season-from','season-to'].includes(prevId))keep=document.getElementById(prevId);
+  if(['team-group-select','team-pitch-formation','team-pitch-depth','team-tactical-role','pitch-formation','season-group','season-sort','season-from','season-to'].includes(prevId))keep=document.getElementById(prevId);
   else if(prevRole)keep=[...root.querySelectorAll('[data-team-role]')].find(el=>el.dataset.teamRole===prevRole&&(prevSlot?el.dataset.teamSlot===prevSlot:!el.dataset.teamSlot));
   else if(prevPitchMode)keep=root.querySelector('[data-pitch-mode="'+prevPitchMode+'"]');
+  else if(prevDepthPage!==undefined)keep=root.querySelector('[data-team-depth-page="'+prevDepthPage+'"]');
   keep?.focus({preventScroll:true});
  }
  modalFocus.sync();
+ if(state.route==='team'){
+  if(state.teamEditorOpen)mountTeamDepthEditor(depthFocus);
+  else if(state.teamFocusReturn){
+   const slotKey=state.teamFocusReturn;state.teamFocusReturn=null;
+   const trigger=[...root.querySelectorAll('[data-team-slot]')].find(element=>element.dataset.teamSlot===slotKey&&!element.closest('#team-depth-editor'));
+   trigger?.focus({preventScroll:true});
+  }
+ }
 }
 function boardPlan(){const filtered=pickBoardMatches(state.data.matches,state.board.week,state.board.mode);const ids=state.board.selected===null?filtered.slice(0,state.board.size==='story'?8:5).map(m=>m.id):state.board.selected;return prepareBoard(state.data.matches,state.data.groups,ids,state.board.size,state.club?.name,state.club?.accent);}
 let weeklyPreviewVersion=0;
@@ -598,7 +642,10 @@ case 'save-match':{if(activeMatch()?.state==='archived')throw Error('Bu maç ar�
  const gameFormat=normalizeGameFormat({playersPerSide:fields.gameSize,goalkeeperMode:fields.goalkeeperMode,benchLimit:fields.benchLimit});
  const pitchLayout=normalizePitchLayout({id:fields.pitchLayoutId,half:fields.pitchHalf},gameFormat);
  for(const k of ['gameSize','goalkeeperMode','benchLimit','pitchLayoutId','pitchHalf'])delete fields[k];
- const r=validateMatch({...old,...fields,gameFormat,pitchLayout});if(!r.ok){toast(r.errors.join(' '),true);return}const match=r.data;
+ const group=state.data.groups.find(g=>g.id===fields.groupId);
+ if(!group)throw Error('Geçerli bir takım / grup seçmelisin.');
+ const ageCategory=old.groupId===group.id&&old.ageCategory?old.ageCategory:group.ageCategory||parseAgeCategory(group.name)||group.name;
+ const r=validateMatch({...old,...fields,ageCategory,gameFormat,pitchLayout});if(!r.ok){toast(r.errors.join(' '),true);return}const match=r.data;
  const policy=getRosterPolicy(match,state.data.groups);if(!policy)throw Error('Geçerli bir maç formatı seçmelisin.');
  let previousRoster=state.data.rosters.find(x=>x.matchId===match.id)||buildRoster(match.id,[]);if(old.groupId&&old.groupId!==match.groupId&&previousRoster.entries.length){if(!confirm('Takım / grup değişiyor. Daha önce seçilen oyuncular korunacak. Devam etmek istiyor musun?'))return;}const oldPolicy=old.id?getRosterPolicy(old,state.data.groups):null;
  let updatedPlan=null;
@@ -810,7 +857,10 @@ listenRoot('click',async e=>{
   try{const direction=priority.dataset.teamPriority==='up'?-1:1;const next=(priority.dataset.teamSlotKey||state.teamSlotSelected)?moveTeamSlotCandidate(activeDepth(),priority.dataset.teamSlotKey||state.teamSlotSelected,priority.dataset.playerId,direction,state.data.players):moveTeamRoleCandidate(activeDepth(),priority.dataset.playerId,state.teamRoleSelected,direction,state.data.players);await persistTeamDepth(next);}
   catch(error){toast(error.message,true);}return;
  }
- const tr=e.target.closest('[data-team-role]');if(tr){state.teamRoleSelected=tr.dataset.teamRole;state.teamSlotSelected=tr.dataset.teamSlot||null;render();return;}
+ const depthPage=e.target.closest('[data-team-depth-page]');if(depthPage){const direction=Number(depthPage.dataset.teamDepthPage)||0;state.teamDepthPage=Math.max(0,(state.teamDepthPage||0)+direction);render();return;}
+ const candidatePage=e.target.closest('[data-team-candidate-page]');if(candidatePage){const direction=Number(candidatePage.dataset.teamCandidatePage)||0;state.teamCandidatePage=Math.max(0,(state.teamCandidatePage||0)+direction);render();return;}
+ const editorClose=e.target.closest('[data-team-editor-close]');if(editorClose){closeTeamDepthEditor();return;}
+ const tr=e.target.closest('[data-team-role]');if(tr){state.teamRoleSelected=tr.dataset.teamRole;state.teamSlotSelected=tr.dataset.teamSlot||null;if(tr.dataset.teamSlot){state.teamEditorOpen=true;state.teamCandidatePage=0;state.teamFocusReturn=null;}render();return;}
  const ptMode=e.target.closest('[data-pitch-mode]');if(ptMode){state.pitchMode=ptMode.dataset.pitchMode==='all'?'all':'match';state.pitchSelectedId=null;render();return;}
  const rolePlayer=e.target.closest('[data-pitch-role-player]');if(rolePlayer){state.pitchSelectedId=rolePlayer.dataset.pitchRolePlayer;render();return;}
  const ptPlayer=e.target.closest('[data-pitch-player]');if(ptPlayer){state.pitchSelectedId=ptPlayer.dataset.pitchPlayer;render();return;}
@@ -864,6 +914,7 @@ listenRoot('input',e=>{
  }
  if(element.id==='team-search'){
   state.teamQuery=element.value;
+  state.teamCandidatePage=0;
   if(!patchSearchRegion(root,teamRosterPage(),'.v22-team-members'))render();
   return;
  }
@@ -889,11 +940,11 @@ function reviewPlayerCsv(text){const groupId=document.getElementById('csv-group'
 listenRoot('change',async e=>{const el=e.target;if(el.id==='club-switch'||el.id==='club-switch-mobile'){try{await chooseClub(el.value)}catch(err){toast(err.message,true)}return;}if(el.id==='weekly-range'){state.board.mode=el.value==='all'?'all':'week';state.board.selected=null;render();return;}if(el.id==='weekly-date'){const week=mondayOf(el.value);if(week){state.board.week=week;state.board.selected=null;render();}return;}if(el.id==='gameSize'){const k=document.getElementById('goalkeeperMode'),lay=document.getElementById('pitchLayoutId');if(k&&Number(el.value)<=4)k.value='none';if(lay&&el.value!=='8'&&lay.value==='half-pitch-crosswise')lay.value='small';return;}if(el.id==='pitch-player-shortcut'){state.pitchSelectedId=el.value||null;render();return;}if(el.id==='pitch-role'){try{await savePitchPlan(setPlayerPitchRole(activeLineup(),activeRoster(),state.pitchSelectedId,el.value));}catch(error){toast(error.message,true);}return;}if(el.id==='pitch-formation'){
  try{const slots=getPitchPresets()[el.value];if(activePolicy()&&slots?.length!==activePolicy().starterLimit)throw Error(`Bu maçta ilk ${activePolicy().starterLimit} kullanılmalı.`);state.pitchSelectedId=null;await savePitchPlan(changePitchPreset(activeLineup(),el.value));}catch(error){toast(error.message,true);}return;
  }if(el.id==='team-group-select'){
-  state.teamGroupId=el.value;state.teamRoleSelected='GK';state.teamSlotSelected=null;state.teamQuery='';
+  state.teamGroupId=el.value;state.teamRoleSelected='GK';state.teamSlotSelected=null;state.teamQuery='';state.teamDepthPage=0;state.teamCandidatePage=0;state.teamEditorOpen=false;state.teamFocusReturn=null;
   state.teamPitchPrefs=storedTeamPitchPrefs(el.value);render();return;
  }if(['team-pitch-formation','team-formation-select','team-pitch-depth','team-depth-factor','team-depth-select'].includes(el.id)){
   try{
-   const changed=el.id.includes('formation')?{formation:el.value}:{depthFactor:Number(el.value)};if(el.id.includes('formation'))state.teamSlotSelected=null;
+   const changed=el.id.includes('formation')?{formation:el.value}:{depthFactor:Number(el.value)};if(el.id.includes('formation')){state.teamSlotSelected=null;state.teamEditorOpen=false;state.teamDepthPage=0;state.teamCandidatePage=0;}
    await persistTeamPitchPrefs({...state.teamPitchPrefs,...changed});
   }catch(error){toast(error.message,true);}return;
  }if(el.id==='team-tactical-role'){try{await persistTeamDepth(setTeamTacticalRole(activeDepth(),el.dataset.teamTacticalSlot,el.value,state.data.players));}catch(error){toast(error.message,true);}return;}if(el.dataset.teamSlotPlayer){try{await persistTeamDepth(setTeamSlotPlayer(activeDepth(),el.dataset.teamSlotKey||state.teamSlotSelected,el.dataset.teamSlotPlayer,el.checked,state.data.players));}catch(error){toast(error.message,true);}return;}if(el.dataset.teamRolePlayer){try{await persistTeamDepth(setTeamPlayerRole(activeDepth(),el.dataset.teamRolePlayer,state.teamRoleSelected,el.checked,state.data.players));}catch(error){toast(error.message,true);}return;}try{

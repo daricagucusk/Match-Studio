@@ -16,6 +16,9 @@ Güncel giriş [proje README](../README.md), klasör sorumlulukları [mimari](ST
 - [VALIDATION.md](VALIDATION.md)
 
 - [Tasarım sistemi](../DESIGN.md)
+- [Takım derinliği araştırması ve tek ekran tasarım sözleşmesi](TEAM-DEPTH-DESIGN.md)
+- [Takım derinliği kabul kontrolü](TEAM-DEPTH-ACCEPTANCE.md)
+- [F.19 ajan test raporları](F19-AJAN-TEST-RAPORLARI-20261106.md)
 - [Birleşik F.17 planı](plans/2026-11-02-unified-final.md)
 
 ## Kurulum ve kullanım

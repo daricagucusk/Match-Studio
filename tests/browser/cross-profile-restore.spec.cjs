@@ -68,7 +68,6 @@ test('P0: encrypted club backup restores roster, match and image in a completely
  await expect(page.locator('#player-form')).toHaveCount(0);
  await nav(page,'matches');
  await page.locator('#groupId').selectOption({label:'U14'});
- await page.locator('#ageCategory').selectOption('U14');
  await page.locator('#opponent').fill('Sentetik Rakip');
  await page.locator('#venue').fill('Sentetik Saha');
  await page.locator('#matchDate').fill('2026-11-08');
