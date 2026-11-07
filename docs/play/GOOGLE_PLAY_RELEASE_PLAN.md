@@ -1,6 +1,8 @@
 # MATCH STUDIO – Google Play Son Üretim Planı
 Tarih: 25 Ekim 2026 | Kanonik uygulama: https://match-studio-telefon.vercel.app
 
+> **Güncel durum (7 Kasım 2026):** İmzalı F.19 upload AAB (versionCode 2, targetSdk 36) hazır. Play App Signing sertifikası ve canlı assetlinks doğrulandı. Mağaza metinleri, görseller, Data Safety ve içerik derecelendirme yanıtları için bkz. [PLAY_CONSOLE_READY_2026-11-07.md](PLAY_CONSOLE_READY_2026-11-07.md). Yükleme, 12 testçi/14 gün ve üretim erişimi hesap sahibinde.
+
 **Durum: Hazırlık. Play Store'a henüz bir AAB yüklenmedi; hesap erişimi ve imzalama anahtarı doğrulanmadı.**
 
 ## A. Mevcut teknik temel

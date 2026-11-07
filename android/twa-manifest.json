@@ -19,7 +19,7 @@
     "path": "./upload-key.jks",
     "alias": "matchstudio-upload"
   },
-  "appVersionCode": 1,
+  "appVersionCode": 2,
   "appVersion": "2.6.8",
   "generatorApp": "match-studio-google-play-prep",
   "webManifestUrl": "https://match-studio-telefon.vercel.app/manifest.webmanifest",
@@ -28,7 +28,12 @@
   "isChromeOSOnly": false,
   "minSdkVersion": 24,
   "orientation": "default",
-  "fingerprints": [],
+  "fingerprints": [
+    {
+      "name": "Google Play App Signing",
+      "value": "49:8F:91:FC:D8:4F:80:11:88:F0:1D:E9:24:2B:B5:6D:7C:33:D6:E7:31:F5:C7:CE:02:B6:2C:B7:82:90:C0:4F"
+    }
+  ],
   "additionalTrustedOrigins": [],
   "shortcuts": [],
   "features": {},
