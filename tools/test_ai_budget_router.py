@@ -245,3 +245,10 @@ class RouterSecurityTests(unittest.TestCase):
                                 runner=runner, stages=("plan",))
         self.assertEqual(router.BudgetLedger(self.ledger, self.policy).spent,
                          Decimal("0.78"))
+
+    def test_prompt_includes_only_real_project_verification_commands(self):
+        prompt = router.make_prompt("Düğmeyi düzelt", "plan")
+        self.assertIn("npm test", prompt)
+        self.assertIn("npm run build", prompt)
+        self.assertIn("npm run test:browser", prompt)
+        self.assertIn("Do not invent", prompt)
