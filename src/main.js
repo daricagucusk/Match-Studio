@@ -38,7 +38,7 @@ const {createMatchSession,getMatchSession,listMatchEvents}=require("src/storage/
 const {commitClockAction}=require("src/storage/match-clock.js");
 const {commitSubstitution}=require("src/storage/match-substitutions.js");
 const {commitSportingEvent}=require("src/storage/match-sporting-events.js");
-const {effectiveSportingEvents,projectMatchReport}=require("src/domain/match-events-report.js");
+const {effectiveSportingEvents,projectMatchReport,planQuickSportingUndo}=require("src/domain/match-events-report.js");
 const {projectClock,formatClock}=require("src/domain/match-clock.js");
 const {createLiveMatchViews}=require("src/app/views/live-match-clock.js");
 const {projectLivePitch}=require('src/domain/live-pitch.js');
@@ -784,12 +784,12 @@ case 'duplicate-match':{if(matchDrafts.read({clubId:state.club.id,matchId:null})
   if(matchdayQuickPending)return;
   const all=state.liveEvents||[],lastRaw=all[all.length-1];
   if(lastRaw?.type==='SUBSTITUTION'){toast('Son işlem oyuncu değişikliği. Müsabaka kuralını bozmamak için otomatik geri alınmaz.',true);return;}
-  const effective=effectiveSportingEvents(all),item=effective[effective.length-1];
-  if(!item){toast('Geri alınacak sportif olay yok.');return;}
+  const undo=planQuickSportingUndo(all);
+  if(!undo){toast('Geri alınacak sportif olay yok.');return;}
   matchdayQuickPending=true;
   const club=state.club?.id,match=state.currentId;
   try{
-   const outcome=await commitSportingEvent({matchId:match,type:'EVENT_CORRECTION',payload:{targetEventId:item.id,reason:'Saha kenarı hızlı geri alma',void:true,replacement:null},expectedRevision:state.liveSession.revision,idempotencyKey:'sport:'+crypto.randomUUID()});
+   const outcome=await commitSportingEvent({matchId:match,type:'EVENT_CORRECTION',payload:undo,expectedRevision:state.liveSession.revision,idempotencyKey:'sport:'+crypto.randomUUID()});
    if(state.club?.id!==club||state.currentId!==match)return;
    if(!outcome.duplicate)notifyLiveUpdate();
    await loadLiveClock();clearMatchdayQuickUi('Son sportif olay geri alındı.');toast('Sportif olay geri alındı');

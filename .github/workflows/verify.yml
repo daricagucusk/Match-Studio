@@ -34,7 +34,7 @@ jobs:
       - name: Fail closed on published static files
         run: node tools/release-security-check.cjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: success()
+        if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
         with:
           name: match-studio-release
           path: |
@@ -45,14 +45,14 @@ jobs:
           if-no-files-found: error
           retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: success()
+        if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
         with:
           name: matchstudio-play-store-screenshots
           path: dist/store-listing/*.png
           if-no-files-found: error
           retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: failure()
+        if: failure() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
         with:
           name: browser-test-diagnostics
           path: test-results/
