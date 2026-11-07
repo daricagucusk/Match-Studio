@@ -38,11 +38,11 @@
     "packageIdAvailableInConsole": true,
     "targetApi": 36,
     "signedAab": true,
-    "signedAabVersionCode": 2,
-    "signedAabSha256": "9a1fd54622c61c5c01fe0ff099f8e8ace84b8e3262781227572389eced3cb204",
+    "signedAabVersionCode": 3,
+    "signedAabSha256": "3e8b67363861cb364ac62bbf7c6d318a00aabbc5db561c2ff2a3db3f93ca33c3",
     "uploadCertificateSha256": "B1:36:AF:04:F2:B1:9F:E3:77:2A:21:B3:09:8B:F3:A3:57:24:1E:70:46:60:94:20:9D:99:98:9F:DD:C8:DA:19",
     "playAppSigningSha256": "49:8F:91:FC:D8:4F:80:11:88:F0:1D:E9:24:2B:B5:6D:7C:33:D6:E7:31:F5:C7:CE:02:B6:2C:B7:82:90:C0:4F",
-    "signedAabInspection": "C:\\Users\\aearo\\Documents\\MatchStudio-Android-Release-Candidate\\artifacts\\AAB_SIGNED_INSPECTION_F19.json"
+    "signedAabInspection": "C:\\Users\\aearo\\Documents\\MatchStudio-Android-Release-Candidate\\artifacts\\AAB_SIGNED_INSPECTION_F19_V3.json"
   },
   "baseline": {
     "main": "4cbf8f899cc1466fe1621d42900fa959357d985f",
