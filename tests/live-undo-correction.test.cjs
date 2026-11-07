@@ -27,7 +27,7 @@ test('undoing latest goal cancellation restores the original 1-0 goal instead of
  assert.equal(planned.targetEventId,goal.id);
  assert.equal(planned.void,false);
  const effective=effectiveSportingEvents([goal,cancelled,{id:'event:restore',type:'EVENT_CORRECTION',sequence:3,payload:planned}]);
- assert.deepEqual(effective.map(e=>e.type),['GOAL']);
+ assert.deepEqual(Array.from(effective,e=>e.type),['GOAL']);
 });
 
 test('ordinary latest goal quick undo still cancels that goal',()=>{
