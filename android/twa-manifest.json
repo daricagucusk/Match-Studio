@@ -19,7 +19,7 @@
     "path": "./upload-key.jks",
     "alias": "matchstudio-upload"
   },
-  "appVersionCode": 2,
+  "appVersionCode": 3,
   "appVersion": "2.6.8",
   "generatorApp": "match-studio-google-play-prep",
   "webManifestUrl": "https://match-studio-telefon.vercel.app/manifest.webmanifest",

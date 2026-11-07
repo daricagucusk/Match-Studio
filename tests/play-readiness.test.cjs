@@ -14,12 +14,13 @@ test('Play preflight validates the existing PWA icons and provisional TWA',()=>{
  assert.match(ret.stdout,/\[PASS\] Android metadata/);
  assert.match(ret.stdout,/Play readiness:/);
 });
-test('provisional Android wrapper points only to canonical production origin',()=>{
+test('signed Android wrapper uses approved production origin and release metadata',()=>{
  const cfg=JSON.parse(fs.readFileSync(path.join(root,'android/twa-manifest.json'),'utf8'));
  assert.equal(cfg.host,'match-studio-telefon.vercel.app');
  assert.equal(cfg.startUrl,'/index.html');
  assert.equal(cfg.enableNotifications,false);
- assert.equal(cfg.appVersionCode,1);
+ const approved=JSON.parse(fs.readFileSync(path.join(root,'docs/play/release-monetization.json'),'utf8'));
+ assert.equal(cfg.appVersionCode,approved.android.signedAabVersionCode);
  assert.equal(cfg.fallbackType,'customtabs');
  assert.equal(cfg.minSdkVersion,24);
  assert.ok(!cfg.signingKey.path.includes('.github'));

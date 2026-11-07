@@ -8,8 +8,8 @@ Bu belge, Play Console'da yayına hazırlamak için gereken bütün alanların k
 |---|---|---|
 | Paket adı | `com.matchdaystudio.app` | Play Console uygulama kaydı 4 Kasım 2026'da doğrulandı |
 | Uygulama kaydı | Var (Console ID `4976448898430635813`) | Play Console doğrulama tutanağı |
-| İmzalı AAB | Var, versionCode **2**, versionName **2.6.8** | `C:\Users\aearo\Documents\MatchStudio-Android-Release-Candidate\artifacts\MatchStudio_F19RC1_UPLOAD_signed.aab` |
-| AAB SHA-256 | `9a1fd54622c61c5c01fe0ff099f8e8ace84b8e3262781227572389eced3cb204` | SHA-256 hesaplandı |
+| İmzalı AAB | Var, versionCode **3**, versionName **2.6.8** | `C:\Users\aearo\Documents\MatchStudio-Android-Release-Candidate\artifacts\MatchStudio_F19RC1_UPLOAD_signed.aab` |
+| AAB SHA-256 | `3e8b67363861cb364ac62bbf7c6d318a00aabbc5db561c2ff2a3db3f93ca33c3` | SHA-256 hesaplandı |
 | Hedef API | compileSdk/targetSdk **36**, minSdk **24** | bundletool manifest dump |
 | İzinler | Yalnızca uygulama içi `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`; Billing/kamera/konum yok | bundletool manifest dump |
 | Yerel kütüphane | Yok (16 KB hizalama riski yok) | AAB içinde `.so` sayısı 0 |
@@ -160,7 +160,7 @@ java -jar tools\bundletool-all-1.18.3.jar dump manifest --bundle=<AAB>
 jarsigner -verify -verbose <AAB>
 
 # Play hazırlık (imzalı AAB raporuyla)
-$env:MATCHSTUDIO_SIGNED_AAB_REPORT="C:\Users\aearo\Documents\MatchStudio-Android-Release-Candidate\artifacts\AAB_SIGNED_INSPECTION_F19.json"
+$env:MATCHSTUDIO_SIGNED_AAB_REPORT="C:\Users\aearo\Documents\MatchStudio-Android-Release-Candidate\artifacts\AAB_SIGNED_INSPECTION_F19_V3.json"
 npm run check:play:strict
 
 # Canlı alan adları
