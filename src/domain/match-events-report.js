@@ -42,6 +42,22 @@ function effectiveSportingEvents(events=[]){
  const live=[...base.values()].filter(e=>!e.voided);const goals=new Set(live.filter(e=>e.type==='GOAL').map(e=>e.id));
  return live.filter(e=>e.type!=='ASSIST'||goals.has(e.payload?.goalEventId)).sort((a,b)=>a.sequence-b.sequence);
 }
+// The coach's last command may be a correction. Revert its projection, not the source goal.
+// The resulting correction is append-only: no audit-history event is deleted.
+function planQuickSportingUndo(events=[]){
+ const ordered=[...events].filter(e=>e&&Number.isSafeInteger(e.sequence)).sort((a,b)=>a.sequence-b.sequence);
+ const latest=ordered[ordered.length-1];
+ if(!latest||latest.type==='SUBSTITUTION')return null;
+ if(latest.type==='EVENT_CORRECTION'){
+  const targetEventId=latest.payload?.targetEventId;
+  const previous=effectiveSportingEvents(ordered.slice(0,-1)).find(e=>e.id===targetEventId);
+  if(!previous)return {targetEventId,reason:'Son düzeltme geri alındı',void:true,replacement:null};
+  return {targetEventId,reason:'Son düzeltme geri alındı',void:false,replacement:{type:previous.type,payload:{...previous.payload}}};
+ }
+ const effective=effectiveSportingEvents(ordered),last=effective[effective.length-1];
+ if(!last)return null;
+ return {targetEventId:last.id,reason:'Saha kenarı hızlı geri alma',void:true,replacement:null};
+}
 function validateCorrection(input,session,events){
  const targetId=String(input?.targetEventId||'');
  const item=events.find(e=>e.id===targetId&&allowed.has(e.type)&&e.sessionId===session.id);
@@ -90,4 +106,4 @@ function projectMatchReport(session,events=[],players=[],roster=null,nowMs=Date.
  const clock=projectClock(session,nowMs);
  return {matchId:session.matchId,status:session.status,ourGoals:us,opponentGoals:opponent,players:participants,events:real,notes,minutesReviewRequired:minute.reviewRequired,clockReviewRequired:clock.reviewRequired,elapsedMatchMs:clock.elapsedMatchMs,matchTimeLabel:session.status==='finished'?'Maç tamamlandı':'Geçici maç özeti',corrections:events.filter(e=>e.type==='EVENT_CORRECTION').length};
 }
-Object.assign(exports,{TYPES,normalizeSportsPayload,effectiveSportingEvents,validateCorrection,projectMatchReport});
+Object.assign(exports,{TYPES,normalizeSportsPayload,effectiveSportingEvents,planQuickSportingUndo,validateCorrection,projectMatchReport});
