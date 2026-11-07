@@ -69,3 +69,24 @@ test('local release packaging runs credential scan before creating archives', ()
   const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'));
   assert.match(pkg.scripts.package, /^node tools\/release-security-check\.cjs && node tools\/package\.cjs$/);
 });
+
+test('artifact uploads are reserved for release refs instead of failing every PR on repository quota', () => {
+  const workflow = fs.readFileSync(path.resolve(__dirname, '../.github/workflows/verify.yml'), 'utf8');
+  const releaseOnly = "github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')";
+  const uploads = workflow.split('uses: actions/upload-artifact@').slice(1);
+  assert.equal(uploads.length, 3);
+  assert.ok(uploads.every(section => section.includes(releaseOnly)), 'Every upload must be release-only');
+  assert.ok(uploads.slice(0,2).every(section => /if: success\(\)/.test(section)), 'Success uploads must still gate on successful tests');
+  assert.match(workflow, /if-no-files-found: error/, 'A missing release archive must remain fatal on a release ref');
+});
+
+
+test('CI artifact upload is opt-in when GitHub storage quota is exhausted', () => {
+  const workflows=['verify.yml','android-twa-unsigned.yml'];
+  for(const file of workflows){
+    const text=fs.readFileSync(path.resolve(__dirname,'../.github/workflows',file),'utf8');
+    const steps=text.split(/\r?\n      - /).filter(step=>step.includes('uses: actions/upload-artifact@'));
+    assert.ok(steps.length>0,`${file} contains export steps`);
+    assert.ok(steps.every(step=>/if: [^\n]*vars\.MATCHSTUDIO_UPLOAD_RELEASE_ARTIFACTS == 'true'/.test(step)),`${file} uploads must be explicitly enabled`);
+  }
+});
