@@ -30,7 +30,7 @@ Tarih: 2026-11-07 | Teknik durum: PARTIAL / NO-GO (üretim)
 ## TestSprite (web PWA, Android kabulü değil)
 - Run: `cb65f8c7-8ee5-47c3-acb7-74c74d0a484c`
 - 15 senaryo: 10 passed / 1 failed / 4 blocked. Kabul başarılı değil.
-- Kritik regresyon: canlı maç düzeltmesini geri alma akışında skor 1–0 yerine 0–0'a düşüyor. Kök neden kaynak kod ve tekrarlanabilir test ile ayrıca doğrulanmalı.
+- Kritik regresyonun kök nedeni doğrulandı: son düzeltmeyi geri alma komutu kaynak golü iptal ediyordu. **PR #31**, geliştirme dalına merge edildi (a80bf0d). Append-only karşı düzeltme önceki skor ve golcü bilgisini koruyor. Ek kontroller: 131/131 birim testi ve 9/9 hedefli masaüstü/telefon/Fold tarayıcı testi PASS. **Eski TestSprite çalışması yeniden çalıştırılmış değildir; canlı production dağıtımı ayrı doğrulanmalı.**
 - TestSprite sonucu Play kapalı testin, gerçek Play-signed APK kurulumunun ya da fiziksel cihaz testinin yerine geçmez.
 
 ## Bir sonraki kabul sırası
@@ -38,7 +38,7 @@ Tarih: 2026-11-07 | Teknik durum: PARTIAL / NO-GO (üretim)
 2. 11+ ek, gerçekten kabul etmiş yetişkin Google kullanıcısı ekleyin; tercihen 15–20 kişiyle yedek katılımcı bırakın. Gerçek katılımcılara opt-in bağlantısını paylaşın. Kullanıcı onaylarını sahte hesap veya bot ile taklit etmeyin.
 3. 12 gerçek kullanıcı 14 gün kesintisiz opt-in olmadan üretim erişim başvurusu yok. Süre, Play'in doğruladığı katılım tarihlerinden başlar; taslak oluşturma tarihinden değil.
 4. Galaxy Z Fold7 USB data kablosuyla bağlanıp geliştirici seçeneklerinden USB hata ayıklama izni verilince `adb devices -l` ile yeniden kontrol. Gerçek cihaz verilerini silmeden Play üzerinden kurulan sürümü test edin.
-5. Canlı maç skor geri al hatasını kaynakta tekrarla/düzelt ve yeniden TestSprite + regresyon çalıştır. Gerekirse versionCode artırıp yeni AAB ile kapalı teste güncelleme ver.
+5. Canlı maç geri alma düzeltmesi geliştirme dalında test edildi. Tam tarayıcı regresyonu ve güvenli üretim dağıtımı başarılı olursa TestSprite'ın aynı senaryosunu canlı sürümde yeniden çalıştır. İmzalı Android paket içeriği değişecekse versionCode artırarak yeni AAB üret; yalnızca web içeriği değişirse Play'deki mevcut AAB'nin yeniden yüklenmesi gerekip gerekmediğini ayrıca değerlendir.
 6. Google Play uygulama içerikleri, veri güvenliği, mağaza girişi, satıcı statüsü ve üretim erişim incelemesini gerçek belgelerle tamamla.
 
 Resmî kaynaklar:
