@@ -24,3 +24,5 @@ Bu dosya kesinleşmiş ve gelecekteki çalışmaları etkileyecek kararları kay
 - `Durum` alanında `aktif`, `değiştirildi`, `iptal edildi` veya `tamamlandı` gibi açık ifadeler kullanın.
 - Yalnızca gelecekte tekrar bilinmesi gereken kararları kaydedin.
 
+
+| 2026-11-08 | Ayrı `feat/abacus-budget-router-20261108` geliştirme worktree'sinde Abacus görev yönlendirme prototipi oluşturulur; varsayılan dry-run, açık premium/ücretli izin ve yerel kredi önkontrolü zorunlu, uygulama kodunu yazma/yayınlama otomatik yapılmaz. | Basic kredi kullanımını korumak, mevcut F.19 ve GitHub/Vercel üretim sürümlerini değiştirmeden model rotasını doğrulamak. | pilot / kabul bekliyor | `tools/ai_budget_router.py`, `config/ai-budget-policy.json`, `docs/ai/ABACUS_BUDGET_ROUTER.md` |
