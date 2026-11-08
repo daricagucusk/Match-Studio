@@ -70,7 +70,10 @@ jobs:
           echo "378b5434cd1378bef6b2bc527b8c7f0ff2584b273830335bce54d6d0813c8584  $RUNNER_TEMP/bundletool.jar" | sha256sum -c -
           python3 -m unittest discover -s tools -p 'test_android_aab.py' -v
           python3 tools/inspect-android-aab.py --aab .unsigned-twa/unsigned-qa.aab --bundletool "$RUNNER_TEMP/bundletool.jar" --mode unsigned --commit "$(git rev-parse HEAD)" --report .unsigned-twa/aab-report.json
+      # GitHub artifact quota may be exhausted. QA build and inspection remain mandatory,
+      # but archive export is explicitly opt-in for manual dispatches only.
       - name: Upload inspected unsigned QA bundle
+        if: ${{ github.event_name == 'workflow_dispatch' && vars.MATCHSTUDIO_UPLOAD_RELEASE_ARTIFACTS == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: matchstudio-android-unsigned-qa
