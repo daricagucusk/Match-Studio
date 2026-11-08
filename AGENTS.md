@@ -14,3 +14,18 @@ Bu projede ana talimat dosyası `CLAUDE.md` dosyasıdır.
 Gerçekten gerekmedikçe bu bölümü boş bırakın.
 Yalnızca Codex'e özgü ve CLAUDE.md içinde bulunmaması gereken talimatlar eklenir.
 -->
+
+## Abacus AI ekonomik ajan yönlendirmesi (izole pilot)
+
+- Bu projenin kaynak-of-truth talimatları hâlâ `CLAUDE.md` ve `context/README.md` dosyalarıdır; onları geçersiz kılma.
+- Kullanıcı model seçimi, görev planı veya kredi tasarruflu ajan devri istediğinde `docs/ai/ABACUS_BUDGET_ROUTER.md` dosyasını oku.
+- İlk kontrol: `py -3 -B tools/ai_budget_router.py "GÖREV"` (dry-run, kredi tüketmez).
+- Abacus CLI'ye para harcatan `--execute` ancak kullanıcının güncel cüzdan bakiyesi ve açık izniyle kullanılabilir; `--allow-premium` ayrı opt-in'dir.
+- Bu sistemin `implement` rolü de salt okunur öneri üretir; kendiliğinden kod değişikliği, push, merge veya yayın yapamaz.
+- `tools/ai_handoff_router.py` GitHub Issue yedekleme akışı ayrı kalır; mevcut `.jarvis/integrations.json` rotalarını değiştirme.
+
+## Abacus AI: onaysız rutin geliştirme
+
+- Normal kod veya belge düzenlemeleri için `accept-edits` modunda yerleşik Edit/Write kullan; onay isteyen `sed -i`, `perl -pi`, toplu Bash değiştirme komutlarına geçme. Riskli komut engellenirse eşdeğer küçük Edit/Write değişiklikleriyle devam et.
+- Mevcut sürümleri, oyun içi canlı maç geri almayı ve test kapsamını koru. Silinen testin kapsamını mevcut testlerle karşılaştır; test ve derleme geçmeden işi tamamlandı diye raporlama.
+- Kodu değiştirirken `npm test`, `npm run build` ve ilgili Playwright testlerini kullan. GitHub push, merge, canlı yayın, kimlik bilgileri, harici ücretli API ve geri alınamaz silmeler otomatik izin kapsamında değildir.

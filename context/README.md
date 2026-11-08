@@ -13,6 +13,7 @@ Bu dosya `context/` klasörünün ana haritasıdır. Proje bağlamını tek baş
 
 - `hedefler.md`: Önceliklendirme, planlama, strateji veya başarı değerlendirmesi yapılırken.
 - `kararlar.md`: Yeni karar alınırken, önceki bir karar sorgulanırken veya çelişki ihtimali varsa.
+- `proje-hafizasi.md`: Yayın, Play Console veya test ortamı durumu ile kalan blokerler sorulduğunda.
 - `kaynaklar/README.md`: Kaynak eklenecekse veya kaynaklara dayalı inceleme yapılacaksa.
 - `kaynaklar/kaynak-indeksi.md`: Belirli bir PDF, tablo, görsel, bağlantı, ses veya video aranıyorsa.
 
@@ -24,6 +25,7 @@ Bu dosya `context/` klasörünün ana haritasıdır. Proje bağlamını tek baş
 | `hedefler.md` | Aktif hedefler, öncelikler ve başarı ölçütleri | Planlama ve önceliklendirmede |
 | `kurallar-ve-sinirlar.md` | Kalıcı kurallar, sınırlar, yasaklar ve yetki gerektiren alanlar | Her görevde |
 | `kararlar.md` | Kesinleşmiş kararlar, gerekçeleri ve durumları | Karar veya değişiklik öncesinde |
+| `proje-hafizasi.md` | F.19 adayının güncel durum anlık görüntüsü: tamamlanan doğrulamalar, Play/hosting blokerleri ve sonraki adım sırası | Yayın/Play durumu veya kalan işler sorulduğunda |
 | `kaynaklar/README.md` | Kaynak sisteminin kullanım ve düzenleme kuralları | Kaynak işlemlerinde |
 | `kaynaklar/kaynak-indeksi.md` | Projede bulunan gerçek kaynakların envanteri | Kanıt veya kaynak aranırken |
 | `kaynaklar/baglantilar.md` | İnternet ve çevrim içi kaynak kayıtları | Dış bağlantı gerektiğinde |

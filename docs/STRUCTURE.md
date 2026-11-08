@@ -45,4 +45,4 @@ Yeni dosyayı işlevine göre mevcut klasöre ekleyin. Proje kökü yalnızca ba
 - `src/` modülleri taşınmadı. Bundle içindeki modül yolları ve bağımlılık sırası korunur.
 - Eski belgeler ve kanıtlar yazıldıkları tarihe aittir. İçlerindeki test/yayın sayıları güncel kabul kanıtı sayılmaz.
 - Kökten kaldırılan `app.bundle.js`, `sw.js` ve `SHA256SUMS.txt` yeniden üretilebilir dosyalardır. Paket iç manifesti ZIP içinde, paket SHA-256 özetleri `dist/SHA256SUMS.txt` içinde üretilir.
-- Taşıma dökümü ve geri dönüş bilgisi [düzenleme raporundadır](REORGANIZATION-20261102.md).
+- Taşıma dökümü ve geri dönüş bilgisi [düzenleme raporundadır](history/REORGANIZATION-20261102.md).
