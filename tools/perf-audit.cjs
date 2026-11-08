@@ -131,11 +131,6 @@ async function main() {
   console.log('='.repeat(70));
   console.log('Match Studio F.19 RC.1 — Performans Denetimi / Dış Göz');
   console.log('='.repeat(70));
-console.log('DEBUG: server check');
-const req = await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => console.log('WARN goto failed'));
-// Test simple response first
-const resp = await page.waitForSelector('.app-shell', { timeout: 10000 }).then(() => true).catch(() => false);
-console.log('DEBUG: .app-shell present?', resp);
 console.log(`Target: ${BASE_URL}`);
   console.log(`Viewport plans: ${VIEWPORTS.map(v => `${v.name}(${v.width}x${v.height}${v.isMobile?' mobile':''})`).join(', ')}\n`);
 

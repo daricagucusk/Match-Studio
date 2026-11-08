@@ -5,7 +5,7 @@ const {chromium}=require('playwright');
 const fs=require('node:fs');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const outDir=process.argv[2]||path.join(root,'evidence','audit-360');
+const outDir=process.argv[2]||path.join(root,'test-results','reviews','audit-360');
 const base=process.argv[3]||'http://127.0.0.1:8913';
 fs.mkdirSync(outDir,{recursive:true});
 const sources=Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root,'tools/module-order.json'),'utf8')).map(id=>[id,fs.readFileSync(path.join(root,id),'utf8')]));
@@ -49,7 +49,7 @@ async function measure(page){
   const context=await browser.newContext({viewport:vp,isMobile:vp.width<900,hasTouch:vp.width<900,deviceScaleFactor:1});
   const page=await context.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(String(e).slice(0,200)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text().slice(0,200));});
-  await page.goto(base+'/');await page.waitForSelector('.app-shell');
+  await page.goto(base+'/');await page.waitForFunction(()=>Boolean(document.querySelector('#app')?.children.length));
   await seed(page);await page.reload();await page.waitForSelector('.app-shell');
   await page.waitForFunction(()=>document.querySelector('#app')?.getAttribute('aria-busy')!=='true');
   report.viewports[vpName]=vp;
