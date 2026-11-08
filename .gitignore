@@ -31,3 +31,6 @@ android/.idea/
 # Generated runtime files; edit src/ or web/ source files and run npm run build.
 /web/app.bundle.js
 /web/sw.js
+
+# One-off Play Console automation scripts live outside the repository (../pc-konsol-araclari/).
+/pc-*.mjs

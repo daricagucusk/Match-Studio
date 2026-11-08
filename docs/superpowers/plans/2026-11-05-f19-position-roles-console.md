@@ -43,4 +43,4 @@ Files: docs/F19-AGENT-HANDOFF.md, docs/design/F19/DESIGN.md, README.md
 - [x] Write field contracts and decision record for other tools.
 - [x] Run unit, Playwright and static build; compare output to exact base.
 - [x] Inspect Git diff and ensure no private files.
-- [ ] Deploy only after passing end-to-end QA. (Kiler açık: yayına geçiş ayrı yetkidir; yerel kabul tamamlandı — 6 Kasım 2026 Hes. kaydı `docs/BIRLESIK-ADAY-20261105.md`.)
+- [ ] Deploy only after passing end-to-end QA. (Kiler açık: yayına geçiş ayrı yetkidir; yerel kabul tamamlandı — 6 Kasım 2026 Hes. kaydı `docs/history/BIRLESIK-ADAY-20261105.md`.)

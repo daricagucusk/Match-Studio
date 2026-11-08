@@ -1,4 +1,4 @@
-> Dosya konumları için güncel [klasör mimarisini](STRUCTURE.md) kullanın. Aşağıdaki sürüm/test/yayın kayıtları kendi tarihlerine aittir; yeni yerel doğrulama [düzenleme raporundadır](REORGANIZATION-20261102.md).
+> Dosya konumları için güncel [klasör mimarisini](STRUCTURE.md) kullanın. Aşağıdaki sürüm/test/yayın kayıtları kendi tarihlerine aittir; yeni yerel doğrulama [düzenleme raporundadır](history/REORGANIZATION-20261102.md).
 
 ## Birleşik yerel aday — 27 Ekim 2026
 Aday yolu: D:/beyin2/Projeler/MatchStudio/Calisma/Birlesik-Aday.

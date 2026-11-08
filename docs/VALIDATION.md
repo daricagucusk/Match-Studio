@@ -1,6 +1,6 @@
-> Güncel birleşik F.17 kabul kaydı: [FINAL-F17-20261102.md](FINAL-F17-20261102.md). Aşağıdaki eski sürümlere ait sonuçlar tarihsel kanıttır.
+> Güncel birleşik F.17 kabul kaydı: [FINAL-F17-20261102.md](history/FINAL-F17-20261102.md). Aşağıdaki eski sürümlere ait sonuçlar tarihsel kanıttır.
 
-> Bu belgenin test/yayın kayıtları tarihseldir. 2 Kasım 2026 klasör düzenlemesinin güncel yerel doğrulaması: [düzenleme raporu](REORGANIZATION-20261102.md).
+> Bu belgenin test/yayın kayıtları tarihseldir. 2 Kasım 2026 klasör düzenlemesinin güncel yerel doğrulaması: [düzenleme raporu](history/REORGANIZATION-20261102.md).
 
 ## Birleşik yerel aday — 27 Ekim 2026
 Aday yolu: D:/beyin2/Projeler/MatchStudio/Calisma/Birlesik-Aday.

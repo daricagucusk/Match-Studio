@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "cycle_id": "2026-11-07",
+  "monthly_cap": 1500,
+  "daily_cap": 350,
+  "task_cap": 500,
+  "min_wallet_balance": 1000,
+  "reserves": {
+    "RouteLLM": 3,
+    "Opus 5.5": 90,
+    "Fable 5.1": 200
+  },
+  "max_parallel_agents": 1,
+  "notes": "Soft preflight limit only; provider may exceed reserve. No automatic premium."
+}
