@@ -22,20 +22,15 @@ async function measureMetrics(page) {
   await page.waitForTimeout(2000);
 
   // FCP: observer start immediately, get entry as soon as it fires
-  const fcpResult = await page.evaluate(() => new Promise((resolve) => {
+  const fcpResult = await page.evaluate(() => Promise.race([new Promise((resolve) => {
     try {
       new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        console.log('FCP entries:', entries.length, entries[0] && entries[0].startTime ? entries[0].startTime : 'none');
         for (const e of entries) if (e.name === 'first-contentful-paint') resolve(e.startTime);
-        if (!entries.length) setTimeout(() => {
-          const nav = performance.getEntriesByType('navigation')[0];
-          console.log('FCP fallback:', nav && nav.domContentLoadedEventEnd ? nav.domContentLoadedEventEnd - performance.now() : 'no nav');
-          resolve(null);
-        }, 4000);
+        setTimeout(() => resolve(null), 4000);
       }).observe({ type: 'first-contentful-paint', buffered: true });
-    } catch(e) { console.log('PerfObserver FCP err:', e.message); resolve(null); }
-  }));
+    } catch(e) { resolve(null); }
+  }), new Promise((resolve) => setTimeout(() => resolve(null), 6000))]));
 
   // LCP
   const lcpResult = await page.evaluate(() => {
@@ -156,8 +151,8 @@ console.log(`Target: ${BASE_URL}`);
     console.log(`  DOM:     ${perf.domReady === 'complete' ? 'done' : 'loading'}`);
     console.log(`  Frames:  idle=${cpuThrottled.frameStats.idle} busy=${cpuThrottled.frameStats.busy} slow=${cpuThrottled.frameStats.slow}`);
     console.log(`  Heap:    ${cpuThrottled.memGrowth.varianceKB.toFixed(0)} KB/s (samples: ${cpuThrottled.memGrowth.points.join(',')})`);
-    const downloadedMB = (cpuThrottled.topResources.reduce((s, r) => s + (r.size || 0), 0) / 1024 / 1024).toFixed(2);
-    console.log(`  Downloaded: ${downloadedMB} MB / ${cpuThrottled.networkData.totalCount} requests`);
+    const downloadedMB = (perf.topResources.reduce((s, r) => s + (r.size || 0), 0) / 1024 / 1024).toFixed(2);
+    console.log(`  Downloaded: ${downloadedMB} MB / ${perf.networkData.totalCount} requests`);
 
     await context.close();
   }
