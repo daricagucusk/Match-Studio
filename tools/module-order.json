@@ -41,6 +41,7 @@
     "src/posters/classic-stadium.js",
     "src/posters/layout.js",
     "src/posters/registry.js",
+    "src/posters/stadium-effects.js",
     "src/posters/reference-designs.js",
     "src/posters/renderer.js",
     "src/posters/weekly-reference.js",
