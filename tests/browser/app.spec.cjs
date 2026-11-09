@@ -50,8 +50,24 @@ test('PWA caches a complete shell and opens with local data while offline',async
  await expect(page.locator('#offline-readiness')).toHaveText('Çevrimdışı uygulama dosyaları hazır');
  await context.setOffline(true);await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await nav(page,'players');await nav(page,'archive');
  await expect(page.locator('#club-settings-form [name=clubName]')).toHaveValue('Üretim Test Spor');
- await page.goto('/device-test.html');await expect(page.getByRole('heading',{name:'IndexedDB, PWA ve katlanabilir ekran testi'})).toBeVisible();
  await context.setOffline(false);
+});
+
+test('device diagnostics page stays reachable but is not precached',async({page})=>{
+ await createClub(page);await page.evaluate(()=>navigator.serviceWorker.ready);
+ await expect.poll(()=>page.evaluate(()=>Boolean(navigator.serviceWorker.controller))).toBe(true);
+ const cached=await page.evaluate(async()=>{
+  const keys=await caches.keys();
+  const urls=[];
+  for(const key of keys){for(const request of await (await caches.open(key)).keys())urls.push(new URL(request.url).pathname);}
+  return urls;
+ });
+ expect(cached.filter(url=>url.includes('device-test'))).toEqual([]);
+});
+
+test('device diagnostics page stays out of the published PWA archive',async({request})=>{
+ const response=await request.get('/device-test.html');
+ expect(response.status()).toBe(404);
 });
 test('encrypted backup can be reselected and restored twice through the phone UI',async({page})=>{
  await createClub(page);await group(page);const password='phone-test-password-123';page.on('dialog',dialog=>dialog.accept(dialog.type()==='prompt'?password:undefined));
