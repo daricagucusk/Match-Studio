@@ -1,6 +1,7 @@
 const {broadcastAtmosphere,broadcastFrame}=require("src/posters/broadcast-frame.js");
 
 const {renderClassicStadium}=require("src/posters/classic-stadium.js");
+const {renderReferencePoster}=require("src/posters/reference-designs.js");
 const {sizes,posterCompetitionLabel}=require("src/domain/poster-document.js");
 const {measureLayout}=require("src/posters/layout.js");
 
@@ -45,7 +46,7 @@ function footer(c,doc,w,h,accent){const x=86,y=h>1500?1615:1140,p=doc.instructio
  let overflow=pairs.length>maxRows;for(let i=0;i<Math.min(maxRows,pairs.length);i++){const yy=y+i*rowGap;text(c,pairs[i][0],x,yy,font-3,'#A8C9B4','left','800');overflow=wrap(c,pairs[i][1],x+258,yy,w-375,font,C.white,1,rowGap)||overflow;}
  return overflow;
 }
-async function renderPoster(doc,canvas,{logo=null,background=null}={}){const [w,h]=sizes[doc.size]||sizes['portrait-post'];canvas.width=w;canvas.height=h;const c=canvas.getContext('2d');if(doc.templateId==='classic-stadium'){const r=renderClassicStadium(c,doc,{logo,background});broadcastFrame(c,w,h,doc.overrides.accent||'#17875D');return r;}let accent=doc.overrides.accent||'#176B46';bg(c,w,h,doc.templateId,accent);broadcastAtmosphere(c,w,h,accent,doc.templateId==='elite-minimal'?'minimal':doc.templateId==='tactical-board'?'tactical':'editorial');if(background){c.save();c.globalAlpha=.40;c.drawImage(background,0,0,w,h);c.restore();rect(c,0,0,w,h,'rgba(3,12,8,.39)');}
+async function renderPoster(doc,canvas,{logo=null,background=null}={}){const [w,h]=sizes[doc.size]||sizes['portrait-post'];canvas.width=w;canvas.height=h;const c=canvas.getContext('2d');if(doc.templateId==='reference-roster'||doc.templateId==='reference-pitch')return renderReferencePoster(c,doc,{logo,background});if(doc.templateId==='classic-stadium'){const r=renderClassicStadium(c,doc,{logo,background});broadcastFrame(c,w,h,doc.overrides.accent||'#17875D');return r;}let accent=doc.overrides.accent||'#176B46';bg(c,w,h,doc.templateId,accent);broadcastAtmosphere(c,w,h,accent,doc.templateId==='elite-minimal'?'minimal':doc.templateId==='tactical-board'?'tactical':'editorial');if(background){c.save();c.globalAlpha=.40;c.drawImage(background,0,0,w,h);c.restore();rect(c,0,0,w,h,'rgba(3,12,8,.39)');}
  centerTitle(c,doc,w,doc.kind,accent,logo);const layout=measureLayout(doc,w,h,(v,size)=>{c.font=`700 ${size}px system-ui,Arial,sans-serif`;return c.measureText(v).width;});let fit=layout.fits;
  if(doc.kind==='private'){roster(c,doc,w,h,layout,accent);if(footer(c,doc,w,h,accent)){layout.warnings.push('Organizasyon talimatları afişin alt bölümüne sığmıyor. Metni kısaltın.');fit=false;}}
  text(c,'BİRLİKTE DAHA GÜÇLÜ',w/2,h-42,28,'#B7D8C4','center','800');broadcastFrame(c,w,h,accent);
