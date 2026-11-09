@@ -44,11 +44,19 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
  expect(errors).toEqual([]);
 });
 test('PWA caches a complete shell and opens with local data while offline',async({page,context})=>{
- await createClub(page);await page.evaluate(()=>navigator.serviceWorker.ready);
+ await createClub(page);await group(page);
+ await nav(page,'players');
+ await page.locator('[data-action=add-player]').first().click();await idle(page);
+ await page.locator('#fullName').fill('Kalıcı Oyuncu');await page.locator('#birthYear').fill('2012');await page.locator('#shirtNumber').fill('7');
+ await page.locator('#player-form [name=groups]').check();
+ await page.locator('[data-action=submit-player]').click();await idle(page);await expect(page.locator('#player-form')).toHaveCount(0);
+ await page.evaluate(()=>navigator.serviceWorker.ready);
  await expect.poll(()=>page.evaluate(()=>Boolean(navigator.serviceWorker.controller))).toBe(true);
  await page.reload();await expect(page.locator('.app-shell')).toBeVisible();
  await expect(page.locator('#offline-readiness')).toHaveText('Çevrimdışı uygulama dosyaları hazır');
- await context.setOffline(true);await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await nav(page,'players');await nav(page,'archive');
+ await context.setOffline(true);await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await nav(page,'players');
+ await expect(page.locator('.player-row').filter({hasText:'Kalıcı Oyuncu'})).toHaveCount(1);
+ await nav(page,'archive');
  await expect(page.locator('#club-settings-form [name=clubName]')).toHaveValue('Üretim Test Spor');
  await context.setOffline(false);
 });

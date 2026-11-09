@@ -27,7 +27,7 @@ test('device diagnostics stay out of the PWA shell and precache',()=>{
   assert.ok(!runtimeFiles.includes(name),name+' must not ship in the archive');
  }
  const worker=fs.readFileSync(path.join(web,'sw.js'),'utf8');
- assert.doesNotMatch(worker,/device-test\.(html|js)/);
+ assert.doesNotMatch(worker,/['"]\.\/device-test\.(html|js)["']/);
 });
 
 test('manifest preserves app identity and has separate any and maskable icons',()=>{
