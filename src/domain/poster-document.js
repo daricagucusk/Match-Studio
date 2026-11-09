@@ -2,6 +2,7 @@
 const {validateOverrides,formatTurkishDate}=require("src/domain/validation.js");
 const {normalizeClubPalette}=require("src/domain/club-brand.js");
 const {getRosterPolicy,getMatchRosterSections}=require("src/domain/roster-policy.js");
+const {getPitchPresets}=require("src/domain/lineup.js");
 
 
 function posterMatchTypeLabel(match){return ({friendly:'HAZIRLIK MAÇI',league:'LİG MAÇI',tournament:'TURNUVA',training:'ANTRENMAN MAÇI'})[match?.matchType]||'MAÇ';}
@@ -23,6 +24,8 @@ if(kind==='private'){
  const starters=new Set(sections?.starters.map(e=>e.playerId)||[]);
  result.players=entries.map(e=>({name:e.nameSnapshot,number:e.shirtNumberSnapshot,position:e.positionSnapshot,playerId:e.playerId,squadSection:sections?(starters.has(e.playerId)?'starter':'bench'):null}));
  if(sections)result.rosterSplit={starters:sections.starters.length,bench:sections.bench.length};
+ const all=roster?.entries||[],lookup=new Map(all.map(e=>[e.playerId,e]));const slots=getPitchPresets()[lineupPlan?.preset]||[];
+ result.lineupPositions=slots.map((slot,i)=>{const p=lookup.get(lineupPlan?.assignments?.[String(i)]);return p?{playerId:p.playerId,name:p.nameSnapshot,number:lineupPlan?.shirtNumberOverrides?.[p.playerId]||p.shirtNumberSnapshot||'',x:slot.x,y:slot.y,label:slot.label}:null}).filter(Boolean);
  result.instructions={meetingTime:match.meetingTime||'',meetingPlace:match.meetingPlace||'',mealDeadline:match.mealDeadline||'',mealMenu:match.mealMenu||'',kitNotes:match.kitNotes||'',hydrationNotes:match.hydrationNotes||'',coachNotes:match.coachNotes||''};}return result;}
 
 Object.assign(exports,{sizes,buildPosterDocument,posterMatchTypeLabel,posterCompetitionLabel});
