@@ -15,8 +15,8 @@ function renderPremiumWeeklyBoard(plan,canvas,{logo=null,watermark=null}={}){if(
  if(logo){let scale=Math.min(160/logo.width,164/logo.height);c.drawImage(logo,52,34,logo.width*scale,logo.height*scale);}
  else{panel(c,49,48,165,149);fit(c,plan.clubName.split(' ').slice(0,2).map(p=>p[0]||'').join(''),131,122,145,46,22,'#B7ECC8','center');}
  fit(c,plan.clubName,540,77,590,35,18,'#BEF5CF','center');fit(c,'MAÇ PROGRAMI',625,170,745,76,58,'#F6FFF6','center');fit(c,turkishDate(plan.items[0].date),540,248,915,33,17,'#B7ECC8','center');
- const n=plan.items.length,top=295,bottom=h-196,gap=n>5?11:17,rowH=Math.min(n===2?422:n===1?460:270,(bottom-top-gap*(n-1))/n);if(rowH<130)warnings.push('Maç listesi afişe sığmıyor.');
- for(let i=0;i<n;i++){const m=plan.items[i],y=top+i*(rowH+gap);panel(c,42,y,996,rowH);rect(c,43,y+13,8,rowH-26,i%2?'#BFF398':'#79E69B');const unit=rowH>=235?1:rowH>=172?.82:.70;const left=85;
+ const n=plan.items.length,top=295,bottom=h-196,gap=n>5?11:17,rowH=Math.min(n===1?420:n===2?300:270,(bottom-top-gap*(n-1))/n);if(rowH<130)warnings.push('Maç listesi afişe sığmıyor.');const startY=top+Math.max(0,(bottom-top-(n*rowH+gap*(n-1)))/2);
+ for(let i=0;i<n;i++){const m=plan.items[i],y=startY+i*(rowH+gap);panel(c,42,y,996,rowH);rect(c,43,y+13,8,rowH-26,i%2?'#BFF398':'#79E69B');const unit=rowH>=235?1:rowH>=172?.82:.70;const left=85;
   if(rowH<206){
    fit(c,m.group.toLocaleUpperCase('tr-TR'),left,y+27,690,28,16,'#C2FFD0');
    if(!fit(c,plan.clubName+'  VS  '+m.opponent.toLocaleUpperCase('tr-TR'),left,y+rowH/2,700,29,16,'#FFFFFF'))warnings.push('Rakip uzun: '+m.opponent);
@@ -29,7 +29,7 @@ function renderPremiumWeeklyBoard(plan,canvas,{logo=null,watermark=null}={}){if(
    fit(c,turkishDate(m.date),865,y+rowH/2+37,265,17*unit,11,'#D1F4D9','center');
   }
  }
- text(c,'SAHADA GÜCÜMÜZÜ',540,h-140,50,'#F5FFF4','center');text(c,'GÖSTERİYORUZ!',540,h-81,62,'#9AFF77','center');if(watermark){c.save();c.translate(w/2,h/2);c.rotate(-.25);c.globalAlpha=.35;text(c,watermark,0,0,108,'#FFFFFF','center');c.restore();}
+ text(c,'SAHADA GÜCÜMÜZÜ',540,h-168,50,'#F5FFF4','center');text(c,'GÖSTERİYORUZ!',540,h-106,62,'#9AFF77','center');if(watermark){c.save();c.translate(w/2,h/2);c.rotate(-.25);c.globalAlpha=.35;text(c,watermark,0,0,108,'#FFFFFF','center');c.restore();}
  return {fits:!warnings.length,warnings,width:w,height:h};
 }
 Object.assign(exports,{renderPremiumWeeklyBoard});
