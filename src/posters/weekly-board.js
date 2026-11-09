@@ -42,7 +42,7 @@ function fillTextFit(ctx,value,x,y,maxWidth,maxSize,minSize=22,fill='#FFF',weigh
  if(ctx.measureText(s).width>maxWidth)return false;ctx.fillText(s,x,y);return true;
 }
 function dateParts(s){let d=new Date(s+'T12:00:00Z');return {day:d.toLocaleDateString('tr-TR',{day:'2-digit',timeZone:'UTC'}),month:d.toLocaleDateString('tr-TR',{month:'short',timeZone:'UTC'}).toLocaleUpperCase('tr-TR'),weekday:d.toLocaleDateString('tr-TR',{weekday:'long',timeZone:'UTC'}).toLocaleUpperCase('tr-TR')};}
-function renderWeeklyBoard(plan,canvas,{logo=null,watermark=null}={}){
+function renderWeeklyBoardLegacy(plan,canvas,{logo=null,watermark=null}={}){
  if(!plan.ok)throw Error(plan.issues.join(' '));const w=1080,h=plan.size==='story'?1920:1350;canvas.width=w;canvas.height=h;
  const c=canvas.getContext('2d');if(!c)throw Error('Canvas kullanılamıyor.');const warnings=[];
  const grad=c.createLinearGradient(0,0,w,h);grad.addColorStop(0,'#09151C');grad.addColorStop(.55,'#162E30');grad.addColorStop(1,'#0A141C');c.fillStyle=grad;c.fillRect(0,0,w,h);broadcastAtmosphere(c,w,h,plan.clubAccent,'editorial');
@@ -79,6 +79,8 @@ function renderWeeklyBoard(plan,canvas,{logo=null,watermark=null}={}){
  if(watermark){c.save();c.translate(w/2,h/2);c.rotate(-.38);c.fillStyle='rgba(255,255,255,.32)';c.font='900 116px system-ui';c.textAlign='center';c.fillText(watermark,0,0);c.restore();}
  return {fits:!warnings.length,warnings,width:w,height:h};
 }
+const {renderPremiumWeeklyBoard}=require("src/posters/weekly-reference.js");
+function renderWeeklyBoard(plan,canvas,assets={}){return renderPremiumWeeklyBoard(plan,canvas,assets);}
 async function exportWeeklyBoard(plan,assets={}){
  const canvas=document.createElement('canvas');const layout=renderWeeklyBoard(plan,canvas,assets);if(!layout.fits)throw Error('Bazı başlıklar sığmıyor: '+layout.warnings.join(' '));return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('PNG oluşturulamadı.')),'image/png'));
 }
