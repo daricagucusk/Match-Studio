@@ -1,0 +1,28 @@
+/* Yoklama ve koruma ekranları: mevcut kart/panel diliyle uyumlu, dokunma hedefleri 44px. */
+.att-layout{display:grid;gap:16px}
+.att-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.att-toolbar label{display:flex;flex-direction:column;gap:6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#B8C6D8}
+.att-toolbar input,.att-toolbar select{min-height:44px;padding:10px 12px;border-radius:10px;border:1px solid #3A577E;background:#101B2B;color:#F4F7FF}
+.att-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.att-stat{background:#101B2B;border:1px solid #3A577E;border-radius:12px;padding:12px}
+.att-stat strong{display:block;font-size:24px;color:#F4F7FF}
+.att-stat span{font-size:12px;color:#A9BEFF}
+.att-list{display:grid;gap:8px}
+.att-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#0E1A28;border:1px solid #2C4463;border-radius:12px;padding:10px 12px}
+.att-row .att-name{font-weight:700;color:#F4F7FF}
+.att-row .att-meta{font-size:12px;color:#9FB4CC}
+.att-actions{display:flex;gap:6px;flex-wrap:wrap}
+.att-actions button{min-height:44px;min-width:44px;padding:0 12px;border-radius:10px;border:1px solid #3A577E;background:#16263C;color:#E6EEF8;font-weight:700;cursor:pointer}
+.att-actions button[aria-pressed="true"]{background:#1F7A4C;border-color:#78E69C;color:#F5FFF5}
+.att-actions button.att-absent[aria-pressed="true"]{background:#7A2A2A;border-color:#FF9C9C}
+.att-actions button.att-excused[aria-pressed="true"]{background:#6A5320;border-color:#E5C478}
+.att-note{font-size:12px;color:#9FB4CC}
+.att-empty{padding:18px;border:1px dashed #3A577E;border-radius:12px;color:#B8C6D8}
+.sg-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.04em}
+.sg-badge.open{background:#7A2A2A;color:#FFE3E3}
+.sg-badge.reviewing{background:#6A5320;color:#FFF1CC}
+.sg-badge.closed{background:#1F7A4C;color:#E9FFF2}
+.sg-badge.high{background:#B3261E;color:#FFF}
+.sg-badge.medium{background:#8A6A1E;color:#FFF6DA}
+.sg-badge.low{background:#2C4463;color:#DCE9F8}
+@media (max-width:640px){.att-row{grid-template-columns:1fr}.att-actions{justify-content:flex-start}}

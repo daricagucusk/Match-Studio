@@ -8,6 +8,7 @@
     "src/app/views/live-match-clock.js",
     "src/app/views/match-operations.js",
     "src/app/views/media-studio.js",
+  "src/app/views/attendance.js",
     "src/app/views/team-analysis.js",
     "src/app/workspace-snapshot.js",
     "src/data/official-roster-2026.js",
