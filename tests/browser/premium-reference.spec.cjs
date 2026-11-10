@@ -96,6 +96,23 @@ test('square 1:1 output renders both reference templates without overflow',async
  }
 });
 
+test('weekly board supports 1:1 square output with four matches',async({page})=>{
+ await page.goto('/');
+ const result=await page.evaluate(sources=>{
+  const mods={};function load(id){if(mods[id])return mods[id];const e={};mods[id]=e;new Function('exports','require',sources[id])(e,load);return e;}
+  const {prepareBoard,renderWeeklyBoard}=load('src/posters/weekly-board.js');
+  const matches=Array.from({length:6},(_,i)=>({id:'sq-m'+i,groupId:'g1',opponent:'KARE RAKİP '+(i+1),matchDate:'2026-11-'+(10+i),kickoffTime:'19:15',venue:'KARE STAD',status:'scheduled',matchType:'league'}));
+  const plan=prepareBoard(matches,[{id:'g1',name:'U14'}],matches.slice(0,4).map(m=>m.id),'square-post','KARE SPOR');
+  const c=document.createElement('canvas');const status=renderWeeklyBoard(plan,c,{});
+  return {ok:plan.ok,issues:plan.issues,items:plan.items.length,size:plan.size,w:c.width,h:c.height,fits:status.fits,warnings:status.warnings};
+ },Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root,'tools/module-order.json'),'utf8')).map(id=>[id,fs.readFileSync(path.join(root,id),'utf8')])));
+ expect(result.ok,JSON.stringify(result.issues)).toBe(true);
+ expect(result.size).toBe('square-post');
+ expect(result.items).toBe(4);
+ expect(result.w).toBe(1080);expect(result.h).toBe(1080);
+ expect(result.fits,JSON.stringify(result.warnings)).toBe(true);
+});
+
 test('goalkeeper is rendered lower on the pitch than forwards',async({page})=>{
  await page.goto('/');
  const positions=await page.evaluate(sources=>{

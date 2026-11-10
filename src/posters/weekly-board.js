@@ -14,8 +14,8 @@ function pickBoardMatches(matches,day,mode='week'){
 function fakeValue(v){return /^(?:ss\d*|test\d*|demo\d*|taslak|deneme\d*|xxx+|aaa+|belirsiz|rakip|henüz\s+belirlenmedi)$/iu.test(String(v||'').trim());}
 function validDate(v){if(!/^\d{4}-\d{2}-\d{2}$/.test(String(v||'')))return false;const d=new Date(String(v)+'T12:00:00Z');return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===v;}
 function prepareBoard(allMatches,groups,selectedIds,size='portrait-post',clubName='SPOR KULÜBÜ',clubAccent='#17875D'){
- const issues=[];const max=size==='story'?8:5;
- if(!['portrait-post','story'].includes(size))issues.push('Çıktı oranı geçersiz.');
+ const issues=[];const max=size==='story'?8:size==='square-post'?4:5;
+ if(!['portrait-post','story','square-post'].includes(size))issues.push('Çıktı oranı geçersiz.');
  const selection=[...new Set(selectedIds||[])],map=new Map((allMatches||[]).map(m=>[String(m.id),m]));
  if(!selection.length)issues.push('Paylaşmak için en az bir maç seç.');
  if(selection.length>max)issues.push(`Bu görsel boyutuna en fazla ${max} maç sığar. Hikâye formatını seç veya seçimi azalt.`);
@@ -43,7 +43,7 @@ function fillTextFit(ctx,value,x,y,maxWidth,maxSize,minSize=22,fill='#FFF',weigh
 }
 function dateParts(s){let d=new Date(s+'T12:00:00Z');return {day:d.toLocaleDateString('tr-TR',{day:'2-digit',timeZone:'UTC'}),month:d.toLocaleDateString('tr-TR',{month:'short',timeZone:'UTC'}).toLocaleUpperCase('tr-TR'),weekday:d.toLocaleDateString('tr-TR',{weekday:'long',timeZone:'UTC'}).toLocaleUpperCase('tr-TR')};}
 function renderWeeklyBoardLegacy(plan,canvas,{logo=null,watermark=null}={}){
- if(!plan.ok)throw Error(plan.issues.join(' '));const w=1080,h=plan.size==='story'?1920:1350;canvas.width=w;canvas.height=h;
+ if(!plan.ok)throw Error(plan.issues.join(' '));const w=1080,h=plan.size==='story'?1920:plan.size==='square-post'?1080:1350;canvas.width=w;canvas.height=h;
  const c=canvas.getContext('2d');if(!c)throw Error('Canvas kullanılamıyor.');const warnings=[];
  const grad=c.createLinearGradient(0,0,w,h);grad.addColorStop(0,'#09151C');grad.addColorStop(.55,'#162E30');grad.addColorStop(1,'#0A141C');c.fillStyle=grad;c.fillRect(0,0,w,h);broadcastAtmosphere(c,w,h,plan.clubAccent,'editorial');
  // Stadium beams and geometries stay behind content, never behind primary labels.
