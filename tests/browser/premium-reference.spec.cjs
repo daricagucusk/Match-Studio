@@ -87,3 +87,26 @@ test('goalkeeper is rendered lower on the pitch than forwards',async({page})=>{
  const gk=positions.find(v=>v.text==='OYUNCU 1'),striker=positions.find(v=>v.text==='OYUNCU 10');
  expect(gk).toBeDefined();expect(striker).toBeDefined();expect(gk.y).toBeGreaterThan(striker.y);
 });
+
+test('pitch tokens never overlap and position pills stay inside the field',async({page})=>{
+ await page.goto('/');
+ const result=await page.evaluate(sources=>{
+  const mods={};function load(id){if(mods[id])return mods[id];const e={};mods[id]=e;new Function('exports','require',sources[id])(e,load);return e;}
+  const {buildPosterDocument}=load('src/domain/poster-document.js'),{renderPoster}=load('src/posters/renderer.js');
+  const match={matchType:'league',opponent:'SENTETİK RAKİP',venue:'SENTETİK STAD',matchDate:'2026-11-10',kickoffTime:'19:15'};
+  const out={};
+  for(const count of [8,11]){
+   const entries=Array.from({length:count},(_,i)=>({playerId:'p'+i,nameSnapshot:'OYUNCU '+(i+1),shirtNumberSnapshot:String(i+1)}));
+   const plan={preset:count===8?'3-3-1':'4-3-3',assignments:Object.fromEntries(entries.map((p,i)=>[String(i),p.playerId]))};
+   const doc=buildPosterDocument(match,{entries},{kind:'private',size:'portrait-post',templateId:'reference-pitch',overrides:{}},plan,'SENTETİK SPOR');
+   const c=document.createElement('canvas'),ctx=c.getContext('2d'),badges=[],pills=[],oldArc=ctx.arc.bind(ctx),oldFill=ctx.fillText.bind(ctx);
+   ctx.arc=(x,y,r,...a)=>{if(Math.abs(r-22)<.01)badges.push({x,y});return oldArc(x,y,r,...a);};
+   ctx.fillText=(t,x,y,...a)=>{if(/^(KL|SB|STP|OS|DOS|KA|SF)$/.test(String(t)))pills.push({text:String(t),x,y});return oldFill(t,x,y,...a);};
+   renderPoster(doc,c);
+   const overlaps=[];for(let i=0;i<badges.length;i++)for(let j=i+1;j<badges.length;j++)if(Math.abs(badges[i].x-badges[j].x)<170&&Math.abs(badges[i].y-badges[j].y)<105)overlaps.push([i,j]);
+   out[count]={badges:badges.length,overlaps,pillsOutside:pills.filter(p=>p.y>806||p.y<290||p.x<140||p.x>940).length};
+  }
+  return out;
+ },Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root,'tools/module-order.json'),'utf8')).map(id=>[id,fs.readFileSync(path.join(root,id),'utf8')])));
+ for(const count of ['8','11']){expect(result[count].badges,count).toBe(Number(count));expect(result[count].overlaps,count+': '+JSON.stringify(result[count].overlaps)).toEqual([]);expect(result[count].pillsOutside,count).toBe(0);}
+});
