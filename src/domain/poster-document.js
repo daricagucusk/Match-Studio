@@ -7,7 +7,7 @@ const {getPitchPresets}=require("src/domain/lineup.js");
 
 function posterMatchTypeLabel(match){return ({friendly:'HAZIRLIK MAÇI',league:'LİG MAÇI',tournament:'TURNUVA',training:'ANTRENMAN MAÇI'})[match?.matchType]||'MAÇ';}
 function posterCompetitionLabel(match){const type=posterMatchTypeLabel(match),competition=String(match?.competition||'').trim().toLocaleUpperCase('tr-TR');return competition&&competition!==type?competition+' · '+type:type;}
-const sizes={'portrait-post':[1080,1350],story:[1080,1920]};
+const sizes={'portrait-post':[1080,1350],story:[1080,1920],'square-post':[1080,1080]};
 function buildPosterDocument(match,roster,draft,lineupPlan=null,clubName="SPOR KULÜBÜ",clubAccent="#176B46",secondaryAccent="#FFFFFF"){
 const kind=draft.kind==='public'?'public':'private',o=validateOverrides(draft.overrides||{});
 // Old drafts inherit both current club colors; a custom palette must be explicit.

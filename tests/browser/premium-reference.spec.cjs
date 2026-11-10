@@ -71,6 +71,31 @@ test('synthetic preview PNG captures for visual review',async({page})=>{
  expect(Object.keys(imgs).length).toBe(3);
 });
 
+test('square 1:1 output renders both reference templates without overflow',async({page})=>{
+ await page.goto('/');
+ const imgs=await page.evaluate(async sources=>{
+  const mods={};function load(id){if(mods[id])return mods[id];const e={};mods[id]=e;new Function('exports','require',sources[id])(e,load);return e;}
+  const {buildPosterDocument,sizes}=load('src/domain/poster-document.js'),{renderPoster}=load('src/posters/renderer.js');
+  const match={matchType:'league',competition:'U14 9. GRUP',opponent:'ÇAYIROVA SENTETİK SK',venue:'SENTETİK NENEHATUN STADI',matchDate:'2026-11-10',kickoffTime:'19:15',meetingTime:'18:15',meetingPlace:'Kulüp Tesisi',mealDeadline:'17:30',mealMenu:'Örnek beslenme notu',kitNotes:'Örnek forma',hydrationNotes:'Örnek sıvı'};
+  const entries=Array.from({length:20},(_,i)=>({playerId:'sq-'+i,nameSnapshot:'KARE SPORCU '+(i+1),shirtNumberSnapshot:String(i+1)}));
+  const lineup={preset:'4-3-3',assignments:Object.fromEntries(Array.from({length:11},(_,i)=>[String(i),'sq-'+i]))};
+  const out={size:sizes['square-post'],items:{}};
+  for(const templateId of ['reference-roster','reference-pitch']){
+   const doc=buildPosterDocument(match,{entries},{kind:'private',size:'square-post',templateId,overrides:{}},lineup,'SENTETİK DARICA SPOR');
+   const c=document.createElement('canvas');const status=await renderPoster(doc,c);
+   out.items[templateId]={fits:status.fits,warnings:status.warnings,width:c.width,height:c.height,png:c.toDataURL('image/png').split(',')[1]};
+  }
+  return out;
+ },Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root,'tools/module-order.json'),'utf8')).map(id=>[id,fs.readFileSync(path.join(root,id),'utf8')])));
+ expect(imgs.size).toEqual([1080,1080]);
+ const dir=path.join(root,'test-results','poster-preview-synthetic');fs.mkdirSync(dir,{recursive:true});
+ for(const [templateId,item] of Object.entries(imgs.items)){
+  expect(item.width,templateId).toBe(1080);expect(item.height,templateId).toBe(1080);
+  expect(item.fits,templateId+': '+JSON.stringify(item.warnings)).toBe(true);
+  fs.writeFileSync(path.join(dir,'square-'+templateId+'.png'),Buffer.from(item.png,'base64'));
+ }
+});
+
 test('goalkeeper is rendered lower on the pitch than forwards',async({page})=>{
  await page.goto('/');
  const positions=await page.evaluate(sources=>{
