@@ -29,7 +29,7 @@ function createAttendanceViews({state,activeRoster,pageHeader,esc}){
    <button class="btn btn-subtle" data-action="att-csv">CSV indir</button>
   </div>
   <div class="att-summary">${stats}</div>
-  ${entries.length?`<div class="att-list">${rows}</div>`:'<div class="att-empty">Yoklama için önce maç kadrosu seç. Kadro Seçimi ekranından oyuncu ekle.</div>'}
+  ${entries.length?`<div class="att-list">${rows}</div>`:`<div class="att-empty">Yoklama için önce maç kadrosu seç. Kadro Seçimi ekranından oyuncu ekle.</div><div class="att-list">${players.filter(p=>!(roster?.entries||[]).some(e=>e.playerId===p.id)).slice(0,30).map(p=>`<div class="att-row"><div><div class="att-name">${esc(p.name)}</div><div class="att-meta">${esc(String(p.shirtNumber||''))} · kadro dışı</div></div><div class="att-actions">${ATT_STATUS.map(([value,label])=>`<button type="button" class="${value==='absent'?'att-absent':value==='excused'?'att-excused':''}" data-att-status="${value}" data-player-id="${esc(p.id)}" aria-pressed="${session?.entries?.[p.id]?.status===value}">${label}</button>`).join('')}</div></div>`).join('')}</div>`}
   ${risks.length?`<div class="att-empty">Devam riski: ${risks.map(r=>esc(r.player?.name||'')).join(', ')}</div>`:''}
  </div>`;
  }
