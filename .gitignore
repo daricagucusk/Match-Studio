@@ -34,3 +34,7 @@ android/.idea/
 
 # One-off Play Console automation scripts live outside the repository (../pc-konsol-araclari/).
 /pc-*.mjs
+
+# Yerel ajan yapilandirmasi yayina girmez
+.codex/
+.mcp.json
