@@ -113,6 +113,24 @@ test('weekly board supports 1:1 square output with four matches',async({page})=>
  expect(result.fits,JSON.stringify(result.warnings)).toBe(true);
 });
 
+test('result poster renders score, verdict and scorers without overflow',async({page})=>{
+ await page.goto('/');
+ const out=await page.evaluate(async sources=>{
+  const mods={};function load(id){if(mods[id])return mods[id];const e={};mods[id]=e;new Function('exports','require',sources[id])(e,load);return e;}
+  const {buildPosterDocument}=load('src/domain/poster-document.js'),{renderPoster}=load('src/posters/renderer.js');
+  const match={matchType:'league',competition:'U14 9. GRUP',opponent:'ÇAYIROVA SENTETİK SK',venue:'SENTETİK NENEHATUN STADI',matchDate:'2026-11-10',kickoffTime:'19:15'};
+  const entries=Array.from({length:14},(_,i)=>({playerId:'r'+i,nameSnapshot:'SONUÇ SPORCU '+(i+1),shirtNumberSnapshot:String(i+1)}));
+  const doc=buildPosterDocument(match,{entries},{kind:'private',size:'portrait-post',templateId:'reference-result',overrides:{}},null,'SENTETİK DARICA SPOR');
+  doc.score={our:3,opponent:1};
+  doc.scorers=[{name:'SONUÇ SPORCU 9',number:'9',minute:12},{name:'SONUÇ SPORCU 10',number:'10',minute:44},{name:'SONUÇ SPORCU 7',number:'7',minute:78}];
+  const c=document.createElement('canvas');
+  const status=await renderPoster(doc,c);
+  return {fits:status.fits,warnings:status.warnings,w:c.width,h:c.height};
+ },Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root,'tools/module-order.json'),'utf8')).map(id=>[id,fs.readFileSync(path.join(root,id),'utf8')])));
+ expect(out.w).toBe(1080);expect(out.h).toBe(1350);
+ expect(out.fits,JSON.stringify(out.warnings)).toBe(true);
+});
+
 test('goalkeeper is rendered lower on the pitch than forwards',async({page})=>{
  await page.goto('/');
  const positions=await page.evaluate(sources=>{
