@@ -43,3 +43,10 @@ android/.idea/
 !/evidence/README.md
 # Ajan baglam klasoru depo disinda (docs-ai/context)
 /context/
+/config/ai-budget-policy.json
+/docs/ai/ajanlar/
+/docs/ai/skills/
+/tools/ai_budget_router.py
+/tools/test_ai_budget_router.py
+/tools/live-review.cjs
+/tools/live-review-deep.cjs
