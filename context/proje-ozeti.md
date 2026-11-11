@@ -28,6 +28,8 @@ Başka Match Studio kopyaları, uzaktaki main, canlı Vercel ve Play Console bu 
 
 7 Kasım 2026: F.19 için imzalı upload AAB versionCode 2 üretildi; Play App Signing sertifikası assetlinks ve Digital Asset Links API ile doğrulandı. Play Console'a yükleme, 12 testçi/14 gün kapalı test ve üretim erişimi hesap sahibinin işlemleridir. Ayrıntı: `docs/play/PLAY_CONSOLE_READY_2026-11-07.md`.
 
+9 Kasım 2026: PR #35 `main`'e birleştirildi (merge commit `c205538`); birleşik dal amacı tamamlandı. `npm test` 130 test / 1 FAIL (`tests/security-headers.test.cjs:30`, `device-test.html` yorum satırı precache denetimini düşürüyor). Abacus ücretli model çağrıları router + beceri dosyaları üzerinden yürüyor; ayrıntı `kararlar.md` 2026-11-09 kaydı.
+
 ## Önemli konumlar
 
 Başlangıç: `README.md`. Mimari: `docs/STRUCTURE.md`. Belgeler: `docs/README.md`. Kod: `src/`. Web kaynakları: `web/`. Araçlar: `tools/`. Testler: `tests/`. Geçmiş kanıtlar: `evidence/`. Üretilen dosyalar: `public/`, `dist/`, `test-results/`.

@@ -16,6 +16,9 @@ class AgentBudgetRouterTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.ledger = Path(self.tmp.name) / "usage.json"
+        self._run_dir = router.RUN_DIR
+        router.RUN_DIR = Path(self.tmp.name) / "runs"
+        self.addCleanup(setattr, router, "RUN_DIR", self._run_dir)
         self.policy = {
             "cycle_id": "2026-11-07",
             "monthly_cap": 1500,
@@ -102,10 +105,24 @@ class AgentBudgetRouterTests(unittest.TestCase):
         self.assertEqual(len(calls), 3)
         self.assertEqual(router.BudgetLedger(self.ledger, self.policy).spent, Decimal("3.75"))
         for argv, prompt, cwd in calls:
-            self.assertIn("--permission-mode", argv)
-            self.assertIn("plan", argv)
-            self.assertNotIn("accept-edits", argv)
             self.assertNotIn("--dangerously-skip-permissions", argv)
+            allowed = argv[argv.index("--allowed-tools") + 1]
+            denied = argv[argv.index("--disallowed-tools") + 1]
+            role = prompt.split("ROLE: ", 1)[1].split(".", 1)[0]
+            if role == "implement":
+                self.assertEqual(argv[argv.index("--permission-mode") + 1], "accept-edits")
+                self.assertEqual(allowed, router.WRITE_ROLE_TOOLS)
+                for tool in ("Write", "Edit", "Bash"):
+                    self.assertIn(tool, allowed.split(","))
+                self.assertIn("WebFetch", denied.split(","))
+            else:
+                self.assertEqual(argv[argv.index("--permission-mode") + 1], "plan")
+                self.assertEqual(allowed, router.READ_ONLY_TOOLS)
+                for tool in ("Read", "Grep", "Glob"):
+                    self.assertIn(tool, allowed.split(","))
+                for tool in ("Write", "Edit", "Bash", "WebFetch"):
+                    self.assertIn(tool, denied.split(","))
+                self.assertNotIn("*", denied)
         self.assertIn("step1", calls[1][1])
         self.assertIn("step2", calls[2][1])
         self.assertLess(len(calls[2][1]), 2900)
@@ -119,7 +136,8 @@ class AgentBudgetRouterTests(unittest.TestCase):
             router.run_pipeline("Düğmeyi düzelt", self.policy, self.ledger,
                                 execute=True, wallet_balance=19933,
                                 runner=runner, stages=("plan", "review"))
-        self.assertEqual(len(calls), 1)
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(router.BudgetLedger(self.ledger, self.policy).spent, Decimal("0"))
 
     def test_missing_credits_fails_closed_without_next_call(self):
         calls = []
@@ -227,13 +245,19 @@ class RouterSecurityTests(unittest.TestCase):
     def test_pipeline_returns_final_bounded_agent_summary(self):
         def runner(argv, prompt, cwd):
             return subprocess.CompletedProcess(argv, 0,
-                "model: ROUTE_LLM\nCredits used: 0.78\nRESULT " + "Z" * 1900, "")
+                "model: ROUTE_LLM\nCredits used: 0.78\nHEAD " + "A" * 5000 +
+                " TAIL " + "Z" * 3000, "")
         result = router.run_pipeline("Düğme metnini düzelt", self.policy,
                                      self.ledger, execute=True,
                                      wallet_balance=19933, runner=runner,
                                      stages=("plan",))
-        self.assertLessEqual(len(result["final_summary"]), 1200)
-        self.assertIn("Z", result["final_summary"])
+        summary = result["final_summary"]
+        self.assertLessEqual(len(summary), router.SUMMARY_HEAD + router.SUMMARY_TAIL + 10)
+        self.assertIn("HEAD", summary)
+        self.assertIn("Z", summary)
+        self.assertIn("[...]", summary)
+        self.assertEqual(len(result["artifacts"]), 1)
+        self.assertTrue(Path(result["artifacts"][0]).exists())
 
     def test_missing_model_identity_is_not_accepted_after_charge(self):
         def runner(argv, prompt, cwd):
