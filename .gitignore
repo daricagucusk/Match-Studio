@@ -38,3 +38,6 @@ android/.idea/
 # Yerel ajan yapilandirmasi yayina girmez
 .codex/
 .mcp.json
+# Test kanit ciktilari izlenmez (README haric)
+/evidence/*
+!/evidence/README.md
