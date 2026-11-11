@@ -15,7 +15,7 @@ Kullanıcının ifadesine en yakın çalışma biçimini seç. İstek belirsizse
 
 ## Ortak ilkeler
 
-- Önce proje kökündeki `CLAUDE.md` ve `context/README.md` dosyalarını oku.
+- Önce proje kökündeki `CLAUDE.md` ve `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` dosyalarını oku.
 - Yalnızca kesinleşmiş, gelecekte tekrar kullanılacak proje bilgisini kalıcı bağlama işle.
 - Geçici fikirleri, reddedilmiş seçenekleri ve doğrulanmamış varsayımları kalıcı bağlama ekleme.
 - Kullanıcının açıkça kesinleştirmediği hedef, kural, karar veya sınırı kendiliğinden değiştirme.
@@ -29,11 +29,11 @@ Kullanıcının ifadesine en yakın çalışma biçimini seç. İstek belirsizse
 Kullanıcı “hafızayı güncelle” dediğinde:
 
 1. Mevcut konuşmada kesinleşen hedefleri, kararları, kuralları, sınırları ve kalıcı proje bilgilerini belirle.
-2. Bunları `context/README.md` haritasındaki mevcut bilgilerle karşılaştır.
+2. Bunları `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` haritasındaki mevcut bilgilerle karşılaştır.
 3. Kesinleşmiş bilgileri ilgili mevcut bağlam dosyasına işle.
 4. Kalıcı olup olmadığı belirsiz bilgileri ayrı listele ve kullanıcıya sor.
 5. Yeni dosya yalnızca mevcut dosyaların hiçbirine uymayan ayrı bir konu varsa oluştur.
-6. Dosya oluşturur, taşır, yeniden adlandırır, amacını değiştirir veya silersen `context/README.md` haritasını aynı işlemde güncelle.
+6. Dosya oluşturur, taşır, yeniden adlandırır, amacını değiştirir veya silersen `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` haritasını aynı işlemde güncelle.
 7. Yalnızca dosya içeriği değişmiş ve amacı aynı kalmışsa ana haritayı değiştirme.
 8. Kullanıcı tarafından yeni bir kaynak eklenmediyse `kaynak-indeksi.md` dosyasına dokunma.
 9. Sonunda hangi kalıcı bilginin hangi dosyaya işlendiğini bildir.
@@ -42,7 +42,7 @@ Kullanıcı “hafızayı güncelle” dediğinde:
 
 Kullanıcı “bağlamı denetle” dediğinde:
 
-1. `context/README.md` haritasını ve haritada gösterilen bağlam dosyalarını incele.
+1. `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` haritasını ve haritada gösterilen bağlam dosyalarını incele.
 2. Haritada bulunmayan, artık var olmayan, taşınmış veya yeniden adlandırılmış bağlam dosyalarını belirle.
 3. Dosyalar arasındaki çelişkileri, yinelenen bilgileri ve güncelliğini yitirmiş olabilecek kayıtları listele.
 4. Geçici fikirlerin yanlışlıkla kalıcı bağlama girip girmediğini kontrol et.
@@ -55,7 +55,7 @@ Kullanıcı “bağlamı denetle” dediğinde:
 
 Kullanıcı “kaynakları denetle” dediğinde:
 
-1. `context/kaynaklar/README.md` ve `kaynak-indeksi.md` dosyalarını oku.
+1. `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\kaynaklar/README.md` ve `kaynak-indeksi.md` dosyalarını oku.
 2. `belgeler/`, `veriler/`, `gorseller/` ve `ses-ve-video/` klasörlerindeki gerçek kaynakları indeksle karşılaştır.
 3. Boş klasörleri koruyan `.gitkeep` dosyalarını gerçek kaynak olarak değerlendirme.
 4. `baglantilar.md` kayıtlarının kaynak indeksinde karşılığı olup olmadığını kontrol et.

@@ -4,16 +4,16 @@ Bu dosya projenin ana ve kalıcı çalışma talimatlarını içerir. Claude Cod
 
 ## Proje bağlamını kullanma
 
-- Her görevin başında `context/README.md` dosyasını oku.
+- Her görevin başında `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` dosyasını oku.
 - Ana haritada “her görevde oku” olarak belirtilen dosyaları oku.
 - Görevin konusuna göre haritada belirtilen diğer bağlam dosyalarını gerektiğinde oku.
 - Görevle ilgisi olmayan dosyaları gereksiz yere bağlama yükleme.
-- Proje bilgileri için `context/` altındaki doğrulanmış ve güncel dosyaları esas al.
+- Proje bilgileri için `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\` altındaki doğrulanmış ve güncel dosyaları esas al.
 - Bağlam dosyaları çelişiyorsa veya güncelliğinden şüphe ediyorsan sessizce seçim yapma; kullanıcıya bildir.
 
 ## Bağlam haritasını koruma
 
-- `context/` altında yeni bir bağlam dosyası oluşturur, taşır, yeniden adlandırır, amacını değiştirir veya silersen aynı işlem içinde `context/README.md` haritasını güncelle.
+- `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\` altında yeni bir bağlam dosyası oluşturur, taşır, yeniden adlandırır, amacını değiştirir veya silersen aynı işlem içinde `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` haritasını güncelle.
 - Bir bağlam dosyasının yalnızca içeriği değişmiş ve dosyanın amacı aynı kalmışsa ana haritayı değiştirme.
 - Her bağlam dosyasının ana haritadan doğrudan veya bir alt harita üzerinden ulaşılabilir olmasını sağla.
 - Haritada bulunmayan bir bağlam dosyası fark edersen amacı açıksa haritaya ekle; belirsizse kullanıcıya sor.
@@ -21,8 +21,8 @@ Bu dosya projenin ana ve kalıcı çalışma talimatlarını içerir. Claude Cod
 
 ## Kaynakları yönetme
 
-- `context/kaynaklar/` altındaki dosyaları kullanıcı veya proje tarafından sağlanan dayanak girdileri olarak değerlendir.
-- Bir kaynak ekler, taşır, yeniden adlandırır veya silersen aynı işlem içinde `context/kaynaklar/kaynak-indeksi.md` dosyasını güncelle.
+- `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\kaynaklar/` altındaki dosyaları kullanıcı veya proje tarafından sağlanan dayanak girdileri olarak değerlendir.
+- Bir kaynak ekler, taşır, yeniden adlandırır veya silersen aynı işlem içinde `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\kaynaklar/kaynak-indeksi.md` dosyasını güncelle.
 - Kaynakların orijinal içeriğini açıkça istenmedikçe değiştirme.
 - Ajan tarafından üretilen çıktı, yorum veya özetleri ham kaynak olarak kaydetme.
 - Bir kaynaktan çıkarılan kalıcı sonucu, kullanıcı tarafından doğrulandığında ilgili bağlam dosyasına kaynak yolu ve dönemiyle birlikte işle.
@@ -72,11 +72,11 @@ Bu dosya projenin ana ve kalıcı çalışma talimatlarını içerir. Claude Cod
 ## Projeye özel kalıcı talimatlar
 
 <!--
-Bu bölüm, context/ içeriği hazırlandıktan sonra Claude Code veya Codex
+Bu bölüm, depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\ içeriği hazırlandıktan sonra Claude Code veya Codex
 tarafından projeye göre yapılandırılır.
 
 Buraya yalnızca her görevde geçerli olacak kısa talimatlar eklenmelidir.
 Ayrıntılı proje geçmişi, hedef kitle, strateji ve kaynak bilgileri buraya
-kopyalanmamalı; context/README.md üzerinden yönlendirilmelidir.
+kopyalanmamalı; depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md üzerinden yönlendirilmelidir.
 -->
 

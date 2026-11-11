@@ -41,3 +41,5 @@ android/.idea/
 # Test kanit ciktilari izlenmez (README haric)
 /evidence/*
 !/evidence/README.md
+# Ajan baglam klasoru depo disinda (docs-ai/context)
+/context/
