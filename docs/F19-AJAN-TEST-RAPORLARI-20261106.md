@@ -7,7 +7,7 @@ Bu belge, 6 Kasım 2026'da Match Studio ilk sürüm (başlangıç commit `d90b87
 - Canlı örnek: `http://127.0.0.1:8913/` (`node tools/serve.cjs 8913 --static`, `public/` çıktısı); gerçek Chromium.
 - Aynı anda en fazla 3 uzman ajan çalışır (proje kuralı); dört kategori iki dalgada koşacaktı.
 - Ajanlar yalnızca rapor/kanıt üretir: kaynak koduna (`src/`, `web/`, `tests/`, `docs/`, `context/`) dokunmaz, commit/push yapmaz.
-- Gerçek kişiden veri kullanılmaz; tüm veri sentetiktir ("Süre Spor", "Mehmet Efe Karadeniz" vb.).
+- Gerçek kişiden veri kullanılmaz; tüm veri sentetiktir ("Süre Spor", "Deneme Oyuncu 01" vb.).
 
 ## Dalga ve ajan planı
 
