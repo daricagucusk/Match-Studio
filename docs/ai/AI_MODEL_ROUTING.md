@@ -109,6 +109,6 @@ secret'ını kullanan uçtan uca istek ve model yanıtını sınar.
 
 ## Yerel Abacus CLI yönlendirme (8 Kasım 2026)
 
-Bu belgede tanımlanan `[AI DEVIR]` GitHub Issue tabanlı Gemini/OpenRouter fallback akışından bağımsız ikinci bir **yerel, bütçe önkontrollü** araç eklendi: `tools/ai_budget_router.py`. Açıklama: [ABACUS_BUDGET_ROUTER.md](ABACUS_BUDGET_ROUTER.md).
+Bu belgede tanımlanan `[AI DEVIR]` GitHub Issue tabanlı Gemini/OpenRouter fallback akışından bağımsız ikinci bir **yerel, bütçe önkontrollü** araç eklendi: `D:/beyin2/Projeler/MatchStudio/docs-ai/tools/ai_budget_router.py (depo disi)`. Açıklama: [ABACUS_BUDGET_ROUTER.md](ABACUS_BUDGET_ROUTER.md).
 
 Bu yeni araç GitHub Actions model sırasını, secret'ları veya yayın davranışını değiştirmez. Model kategorilerini RouteLLM/Opus 5.5/Fable 5.1 olarak göreve göre sınıflandırır; kullanıcı `--allow-premium` ve `--execute` yetkisi vermedikçe premium kredi harcamaz. Tüm uygulama rolü çağrıları salt okunurdur.

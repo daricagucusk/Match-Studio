@@ -19,7 +19,7 @@ Yalnızca Codex'e özgü ve CLAUDE.md içinde bulunmaması gereken talimatlar ek
 
 - Bu projenin kaynak-of-truth talimatları hâlâ `CLAUDE.md` ve `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` dosyalarıdır; onları geçersiz kılma.
 - Kullanıcı model seçimi, görev planı veya kredi tasarruflu ajan devri istediğinde `docs/ai/ABACUS_BUDGET_ROUTER.md` dosyasını oku.
-- İlk kontrol: `py -3 -B tools/ai_budget_router.py "GÖREV"` (dry-run, kredi tüketmez).
+- İlk kontrol: `py -3 -B D:/beyin2/Projeler/MatchStudio/docs-ai/tools/ai_budget_router.py (depo disi) "GÖREV"` (dry-run, kredi tüketmez).
 - Abacus CLI'ye para harcatan `--execute` ancak kullanıcının güncel cüzdan bakiyesi ve açık izniyle kullanılabilir; `--allow-premium` ayrı opt-in'dir.
 - Bu sistemin `implement` rolü yazma yetkilidir: `--permission-mode accept-edits` ile `Read,Grep,Glob,Write,Edit,NotebookEdit,Bash` araçlarını kullanır; `plan` ve `review` rolleri salt okunur kalır. Push, merge, yayın ve kimlik bilgileri hiçbir rolde otomatik izin kapsamında değildir.
 - `tools/ai_handoff_router.py` GitHub Issue yedekleme akışı ayrı kalır; mevcut `.jarvis/integrations.json` rotalarını değiştirme.
