@@ -1,82 +1,84 @@
-# Proje Çalışma Talimatları
+# Match Studio — Çalışma Talimatları
 
-Bu dosya projenin ana ve kalıcı çalışma talimatlarını içerir. Claude Code bu dosyayı doğrudan kullanır. Codex, `AGENTS.md` üzerinden bu dosyaya yönlendirilir.
+Bu dosya her oturumda yüklenen ana talimattır. Ayrıntı `.claude/rules/`, `.claude/skills/` ve depo dışı bağlam haritasındadır. Codex giriş noktası `AGENTS.md`'dir.
 
-## Proje bağlamını kullanma
+## 1. Proje kimliği
 
-- Her görevin başında `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` dosyasını oku.
-- Ana haritada “her görevde oku” olarak belirtilen dosyaları oku.
-- Görevin konusuna göre haritada belirtilen diğer bağlam dosyalarını gerektiğinde oku.
-- Görevle ilgisi olmayan dosyaları gereksiz yere bağlama yükleme.
-- Proje bilgileri için `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\` altındaki doğrulanmış ve güncel dosyaları esas al.
-- Bağlam dosyaları çelişiyorsa veya güncelliğinden şüphe ediyorsan sessizce seçim yapma; kullanıcıya bildir.
+- Match Studio: çevrimdışı çalışan kulüp, grup, sporcu, kadro, canlı maç ve afiş yönetimi PWA'sı; şifreli yedek ve geri yükleme içerir.
+- Paket sürümü `2.6.8-f.19-rc.1`. Tek aktif kaynak bu klasördür. GitHub `main`, Vercel ve Play Console bu klasörle aynı durum sayılmaz.
+- Yığın: bağımlılıksız ES modülleri (`src/`), statik `web/`, Node 24 derleme araçları (`tools/`), Playwright testleri (`tests/`). Çerçeve, paket yöneticisi katmanı veya yeni kütüphane ekleme; mevcut modülleri kullan.
 
-## Bağlam haritasını koruma
+## 2. Değişmez ürün kararları
 
-- `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\` altında yeni bir bağlam dosyası oluşturur, taşır, yeniden adlandırır, amacını değiştirir veya silersen aynı işlem içinde `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md` haritasını güncelle.
-- Bir bağlam dosyasının yalnızca içeriği değişmiş ve dosyanın amacı aynı kalmışsa ana haritayı değiştirme.
-- Her bağlam dosyasının ana haritadan doğrudan veya bir alt harita üzerinden ulaşılabilir olmasını sağla.
-- Haritada bulunmayan bir bağlam dosyası fark edersen amacı açıksa haritaya ekle; belirsizse kullanıcıya sor.
-- Gerekli harita güncellemesi tamamlanmadan bağlamla ilgili görevi tamamlanmış sayma.
+- Kulüp ayrımı, IndexedDB şeması, AES-GCM şifreli yedek, kurtarma noktası, kalıcı silme ve fixture oturum izolasyonu korunur.
+- Canlı maç geçmişi append-only'dir. Düzeltme ve iptal `EVENT_CORRECTION` ile yeni olay olarak yazılır; geçmiş kaydı geriye dönük değiştirilmez.
+- Aynı işlem anahtarı mükerrer olay üretmez; eski revizyon reddedilir. Gol, asist, kart ve oyuncu değişikliği bu kurala tabidir.
+- Takım derinliğinde her saha görevi bağımsız kimlik taşır (`<roleCode>:<roleIndex>`); alternatif sayısı sınırsızdır; `slotCandidates` ve `tacticalRoles` geriye uyumludur.
+- Tasarım dili `DESIGN.md`: obsidyen zemin, şampanya eylem, zümrüt saha. Sahte reyting, uydurma metrik ve olmayan özellik iddiası yasaktır.
+- `web/app.bundle.js`, `web/sw.js`, `public/`, `dist/` ve `test-results/` üretilen çıktıdır; elle düzenlenmez. Kaynak `src/` ve `web/` altındadır.
 
-## Kaynakları yönetme
+## 3. Bağlam haritası
 
-- `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\kaynaklar/` altındaki dosyaları kullanıcı veya proje tarafından sağlanan dayanak girdileri olarak değerlendir.
-- Bir kaynak ekler, taşır, yeniden adlandırır veya silersen aynı işlem içinde `depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\kaynaklar/kaynak-indeksi.md` dosyasını güncelle.
-- Kaynakların orijinal içeriğini açıkça istenmedikçe değiştirme.
-- Ajan tarafından üretilen çıktı, yorum veya özetleri ham kaynak olarak kaydetme.
-- Bir kaynaktan çıkarılan kalıcı sonucu, kullanıcı tarafından doğrulandığında ilgili bağlam dosyasına kaynak yolu ve dönemiyle birlikte işle.
-- Kullanıcı tarafından yeni bir kaynak eklenmedikçe kaynak indeksine yeni kaynak kaydı oluşturma.
-- Parola, erişim anahtarı veya gereksiz kişisel veri gibi hassas bilgileri proje bağlamına ekleme.
+- Her görevde oku: `D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md`, `proje-ozeti.md`, `kurallar-ve-sinirlar.md`.
+- Göreve göre oku: `hedefler.md`, `kararlar.md`, `proje-hafizasi.md`, `kaynaklar/README.md`, `kaynaklar/kaynak-indeksi.md`.
+- Haritada bulunmayan bağlam dosyası güvenilir kabul edilmez. Çelişki varsa sessiz seçim yapma; kullanıcıya bildir.
+- Bağlam dosyası eklenir, taşınır, yeniden adlandırılır veya silinirse aynı işlemde `context/README.md` güncellenir. Kaynak işlemlerinde `kaynak-indeksi.md` güncellenir.
+- "Hafızayı güncelle", "bağlamı denetle", "kaynakları denetle" dendiğinde `proje-hafizasi` becerisini kullan.
 
-## Proje hafızasını güncel tutma
+## 4. Kaynak seçme
 
-- Bir görev sırasında hedef, karar, kural, kapsam, sınır veya başka bir kalıcı proje bilgisi açıkça değişirse ilgili bağlam dosyasını aynı görev içinde güncelle.
-- Bir bilginin geçici mi kalıcı mı olduğu belirsizse bağlama eklemeden önce kullanıcıya sor.
-- Geçici konuşmaları, reddedilmiş seçenekleri ve doğrulanmamış varsayımları kalıcı bağlam olarak kaydetme.
-- Sohbetin tamamını bağlam dosyalarına kopyalama; yalnızca gelecekte tekrar kullanılacak kesinleşmiş bilgileri işle.
-- Kullanıcı “hafızayı güncelle”, “bağlamı denetle” veya “kaynakları denetle” dediğinde `proje-hafizasi` becerisini kullan.
-- Uzun bir konuşmada kalıcı bağlama işlenmemiş önemli bilgiler oluştuysa, uygun zamanda kullanıcıya hafızayı güncellemeyi isteyip istemediğini sor.
+- Önce `grep` ve `glob` ile dar arama yap; dosyayı baştan sona okuma yalnız gerektiğinde.
+- Bir adımda ilgili 2-8 dosya oku; büyük log, tarama ve analiz subagent içinde yapılır, ana ajana karar ve kanıt döner.
+- `docs/history/`, `docs/audit/` ve `evidence/` altındaki tarihli kayıtlar kanıttır; güncel durum değildir.
+- Doğrulanmamış sayı, sürüm veya yayın durumunu kesin bilgi gibi aktarma.
 
-## Çalışma yaklaşımı
+## 5. Yetki ve güvenlik
 
-- İşleme başlamadan önce talebi, ilgili dosyaları ve mevcut yapıyı incele.
-- Kullanıcıya ait mevcut çalışmaları koru ve yalnızca görev için gerekli alanları değiştir.
-- Görev kapsamı dışında kalan dosyaları değiştirme.
-- Sonucu önemli ölçüde etkileyen bir varsayımı açıkça belirt.
-- Sonucu değiştirecek bir belirsizlik varsa kullanıcıya sor; küçük ayrıntılarda makul karar vererek ilerle.
-- Güncel veya dış dünyaya ilişkin önemli bir iddiayı doğrulamadan kesin bilgi gibi sunma.
+- Açık yetki olmadan yapılmayacaklar: `git push`, `main`'e birleştirme, Vercel veya Play yayını, dosya silme, mevcut içeriğin üzerine yazma, dışarıya mesaj, ödeme, ücretli model çağrısı.
+- Yasak komutlar: `git reset --hard`, `git clean`, `rm -rf`, `npm publish`, `vercel --prod`.
+- `.env`, `*.jks`, `*.keystore`, `*.p12`, `android/key.properties` ve gerçek sporcu verisi depoya, rapora veya loga girmez. Sır değerini yanıtta tekrar etme; adıyla an.
+- Ücretli model çağrısı yalnız `tools/ai_budget_router.py` dry-run veya ilgili beceri dosyası üzerinden yapılır; router atlanmaz.
+- Göreve `git status`, dal ve mevcut değişiklikleri kontrol ederek başla; kullanıcı çalışmasını koru.
 
-## Yetki ve güvenlik
+## 6. Geliştirme döngüsü
 
-- Geri alınması zor, veri kaybına yol açabilecek veya dış dünyada etkisi olacak işlemleri açık yetki olmadan yapma.
-- Dosya silme, mevcut içeriğin üzerine yazma, yayımlama, dışarıya mesaj gönderme veya ödeme oluşturma gibi işlemlerde hedefi ve kapsamı doğrula.
-- Kullanıcının açıkça istediği ve görev kapsamında bulunan güvenli işlemler için gereksiz yere tekrar onay isteme.
-- Gizli bilgileri yanıtlarda, günlüklerde veya proje belgelerinde açığa çıkarma.
+1. Talebi, ilgili dosyaları ve mevcut yapıyı incele.
+2. İlgili `.claude/rules/` dosyası eşleşen dosya okunduğunda kendiliğinden yüklenir; ayrıca istemek gerekmez.
+3. Küçük ve odaklı yama uygula; kapsam dışı dosyaya dokunma, biçimi değiştirme.
+4. Davranış değişikliğinde önce kırılan regresyon testini yaz, sonra düzelt.
+5. Bölüm 7'deki doğrulama komutlarını çalıştır.
+6. Sonucu kanıtla teslim et.
 
-## Doğrulama ve tamamlanma
+## 7. Test ve doğrulama
 
-- Bir işi tamamlandı olarak bildirmeden önce sonucu görevin riskine uygun biçimde kontrol et.
-- Yazılım projesiyse mevcut test, denetim ve derleme komutlarını kullan; komut uydurma.
-- Belge, analiz veya içerik projesiyse sonucu kaynaklar, bağlam kuralları ve istenen biçim açısından incele.
-- Kontrol edemediğin bir noktayı kontrol edilmiş gibi gösterme.
-- Tamamlandığında yapılan değişiklikleri, etkilenen dosyaları ve doğrulanamayan noktaları kısa şekilde bildir.
+| Komut | Kapsam |
+|---|---|
+| `npm run build` | `src/` + `web/` → `web/app.bundle.js`, `web/sw.js` |
+| `npm test` | 26 Node test dosyası, IndexedDB, depolama, paket güvenliği |
+| `npm run test:browser` | 32 Playwright senaryosu; `public/` çıktısı üzerinden |
+| `npm run check` | Derleme + Node + tarayıcı (tam paket) |
+| `npm run build:vercel` | Bütünlük doğrulanmış statik çıktı |
+| `npm run package` | `release-security-check` + PWA/kaynak ZIP |
+| `npm run release` | Tüm kontroller + paket |
+| `npm run check:play` | Play hazırlık raporu (hazırlık modunda 0 dönebilir) |
+| `npm run check:play:strict` | Uzak uçlar dahil, engelde başarısız |
 
-## İletişim
+- Playwright projeleri: `desktop` 1440×1000, `phone` 360×780, `fold-open` 840×980; `workers:1`.
+- Yalnız `npm test` yeterli değildir; davranış değişikliğinde `npm run check` çalıştır.
+- Gerçek cihaz ve Play kabulü otomasyondan ayrıdır: `docs/guides/DEVICE_CHECKLIST.md`.
+- Test geçmediyse iş tamamlandı sayılmaz. Doğrulanamayan nokta açıkça yazılır.
 
-- Kullanıcının dilini ve bilgi seviyesini takip et.
-- Sonucu önce, gerekli açıklamayı ardından ver.
-- Teknik terimleri yalnızca gerektiğinde kullan ve ilk kullanımda sade biçimde açıkla.
-- Belirsizlikleri, varsayımları ve engelleri gizleme.
+## 8. Ajan politikası
 
-## Projeye özel kalıcı talimatlar
+- Varsayılan: işi ana ajan kendisi yapar. Ajan devri yalnız 3+ bağımsız modül, geniş kod taraması veya bağımsız denetim gerektiğinde.
+- Roller `.claude/agents/` altındadır: `mimar`, `gelistirici`, `qa-denetci`, `guvenlik-denetci`, `arayuz-denetci`, `test-otomasyon`.
+- Aynı dosyayı iki ajana yazdırma. Ana ajan mimari lider, koordinatör ve nihai kalite sorumlusudur.
+- Agent Teams deneysel ve varsayılan kapalıdır; açmak kullanıcı kararıdır.
+- Basit işte takım kurma; tek dosyalık düzeltme ana ajanda kalır.
 
-<!--
-Bu bölüm, depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\ içeriği hazırlandıktan sonra Claude Code veya Codex
-tarafından projeye göre yapılandırılır.
+## 9. Teslim ve raporlama
 
-Buraya yalnızca her görevde geçerli olacak kısa talimatlar eklenmelidir.
-Ayrıntılı proje geçmişi, hedef kitle, strateji ve kaynak bilgileri buraya
-kopyalanmamalı; depo dışı: D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md üzerinden yönlendirilmelidir.
--->
-
+- Sonuç önce, kanıt sonra. Her iddia bir araç çıktısına bağlanır.
+- "Yazıldı ama test edilmedi" ile "test geçti" ayrımını açık yaz.
+- Rapor: değişen dosyalar, çalıştırılan komut ve sonucu, doğrulanamayan noktalar, kalan risk.
+- Kullanıcının dilini izle; teknik terimi ilk kullanımda sade açıkla.
