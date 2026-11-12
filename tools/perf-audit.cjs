@@ -21,25 +21,25 @@ async function measureMetrics(page) {
   try { await page.waitForSelector('.app-shell', { timeout: 10000 }); } catch(e) {}
   await page.waitForTimeout(2000);
 
-  // FCP: observer start immediately, get entry as soon as it fires
-  const fcpResult = await page.evaluate(() => Promise.race([new Promise((resolve) => {
+  // FCP: read the buffered paint entry directly; the observer only fires for new entries
+  const fcpResult = await page.evaluate(() => {
     try {
-      new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        for (const e of entries) if (e.name === 'first-contentful-paint') resolve(e.startTime);
-        setTimeout(() => resolve(null), 4000);
-      }).observe({ type: 'first-contentful-paint', buffered: true });
-    } catch(e) { resolve(null); }
-  }), new Promise((resolve) => setTimeout(() => resolve(null), 6000))]));
-
-  // LCP
-  const lcpResult = await page.evaluate(() => {
-    try {
-      const list = performance.getEntriesByType('largest-contentful-paint');
-      if (!list.length) return null;
-      return Math.max(...list.map(e => e.startTime));
+      const entry = performance.getEntriesByType('paint').find(e => e.name === 'first-contentful-paint');
+      return entry ? entry.startTime : null;
     } catch(e) { return null; }
   });
+
+  // LCP: buffered entries are only exposed through an observer, so observe and read the buffer
+  const lcpResult = await page.evaluate(() => new Promise((resolve) => {
+    try {
+      let value = null;
+      const observer = new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) value = Math.max(value || 0, e.startTime);
+      });
+      observer.observe({ type: 'largest-contentful-paint', buffered: true });
+      setTimeout(() => { observer.disconnect(); resolve(value); }, 1500);
+    } catch(e) { resolve(null); }
+  }));
 
   // CLS
   const clsResult = await page.evaluate(() => {

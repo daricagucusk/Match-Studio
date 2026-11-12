@@ -4,7 +4,7 @@
 
 ## Gerçekleştirilen tasarım
 
-- `tools/ai_budget_router.py`: Görev zorluğuna göre otomatik rol/model seçimi, alt ajan çıktı devri, CLI faturalama satırından tüketim okuma, bütçe önkontrolü.
+- `D:/beyin2/Projeler/MatchStudio/docs-ai/tools/ai_budget_router.py (depo disi)`: Görev zorluğuna göre otomatik rol/model seçimi, alt ajan çıktı devri, CLI faturalama satırından tüketim okuma, bütçe önkontrolü.
 - `config/ai-budget-policy.json`: Aylık **1500**, günlük **350**, tek görev **500** kredi *yerel ihtiyat limitleri*. Cüzdanda minimum **1000** kredi bırakılmaya çalışılır. Bu sayılar hesap bakiyesi değil, yalnız bu aracın kullanım bütçesidir.
 - `tools/test_ai_budget_router.py`: Çevrimdışı güvenlik ve karar testleri. API veya kredi tüketmez.
 - Sıralama: plan → implement (yalnızca değişiklik önerisi) → review → verify (sabit yerel test önerileri). Tüm çağrılar **read-only Plan** modunda; uygulama kodunu kendiliğinden değiştirmez.
@@ -19,7 +19,7 @@
 İzole geliştirme klasöründeki terminal:
 
 ```powershell
-py -3 -B tools/ai_budget_router.py "Canlı maç geri almayı analiz et"
+py -3 -B D:/beyin2/Projeler/MatchStudio/docs-ai/tools/ai_budget_router.py (depo disi) "Canlı maç geri almayı analiz et"
 ```
 
 Model planını **ücretsiz** görmek için bu yeterli.
@@ -27,19 +27,19 @@ Model planını **ücretsiz** görmek için bu yeterli.
 Kritik görevde premium seçeneklerini *sadece planlamak* için:
 
 ```powershell
-py -3 -B tools/ai_budget_router.py "Kritik güvenlik mimarisini değerlendir" --allow-premium
+py -3 -B D:/beyin2/Projeler/MatchStudio/docs-ai/tools/ai_budget_router.py (depo disi) "Kritik güvenlik mimarisini değerlendir" --allow-premium
 ```
 
 İlgili küçük kaynak dosyasını sınırlı bağlam olarak kullanmak için:
 
 ```powershell
-py -3 -B tools/ai_budget_router.py "Kadrodaki alternatifleri analiz et" --context-file src/domain/team-depth.js
+py -3 -B D:/beyin2/Projeler/MatchStudio/docs-ai/tools/ai_budget_router.py (depo disi) "Kadrodaki alternatifleri analiz et" --context-file src/domain/team-depth.js
 ```
 
 **Gerçek kredi tüketen isteğe örnek — yalnız bakiye ve bütçe ekranını kontrol ettikten sonra:**
 
 ```powershell
-py -3 -B tools/ai_budget_router.py "Geri alma mimarisini analiz et" --allow-premium --execute --wallet-balance <GUNCEL_HESAP_KREDISI> --stage plan
+py -3 -B D:/beyin2/Projeler/MatchStudio/docs-ai/tools/ai_budget_router.py (depo disi) "Geri alma mimarisini analiz et" --allow-premium --execute --wallet-balance <GUNCEL_HESAP_KREDISI> --stage plan
 ```
 
 Bu komutun kendisi ücretli model çağrıları yapabilir. Gerçek bakiye elle verilir; sağlayıcıdan otomatik çekilmez. Terminal komutunun `<GUNCEL_HESAP_KREDISI>` kısmını gerçek sayıyla değiştirmek gerekir.
@@ -71,4 +71,4 @@ git diff --check
 - VS Code **Terminal > Run Task > Abacus AI: Safe Auto-Edits** görevini kullan. Bu görev `abacusai --permission-mode accept-edits --auto-accept-edits --model RouteLLM` ile başlar; normal Edit/Write dosya düzenlemeleri için tek tek onay gerekmez.
 - Bu mod tüm terminal komutlarına sınırsız izin vermez. Toplu shell değiştirme (`sed -i`, `perl -pi`) ve geri dönülemez komutlar reddedilir; ilgili dosyaları yerleşik Edit/Write ile küçük parçalar halinde düzenle.
 - Proje izinleri `.abacusai/config.json` içinde yalnız yerel bilgisayarda tutulur; `.git/info/exclude` ile yanlışlıkla Git'e eklenmesi engellenmiştir. GitHub'a push, merge ve production yayınını açık görev olmadan yapma.
-- Bu görev Abacus sohbetinin otomatik kredi yönlendirmesiyle aynı şey değildir. Kredi önkontrollü ayrı görev planlamak için `tools/ai_budget_router.py` kullanılır; gerçek kodlama oturumunun premium harcaması otomatik olarak bu Python defterine yansımaz.
+- Bu görev Abacus sohbetinin otomatik kredi yönlendirmesiyle aynı şey değildir. Kredi önkontrollü ayrı görev planlamak için `D:/beyin2/Projeler/MatchStudio/docs-ai/tools/ai_budget_router.py (depo disi)` kullanılır; gerçek kodlama oturumunun premium harcaması otomatik olarak bu Python defterine yansımaz.

@@ -34,3 +34,21 @@ android/.idea/
 
 # One-off Play Console automation scripts live outside the repository (../pc-konsol-araclari/).
 /pc-*.mjs
+
+# Yerel ajan yapilandirmasi yayina girmez
+.codex/
+.mcp.json
+.claude/settings.local.json
+.claude/backup-*/
+# Test kanit ciktilari izlenmez (README haric)
+/evidence/*
+!/evidence/README.md
+# Ajan baglam klasoru depo disinda (docs-ai/context)
+/context/
+/config/ai-budget-policy.json
+/docs/ai/ajanlar/
+/docs/ai/skills/
+/tools/ai_budget_router.py
+/tools/test_ai_budget_router.py
+/tools/live-review.cjs
+/tools/live-review-deep.cjs

@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 /* Live Chromium acceptance check for the team-depth screen.
  * Runs without the Playwright test runner (which is blocked by the local
  * process-spawn policy in this environment), but uses the same Chromium build. */
@@ -29,7 +29,8 @@ async function seed(page){
   registry.setActiveId('report_test_club');db.setClubDatabase('report_test_club');
   await db.putRecord('groups',{id:'g1',name:'U14',isActive:true});
   await db.putRecord('groups',{id:'g2',name:'U12',isActive:true});
-  const longNames=['Mehmet Efe Karadeniz','Abdurrahman Uzunsoy','Muhammed Ali Çelik','Bartu Kağan Yıldırım','Eymen Denizhan','Kerem Alp','Yiğit Aras','Poyraz','Ege','Arda','Mert','Can','Emir','Kaan','Bora','Alp','Efe','Sarp','Umut','Tuna','Berk','Cem','Doruk','Ozan','Görkem','İlker','Levent','Mete','Onur','Tolga'];
+  const firstNames=['Aral','Berk','Cem','Deniz','Emir','Fatih','Giray','Hakan','Ilker','Jale','Kaan','Lale','Mert','Nehir','Oguz','Pinar','Rana','Sarp','Tuna','Umut','Volkan','Yigit','Zeki','Alp','Baran','Cenk','Doruk','Ege','Firat','Gokay'];
+  const longNames=firstNames.map((n,i)=>i===0?'Deneme Oyuncu Uzunsoyadlitest':n+' Deneme');
   for(let i=1;i<=30;i++)await db.putRecord('players',{id:'p'+i,fullName:longNames[i-1],position:i===1?'GK':i<8?'DF':i<20?'MF':'FW',groupIds:['g1'],isActive:true});
   const ids=Array.from({length:30},(_,i)=>'p'+(i+1));
   await db.putRecord('settings',{id:'teamPitchPrefs:g1',value:{formation:'4-3-3',depthFactor:2}});
@@ -173,9 +174,9 @@ async function closeSlot(page){
    // Add a player, move the priority, then prove both survive a reload.
    await openSlot(page,'CB:0');
    assert.equal(await page.locator('#team-tactical-role').inputValue(),'central-defender',`${view.name}: taktik rol yenilemeden sonra kayboldu`);
-   await page.locator('#team-search').fill('Mehmet Efe');
+   await page.locator('#team-search').fill('Deneme Oyuncu');
    await page.locator('.depth-candidate').first().waitFor({state:'visible'});
-   assert.match(await page.locator('.depth-candidate').first().innerText(),/Mehmet Efe Karadeniz/);
+   assert.match(await page.locator('.depth-candidate').first().innerText(),/Deneme Oyuncu Uzunsoyadlitest/);
    await page.locator('.depth-candidate input').first().check();
    await page.waitForFunction(()=>/tercih/.test(document.querySelector('.depth-candidate small')?.textContent||''));
    const addedRank=rankOf(await page.locator('.depth-candidate small').first().innerText());
@@ -191,7 +192,7 @@ async function closeSlot(page){
    await nav(page,'team');
    await openSlot(page,'CB:0');
    assert.equal(await page.locator('#team-tactical-role').inputValue(),'central-defender',`${view.name}: taktik rol kalıcı değil`);
-   await page.locator('#team-search').fill('Mehmet Efe');
+   await page.locator('#team-search').fill('Deneme Oyuncu');
    await page.locator('.depth-candidate').first().waitFor({state:'visible'});
    assert.equal(await page.locator('.depth-candidate input').first().isChecked(),true,`${view.name}: seçim yenilemeden sonra korunmadı`);
    assert.equal(rankOf(await page.locator('.depth-candidate small').first().innerText()),movedRank,`${view.name}: öncelik sırası yenilemeden sonra korunmadı`);

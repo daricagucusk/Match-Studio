@@ -27,8 +27,9 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
  const checkboxes=page.locator('input[data-player-id]');await expect(checkboxes).toHaveCount(4);
  for(let i=0;i<4;i++){await page.locator('input[data-player-id]').nth(i).check();await idle(page);}
  await nav(page,'pitch');await expect(page.locator('[data-pitch-slot]')).toHaveCount(3);
- // The bench and field are separated by a smooth page scroll; keep the drag target stationary.
- if(info.project.name==='desktop'){await page.emulateMedia({reducedMotion:'reduce'});await page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});await page.locator('.pitch-field').evaluate(el=>el.getBoundingClientRect().toJSON());await page.locator('[data-pitch-player]:visible').first().dragTo(page.locator('[data-pitch-slot]:visible').first());await idle(page);await expect(page.locator('[data-pitch-slot]')).toContainText(['Oyuncu 4','Oyuncu 2','Oyuncu 3']);}
+ // Drive the HTML5 drag contract directly: dragTo replays pointer movement and
+ // loses the drop target when the bench/field scroll shifts layout mid-drag.
+ if(info.project.name==='desktop'){const benchCard=page.locator('[data-pitch-player]:visible').first();await expect(benchCard).toContainText('Oyuncu 4');const target=page.locator('[data-pitch-slot]:visible').first();const dataTransfer=await page.evaluateHandle(()=>new DataTransfer());await benchCard.dispatchEvent('dragstart',{dataTransfer});await target.dispatchEvent('dragover',{dataTransfer});await target.dispatchEvent('drop',{dataTransfer});await benchCard.dispatchEvent('dragend',{dataTransfer});await idle(page);await expect(page.locator('[data-pitch-slot]')).toContainText(['Oyuncu 4','Oyuncu 2','Oyuncu 3']);}
  await nav(page,'live');await expect(page.locator('#live-rules-form')).toBeVisible();await page.locator('#live-substitution-mode').selectOption('returnAllowed');
  await page.locator('#live-rules-form button[type=submit]').click();await idle(page);await page.locator('[data-action=live-start]').click();await idle(page);
  await expect(page.locator('.live-status')).toHaveText('Oynanıyor');
@@ -44,14 +45,38 @@ test('complete player, match, roster, live clock and poster workflow',async({pag
  expect(errors).toEqual([]);
 });
 test('PWA caches a complete shell and opens with local data while offline',async({page,context})=>{
- await createClub(page);await page.evaluate(()=>navigator.serviceWorker.ready);
+ await createClub(page);await group(page);
+ await nav(page,'players');
+ await page.locator('[data-action=add-player]').first().click();await idle(page);
+ await page.locator('#fullName').fill('Kalıcı Oyuncu');await page.locator('#birthYear').fill('2012');await page.locator('#shirtNumber').fill('7');
+ await page.locator('#player-form [name=groups]').check();
+ await page.locator('[data-action=submit-player]').click();await idle(page);await expect(page.locator('#player-form')).toHaveCount(0);
+ await page.evaluate(()=>navigator.serviceWorker.ready);
  await expect.poll(()=>page.evaluate(()=>Boolean(navigator.serviceWorker.controller))).toBe(true);
  await page.reload();await expect(page.locator('.app-shell')).toBeVisible();
  await expect(page.locator('#offline-readiness')).toHaveText('Çevrimdışı uygulama dosyaları hazır');
- await context.setOffline(true);await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await nav(page,'players');await nav(page,'archive');
+ await context.setOffline(true);await page.reload();await expect(page.locator('.app-shell')).toBeVisible();await nav(page,'players');
+ await expect(page.locator('.player-row').filter({hasText:'Kalıcı Oyuncu'})).toHaveCount(1);
+ await nav(page,'archive');
  await expect(page.locator('#club-settings-form [name=clubName]')).toHaveValue('Üretim Test Spor');
- await page.goto('/device-test.html');await expect(page.getByRole('heading',{name:'IndexedDB, PWA ve katlanabilir ekran testi'})).toBeVisible();
  await context.setOffline(false);
+});
+
+test('device diagnostics page stays reachable but is not precached',async({page})=>{
+ await createClub(page);await page.evaluate(()=>navigator.serviceWorker.ready);
+ await expect.poll(()=>page.evaluate(()=>Boolean(navigator.serviceWorker.controller))).toBe(true);
+ const cached=await page.evaluate(async()=>{
+  const keys=await caches.keys();
+  const urls=[];
+  for(const key of keys){for(const request of await (await caches.open(key)).keys())urls.push(new URL(request.url).pathname);}
+  return urls;
+ });
+ expect(cached.filter(url=>url.includes('device-test'))).toEqual([]);
+});
+
+test('device diagnostics page stays out of the published PWA archive',async({request})=>{
+ const response=await request.get('/device-test.html');
+ expect(response.status()).toBe(404);
 });
 test('encrypted backup can be reselected and restored twice through the phone UI',async({page})=>{
  await createClub(page);await group(page);const password='phone-test-password-123';page.on('dialog',dialog=>dialog.accept(dialog.type()==='prompt'?password:undefined));

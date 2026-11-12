@@ -39,6 +39,8 @@ self.addEventListener('fetch',event=>{
  const canonical=new URL(url);canonical.search='';canonical.hash='';
  // Legal privacy policy is a distinct public document, not a SPA navigation.
  if(req.mode==='navigate'&&canonical.pathname==='/privacy.html')return;
+ // Manual device diagnostics page is served from the network, never from the shell cache.
+ if(canonical.pathname.endsWith('/device-test.html'))return;
  if(!shellUrls.has(canonical.href)&&req.mode!=='navigate')return;
  event.respondWith((async()=>{
   const cache=await caches.open(CACHE);

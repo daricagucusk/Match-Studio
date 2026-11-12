@@ -12,6 +12,10 @@ const PATTERNS = [
   ['github-fine-grained-token', /github_pat_[A-Za-z0-9_]{30,}/],
   ['nvidia-token', /nvapi-[A-Za-z0-9_-]{20,}/],
   ['huggingface-token', /hf_[A-Za-z0-9]{30,}/],
+  ['anthropic-token', /sk-ant-[A-Za-z0-9_-]{20,}/],
+  ['google-api-key', /AIza[0-9A-Za-z_-]{35}/],
+  ['aws-access-key', /AKIA[0-9A-Z]{16}/],
+  ['supabase-access-token', /sbp_[a-f0-9]{40}/],
   ['private-key', /-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----/]
 ];
 
@@ -19,6 +23,7 @@ function forbiddenTrackedPath(file) {
   const n = String(file).replaceAll('\\', '/').toLowerCase();
   if (/(^|\/)\.env(\.|$)/.test(n) && !n.endsWith('/.env.example') && n !== '.env.example') return true;
   if (/(^|\/)\.codex(?:\/|$)/.test(n)) return true;
+  if (n === '.claude/settings.json') return false; // paylasilan minimal: yalniz deny + hook
   if (/(^|\/)\.claude\/(?:settings[^/]*\.json|\.credentials\.json|config\.toml)$/.test(n)) return true;
   if (/(^|\/)(?:key\.properties|credentials\.json|service-account\.json)$/.test(n)) return true;
   return /\.(?:jks|keystore|p12|pfx|pkcs12|key)$/.test(n);

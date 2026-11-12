@@ -9,7 +9,7 @@ const root=process.argv[3]==='--static'?path.join(project,'public'):
  fs.existsSync(path.join(project,'web'))?path.join(project,'web'):project;
 const port=Number(process.argv[2]||8904);
 const files=new Map([['/','index.html'],...[
- ...require('./runtime-files.cjs').runtimeFiles,'sw.js','privacy.html','robots.txt','.well-known/assetlinks.json'
+ ...require('./runtime-files.cjs').runtimeFiles,...require('./runtime-files.cjs').diagnostics,'sw.js','privacy.html','robots.txt','.well-known/assetlinks.json'
 ].map(name=>['/'+name,name])]);
 const types={'.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.webmanifest':'application/manifest+json; charset=utf-8','.png':'image/png','.json':'application/json; charset=utf-8','.txt':'text/plain; charset=utf-8','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf'};
 if(!Number.isInteger(port)||port<1024||port>65535)throw new Error('Port 1024–65535 arasında olmalı.');

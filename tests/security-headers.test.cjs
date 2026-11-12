@@ -20,6 +20,16 @@ test('app and device diagnostics use external scripts compatible with strict CSP
  assert.match(fs.readFileSync(path.join(web,'device-test.html'),'utf8'),/<script\b[^>]*\bsrc="\.\/device-test\.js"/);
 });
 
+test('device diagnostics stay out of the PWA shell and precache',()=>{
+ const {shell,runtimeFiles,diagnostics}=require('../tools/runtime-files.cjs');
+ for(const name of diagnostics){
+  assert.ok(!shell.includes('./'+name),name+' must not be precached');
+  assert.ok(!runtimeFiles.includes(name),name+' must not ship in the archive');
+ }
+ const worker=fs.readFileSync(path.join(web,'sw.js'),'utf8');
+ assert.doesNotMatch(worker,/['"]\.\/device-test\.(html|js)["']/);
+});
+
 test('manifest preserves app identity and has separate any and maskable icons',()=>{
  const manifest=JSON.parse(fs.readFileSync(path.join(web,'manifest.webmanifest'),'utf8'));
  assert.equal(manifest.name,'Match Studio — Futbol Kulübü');

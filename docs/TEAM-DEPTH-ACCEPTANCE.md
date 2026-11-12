@@ -11,7 +11,7 @@ Kaynak: `Calisma/Birlesik-Tek-Surum`, dal `work/birlesik-te-surum-20261105`, ba�
 | Bütün aktif diziliş görevleri tek ekranda | 4-3-3 için 11/11 görev satırı dört görünümde de görünür; diziliş listesi 3v3–11v11 seçeneklerini korur | PASS (canlı 4-3-3) |
 | Ana görünümde aşağı kaydırma olmaması | Belge, ana içerik ve tablo yüksekliği görünür alana eşit; ölçüm tablosu aşağıda | PASS |
 | Ek tercihlere kolay erişim | Sütun okları 1. tercihten 4. tercihe (masaüstü/laptop) ve 3. tercihe (Fold/telefon) gidip döndü; 8 adaylı stoper kuyruğu; 30 oyuncu havuzu 6 sayfa | PASS |
-| Basit oyuncu girişi | "Mehmet Efe" araması → seçim → 9. tercihe ekleme; uzun ad kırpılmadan erişilebilir; boş takımda açıklama | PASS |
+| Basit oyuncu girişi | "Deneme Oyuncu" araması → seçim → 9. tercihe ekleme; uzun ad kırpılmadan erişilebilir; boş takımda açıklama | PASS |
 | Tercih ve taktik rol düzenleme | Taktik rol `central-defender` olarak değişti; öncelik 9→8 yükseldi; ikisi de yenilemeden sonra korundu | PASS |
 | Bağımsız sağ/sol görevler | Sol stoper `ball-playing-defender`, sağ stoper `stopper`; ilk adaylar farklı kuyruklardan | PASS (canlı) |
 | Kulüp verisi ayrımı ve kayıp koruması | Mevcut kulüp kapsamlı IndexedDB ve depolama testleri kullanılıyor; bu turda ayrı kulüple canlı senaryo koşulmadı | Kısmi |

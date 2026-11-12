@@ -30,7 +30,7 @@ Kayıtlar site adresine ve tarayıcı profiline bağlıdır. Mevcut kulüp veril
 | [`tests/`](tests/) | Node testleri ve `browser/` altındaki tarayıcı senaryoları |
 | [`android/`](android/) | Android TWA metadata dosyası; özel imza anahtarları burada tutulmaz |
 | [`docs/`](docs/README.md) | Kurulum, yayın, Play, AI ve tarihsel belgeler |
-| [`context/`](context/README.md) | Proje bağlamı, kararlar ve kullanıcı kaynaklarının haritası |
+| `context/` (depo dışı: `D:\beyin2\Projeler\MatchStudio\docs-ai\context`) | Proje bağlamı, kararlar ve kullanıcı kaynaklarının haritası |
 | [`evidence/`](evidence/README.md) | Korunan eski paketler, incelemeler ve dağıtım kayıtları |
 | `public/` | Derlemeden üretilen web yayın çıktısı |
 | `dist/` | Üretilen PWA/kaynak ZIP'leri ve mağaza görselleri |
