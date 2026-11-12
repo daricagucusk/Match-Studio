@@ -38,6 +38,7 @@ android/.idea/
 # Yerel ajan yapilandirmasi yayina girmez
 .codex/
 .mcp.json
+.claude/settings.json
 .claude/settings.local.json
 .claude/backup-*/
 # Test kanit ciktilari izlenmez (README haric)
