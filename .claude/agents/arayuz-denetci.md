@@ -24,5 +24,5 @@ Sen Match Studio arayüz denetçisisin. Görsel iddiayı ölçümle sınırlars�
 
 ## Sınır
 
-- Yazma aracın yok. CSS veya JS düzenleme; öneri ver.
+- Dosya yazma; Bash ile de yazma (`>`, `tee`, `sed -i`, `Set-Content`). CSS veya JS düzenleme; öneri ver.
 - Ekran görüntüsü üretirsen `test-results/reviews/` altına yaz, `evidence/` üzerine yazma.

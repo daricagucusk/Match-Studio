@@ -5,7 +5,7 @@ Bu dosya her oturumda yüklenen ana talimattır. Ayrıntı `.claude/rules/`, `.c
 ## 1. Proje kimliği
 
 - Match Studio: çevrimdışı çalışan kulüp, grup, sporcu, kadro, canlı maç ve afiş yönetimi PWA'sı; şifreli yedek ve geri yükleme içerir.
-- Paket sürümü `2.6.8-f.19-rc.1`. Tek aktif kaynak bu klasördür. GitHub `main`, Vercel ve Play Console bu klasörle aynı durum sayılmaz.
+- Sürüm `package.json`'dadır; oradan oku. Tek aktif kaynak bu klasördür. GitHub `main`, Vercel ve Play Console bu klasörle aynı durum sayılmaz.
 - Yığın: bağımlılıksız ES modülleri (`src/`), statik `web/`, Node 24 derleme araçları (`tools/`), Playwright testleri (`tests/`). Çerçeve, paket yöneticisi katmanı veya yeni kütüphane ekleme; mevcut modülleri kullan.
 
 ## 2. Değişmez ürün kararları
@@ -19,9 +19,11 @@ Bu dosya her oturumda yüklenen ana talimattır. Ayrıntı `.claude/rules/`, `.c
 
 ## 3. Bağlam haritası
 
+- Kanonik bağlam: `D:\beyin2\Projeler\MatchStudio\docs-ai\context\`. Depodaki `context/` yalnız aynadır; ikisi çelişirse kanonik geçerlidir ve kullanıcıya bildirilir.
 - Her görevde oku: `D:\beyin2\Projeler\MatchStudio\docs-ai\context\README.md`, `proje-ozeti.md`, `kurallar-ve-sinirlar.md`.
 - Göreve göre oku: `hedefler.md`, `kararlar.md`, `proje-hafizasi.md`, `kaynaklar/README.md`, `kaynaklar/kaynak-indeksi.md`.
 - Haritada bulunmayan bağlam dosyası güvenilir kabul edilmez. Çelişki varsa sessiz seçim yapma; kullanıcıya bildir.
+- Test sayısı, dal ve sürüm gibi tarihli durum bağlam dosyasından değil `git` ve komut çıktısından alınır.
 - Bağlam dosyası eklenir, taşınır, yeniden adlandırılır veya silinirse aynı işlemde `context/README.md` güncellenir. Kaynak işlemlerinde `kaynak-indeksi.md` güncellenir.
 - "Hafızayı güncelle", "bağlamı denetle", "kaynakları denetle" dendiğinde `proje-hafizasi` becerisini kullan.
 
@@ -34,9 +36,9 @@ Bu dosya her oturumda yüklenen ana talimattır. Ayrıntı `.claude/rules/`, `.c
 
 ## 5. Yetki ve güvenlik
 
-- Açık yetki olmadan yapılmayacaklar: `git push`, `main`'e birleştirme, Vercel veya Play yayını, dosya silme, mevcut içeriğin üzerine yazma, dışarıya mesaj, ödeme, ücretli model çağrısı.
-- Yasak komutlar: `git reset --hard`, `git clean`, `rm -rf`, `npm publish`, `vercel --prod`.
-- `.env`, `*.jks`, `*.keystore`, `*.p12`, `android/key.properties` ve gerçek sporcu verisi depoya, rapora veya loga girmez. Sır değerini yanıtta tekrar etme; adıyla an.
+- Açık yetki olmadan yapılmayacaklar: `git push`, `main`'e birleştirme, Vercel veya Play yayını, dosya silme, mevcut içeriğin üzerine yazma, dışarıya mesaj, ödeme, ücretli model çağrısı, `.mcp.json` veya MCP sunucusu ekleme/etkinleştirme.
+- Yasak komutlar: `git reset --hard`, `git clean`, `rm -rf`, `npm publish`, `vercel --prod`. Aynı zararı veren karşılıkları da yasaktır: `git restore .`, `git checkout .`, `git branch -D`, `git stash drop/clear`, PowerShell `Remove-Item -Recurse`, cmd `del /s` ve `rd /s`.
+- `.env`, `*.jks`, `*.keystore`, `*.p12`, `android/key.properties` ve gerçek sporcu verisi depoya, rapora veya loga girmez; Bash ile de okunmaz. Sır değerini yanıtta tekrar etme; adıyla an.
 - Ücretli model çağrısı yalnız `tools/ai_budget_router.py` dry-run veya ilgili beceri dosyası üzerinden yapılır; router atlanmaz.
 - Göreve `git status`, dal ve mevcut değişiklikleri kontrol ederek başla; kullanıcı çalışmasını koru.
 
@@ -54,8 +56,8 @@ Bu dosya her oturumda yüklenen ana talimattır. Ayrıntı `.claude/rules/`, `.c
 | Komut | Kapsam |
 |---|---|
 | `npm run build` | `src/` + `web/` → `web/app.bundle.js`, `web/sw.js` |
-| `npm test` | 26 Node test dosyası, IndexedDB, depolama, paket güvenliği |
-| `npm run test:browser` | 32 Playwright senaryosu; `public/` çıktısı üzerinden |
+| `npm test` | Node testleri: IndexedDB, depolama, paket güvenliği |
+| `npm run test:browser` | Playwright; `public/` çıktısı üzerinden |
 | `npm run check` | Derleme + Node + tarayıcı (tam paket) |
 | `npm run build:vercel` | Bütünlük doğrulanmış statik çıktı |
 | `npm run package` | `release-security-check` + PWA/kaynak ZIP |
@@ -63,6 +65,7 @@ Bu dosya her oturumda yüklenen ana talimattır. Ayrıntı `.claude/rules/`, `.c
 | `npm run check:play` | Play hazırlık raporu (hazırlık modunda 0 dönebilir) |
 | `npm run check:play:strict` | Uzak uçlar dahil, engelde başarısız |
 
+- Geçen test sayısını komut çıktısından raporla; bu dosyadan veya bağlam dosyasından alma.
 - Playwright projeleri: `desktop` 1440×1000, `phone` 360×780, `fold-open` 840×980; `workers:1`.
 - Yalnız `npm test` yeterli değildir; davranış değişikliğinde `npm run check` çalıştır.
 - Gerçek cihaz ve Play kabulü otomasyondan ayrıdır: `docs/guides/DEVICE_CHECKLIST.md`.

@@ -12,6 +12,15 @@ const RULES=[
   {re:/git\s+checkout\s+--\s+\.\s*$/i, why:'tum calisma agacini geri alma'},
   {re:/\bformat\s+[a-zA-Z]:/i, why:'disk bicimlendirme'},
   {re:/:\(\)\s*\{\s*:\|:&\s*\};:/, why:'fork bomb'},
+  {re:/git\s+restore\s+(?:--\S+\s+)*\.(?:\s|$)/i, why:'git restore . tum calisma agacini geri alir'},
+  {re:/git\s+checkout\s+\.(?:\s|$)/i, why:'git checkout . tum calisma agacini geri alir'},
+  {re:/git\s+branch\s+-D\b/, why:'git branch -D dali zorla siler'},
+  {re:/git\s+stash\s+(?:drop|clear)\b/i, why:'git stash drop/clear saklanan calismayi siler'},
+  {re:/git\s+(?:-[cC]\s+\S+\s+)+push\b/i, why:'git push ayri acik yetki ister'},
+  {re:/Remove-Item\b[^|;&\n]*-Recurse/i, why:'PowerShell ozyinelemeli silme yasak'},
+  {re:/\b(?:del|erase)\s+[^|;&\n]*\/s\b/i, why:'cmd del /s yasak'},
+  {re:/\b(?:rd|rmdir)\s+[^|;&\n]*\/s\b/i, why:'cmd rd /s yasak'},
+  {re:/(?:\bcat|\btype|\bGet-Content|\bgc|\bhead|\btail|\bmore)\s+[^|;&\n]*(?:\.env(?!\.example)(?:\.\w+)?(?=\s|$|["'])|key\.properties|\.(?:jks|keystore|p12)\b)/i, why:'gizli dosya Bash ile okunamaz'},
 ];
 
 function deny(reason){

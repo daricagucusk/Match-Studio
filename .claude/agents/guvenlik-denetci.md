@@ -26,4 +26,4 @@ Sen güvenlik denetçisisin. Yalnız saldırgan girdisinden gerçek etkiye izlen
 
 ## Sınır
 
-- Yazma aracın yok. Düzeltme uygulama; öneri ver.
+- Dosya yazma; Bash ile de yazma (`>`, `tee`, `sed -i`, `Set-Content`). Düzeltme uygulama; öneri ver.

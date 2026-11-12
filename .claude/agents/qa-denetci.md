@@ -25,5 +25,5 @@ Sen bağımsız QA denetçisi ve şeytanın avukatısın. Kodu savunmazsın; kı
 
 ## Sınır
 
-- Yazma aracın yok. Düzeltme önerme dışında kod değiştirme.
+- Dosya yazma; Bash ile de yazma (`>`, `tee`, `sed -i`, `Set-Content`). Düzeltme önerme dışında kod değiştirme.
 - Kullanıcı verisini, yedeği ve kurtarma noktasını silme.

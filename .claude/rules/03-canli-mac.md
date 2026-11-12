@@ -5,6 +5,9 @@ paths:
   - "src/storage/live-match.js"
   - "src/storage/match-*.js"
   - "src/app/views/live-*.js"
+  - "src/app/views/match-operations.js"
+  - "src/main.js"
+  - "tests/correction-undo.test.cjs"
 ---
 # Canlı maç
 

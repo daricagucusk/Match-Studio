@@ -31,6 +31,22 @@ test('refuses tracked credentials, signing keys and private agent settings', () 
     assert.equal(forbiddenTrackedPath(value), true, value);
   }
   assert.equal(forbiddenTrackedPath('web/manifest.webmanifest'), false);
+  assert.equal(forbiddenTrackedPath('.claude/settings.json'), false);
+});
+
+test('detects synthetic Anthropic, Google, AWS and Supabase credentials without returning values', () => {
+  const samples = {
+    'anthropic-token': ['sk-ant-', 'b'.repeat(40)].join(''),
+    'google-api-key': ['AIza', 'c'.repeat(35)].join(''),
+    'aws-access-key': ['AKIA', 'D'.repeat(16)].join(''),
+    'supabase-access-token': ['sbp_', 'e'.repeat(40)].join('')
+  };
+  for (const [kind, value] of Object.entries(samples)) {
+    const findings = scanText('const k = "' + value + '";', 'src/x.js');
+    assert.equal(findings.length, 1, kind);
+    assert.equal(findings[0].kind, kind);
+    assert.equal(JSON.stringify(findings).includes(value), false, kind);
+  }
 });
 
 test('scans tracked files in a disposable repository, not ignored secrets', () => {

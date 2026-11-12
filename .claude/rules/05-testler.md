@@ -12,4 +12,4 @@ paths:
 - Yeni görseller `test-results/reviews/` altına yazılır; `evidence/` üzerine yazılmaz.
 - Testi geçirmek için üretim kodunu gevşetme; kapsamı daraltma, test silme.
 - Davranış değişikliğinde önce kırılan testi yaz, kırmızıyı gör, sonra düzelt.
-- Tarihli test sayıları kanıttır; güncel durum için komutu yeniden çalıştır.
+- Test sayısı komut çıktısından alınır; tarihli sayı güncel durum sayılmaz, komutu yeniden çalıştır.
